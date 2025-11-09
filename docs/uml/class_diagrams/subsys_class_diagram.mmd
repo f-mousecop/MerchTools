@@ -1,0 +1,180 @@
+---
+config:
+  theme: default
+  look: neo
+  layout: elk
+  elk:
+    nodePlacementStrategy: NETWORK_SIMPLEX
+  class:
+    hideEmptyMembersBox: true
+---
+classDiagram
+direction LR
+    class ScanSearchService:::service {
+	    +scanBarcode() : Flow~String~
+	    +searchSku(query:String) : List~Sku~
+    }
+    class AuditCaptureService:::service {
+	    +startAudit(storeId:Long, sectionId:Long) : Audit
+	    +addItem(auditId:Long, skuId:Long, qty:Int, note:String?) : AuditItem
+	    +attachPhoto(auditItemId:Long, uri:String) : Photo
+	    +validate(item:AuditItem) : Boolean
+    }
+    class ReportGenerator:::service {
+	    +generatePdf(auditId:Long) : Uri
+	    +generateCsv(auditId:Long) : Uri
+    }
+    class ShareService:::service {
+	    +share(uri:Uri, mime:String) : Unit
+    }
+    class HistoryService:::service {
+	    +listAudits() : List~Audit~
+	    +getAudit(auditId:Long) : Audit
+    }
+    class CameraAdapter:::platform {
+	    +open() : Unit
+    }
+    class MLKitAdapter:::platform {
+	    +decode(frame:Image) : String
+    }
+    class FileStorage:::platform {
+	    +write(bytes) : Uri
+	    +read(uri:Uri) : ByteArray
+    }
+    class PdfAdapter:::platform {
+	    +compose(audit:Audit) : Uri
+    }
+    class CsvAdapter:::platform {
+	    +compose(audit:Audit) : Uri
+    }
+    class TimeProvider:::platform {
+	    +now() : Instant
+    }
+    class PermissionGateway:::platform {
+	    +ensure(...) : Boolean
+    }
+    class AuditRepository:::repository {
+	    +create(storeId, sectionId, startedAt) : Audit
+	    +addItem(auditId, skuId, qty, note) : AuditItem
+	    +attachPhoto(itemId, uri) : Photo
+	    +getAuditWithItems(auditId) : Audit
+	    +getHistory() : List~Audit~
+    }
+    class SkuRepository:::repository {
+	    +findByBarcode(code:String) : Sku?
+	    +search(text:String) : List~Sku~
+    }
+    class MediaRepository:::repository {
+	    +savePhoto(bytes:ByteArray) : Uri
+    }
+    class AuditDao:::dao {
+	    +insertAudit(a:Audit) : Long
+	    +insertItem(i:AuditItem) : Long
+	    +insertPhoto(p:Photo) : Long
+	    +getAuditWithItems(id:Long) : AuditWithItems
+	    +getAllAudits() : List~Audit~
+    }
+    class SkuDao:::dao {
+	    +getByBarcode(code:String) : Sku?
+	    +search(text:String) : List~Sku~
+    }
+    class StoreDao:::dao {
+    }
+    class SectionDao:::dao {
+    }
+    class Store:::reg {
+	    +id: Long
+	    +name: String
+    }
+    class Section:::reg {
+	    +id: Long
+	    +storeId: Long
+	    +name: String
+    }
+    class Audit:::reg {
+	    +id: Long
+	    +storeId: Long
+	    +sectionId: Long
+	    +startedAt: Instant
+	    +completedAt: Instant?
+    }
+    class AuditItem:::reg {
+	    +id: Long
+	    +auditId: Long
+	    +skuId: Long
+	    +qty: Int
+	    +note: String?
+    }
+    class Photo:::reg {
+	    +id: Long
+	    +auditItemId: Long
+	    +uri: String
+	    +createdAt: Instant
+    }
+    class Sku:::reg {
+	    +id: Long
+	    +barcode: String
+	    +name: String
+	    +uom: String
+    }
+
+	<<service>> ScanSearchService
+	<<service>> AuditCaptureService
+	<<service>> ReportGenerator
+	<<service>> ShareService
+	<<service>> HistoryService
+	<<platform>> CameraAdapter
+	<<platform>> MLKitAdapter
+	<<platform>> FileStorage
+	<<platform>> PdfAdapter
+	<<platform>> CsvAdapter
+	<<platform>> TimeProvider
+	<<platform>> PermissionGateway
+	<<interface>> AuditRepository
+	<<interface>> SkuRepository
+	<<interface>> MediaRepository
+	<<dao>> AuditDao
+	<<dao>> SkuDao
+	<<dao>> StoreDao
+	<<dao>> SectionDao
+
+    Store "1" o-- "many" Section
+    Store "1" o-- "many" Audit : via storeId
+    Section "1" o-- "many" Audit : via sectionId
+    Audit "1" o-- "many" AuditItem
+    AuditItem "1" o-- "0..*" Photo
+    Sku "1" <-- "many" AuditItem : via skuId
+    AuditRepository --> AuditDao
+    SkuRepository --> SkuDao
+    MediaRepository --> FileStorage
+    ScanSearchService --> SkuRepository
+    ScanSearchService --> CameraAdapter
+    ScanSearchService --> MLKitAdapter
+    ScanSearchService --> PermissionGateway
+    AuditCaptureService --> AuditRepository
+    AuditCaptureService --> MediaRepository
+    AuditCaptureService --> TimeProvider
+    AuditCaptureService --> PermissionGateway
+    ReportGenerator --> AuditRepository
+    ReportGenerator --> PdfAdapter
+    ReportGenerator --> CsvAdapter
+    ReportGenerator --> FileStorage
+    ReportGenerator --> TimeProvider
+    ShareService --> FileStorage
+    HistoryService --> AuditRepository
+
+    %% Style for <<service>>
+    classDef service fill:#7A7265,stroke:#333,stroke-width:4px;
+
+    %% Style for <<platform>>
+    classDef platform fill:#C0B7B1,stroke:#333,stroke-width:4px;
+
+    %% Style for <<interface>>
+    classDef repository fill:#8E6E53,stroke:#333,stroke-width:4px;
+
+    %% Style for <<dao>>
+    classDef dao fill:#C69C72,stroke:#333,stroke-width:4px;
+
+    %% Style for regular class
+    classDef reg fill:#433E3F,stroke:#C0B7B1, color:#F5F5DC,stroke-width:4px;
+  
