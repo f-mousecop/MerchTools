@@ -1,0 +1,23 @@
+---
+config:
+    theme: default
+    look: neo
+---
+
+sequenceDiagram
+    title UC-05 Report Generator
+    actor User
+    participant UI as ReportScreen (UI)
+    participant VM as ReportViewModel
+    participant Repo as AuditRepository
+    participant Pdf as ReportGenerator
+    participant Nav as AppNav
+
+    User ->> UI: tap Generate Report
+    UI ->> VM: generate PDF
+    VM ->> Repo: getAuditWithItems(auditId)
+    Repo ->> VM: Audit + Items + Photos
+    VM ->> Pdf: generatePdf(auditId)
+    VM ->> UI: success (toast)
+    VM ->> Nav: navigateToReportScreen()
+    VM ->> UI: displayReport()

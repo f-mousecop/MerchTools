@@ -1,0 +1,42 @@
+---
+config:
+    theme: default
+    look: neo
+---
+
+sequenceDiagram
+    title UC-02 Search SKU
+    actor User
+    participant UI as SearchScreen (UI)
+    participant VM as SearchViewModel
+    participant Repo as SkuRepository
+    participant Nav as AppNav
+
+    User ->> UI: Tap "Search"
+    UI ->> VM: navigateSearchCommand()
+    VM ->> Nav: navigateToSearchScreen()
+
+    User ->> UI: Query search in text box
+    UI ->> VM: onQueryChanged(query)
+    VM ->> Repo: search(query) // name, brand, UPC, SKU
+    Repo ->> VM: results: List<Sku>
+    VM ->> UI: returnResults(results)
+
+    User ->> UI: tap a search result (skuId)
+    UI ->> VM: onSkuSelected(skuId)
+    VM ->> Nav: navigateToAuditCapture(skuId)
+    Nav ->> UI: navigate to Audit Capture Screen
+
+    alt No results
+        VM ->> UI: showEmptyState(skuId)
+        UI ->> VM: suggestAddSku()
+        alt User taps Add SKU
+            User ->> UI: tap Add SKU
+            UI ->> VM: navigateAddSkuCommand()
+            VM ->> Nav: navigateToAddSku()
+        else User denies
+            VM ->> UI: showEmptyState(skuId)
+        end
+    end
+
+    note over VM,Repo: Errors -> showError("Search Unavailable") -> allow retry    

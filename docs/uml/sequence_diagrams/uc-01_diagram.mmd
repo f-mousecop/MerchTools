@@ -1,0 +1,43 @@
+---
+config:
+    theme: default
+    look: neo
+---
+
+sequenceDiagram
+    title UC-01 Scan SKU
+    actor User
+    participant UI as ScanScreen (UI)
+    participant VM as ScanViewModel
+    participant Perm as PermissionManager
+    participant Cam as BarcodeScanner (Camera)
+    participant Repo as SkuRepository
+    participant Nav as AppNav
+
+    User ->> UI: Tap "Scan"
+    UI ->> VM: startScan()
+
+    VM ->> Perm: hasCameraPermission()
+    alt Permission granted
+        VM ->> Cam: openAndStartBarcodeScanner()
+        Cam ->> VM: onBarcodeDecoded()
+        VM ->> Repo: getByUpc(upc)
+        Repo ->> VM: matches: List<Sku>
+        alt Matches
+            VM ->> Nav: navigateToAuditCapture(skuId)
+        else No match
+            VM ->> UI: noMatchErr(upc)
+            UI ->> VM: openSearchSku()
+        end
+        VM ->> Cam: stopScan()
+    else Permission denied
+        VM ->> UI: showPermissionErr()
+        User ->> UI: Accept permission request
+        alt Granted on retry
+            VM ->> Cam: openAndStartBarcodeScanner()
+        else Denied
+            VM ->> Nav: manualSearchFallback()
+        end
+    end
+
+    note over VM,Repo: Errors (decode/IO) -> showRetry() or fallback to Search

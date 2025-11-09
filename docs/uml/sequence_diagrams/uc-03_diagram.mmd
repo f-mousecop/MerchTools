@@ -1,0 +1,43 @@
+---
+config:
+    theme: default
+    look: neo
+---
+
+sequenceDiagram
+    title UC-03 Add SKU
+    actor User
+    participant UI as AddSkuScreen (UI)
+    participant VM as AddViewModel
+    participant Perm as PermissionManager
+    participant Cam as BarcodeScanner (Camera)
+    participant Repo as SkuRepository
+    participant Nav as AppNav
+
+    User ->> UI: tap Add SKU
+    UI ->> VM: addSkuCommand()
+    VM ->> Nav: navigateToAddSkuScreen()
+
+    User ->> UI: enter provided SKU fields
+    alt User taps Scan
+        User ->> UI: tap Scan
+        UI ->> VM: startScan()
+
+        VM ->> Perm: hasCameraPermission()
+        alt Permission granted
+            VM ->> Cam: openAndStartBarcodeScanner()
+            Cam ->> VM: onBarcodeDecoded()
+            VM ->> UI: populateWithResults()
+        else Permission denied
+            VM ->> UI: showPermissionErr()
+            User ->> UI: Accept permission request
+        alt Granted on retry
+            VM ->> Cam: openAndStartBarcodeScanner()
+        else Denied
+            VM ->> UI: return to AddSkuScreen
+        end
+        end
+    end
+    UI ->> VM: onFieldsChanged(input)
+    VM ->> Repo: addSku(input)
+    VM ->> UI: displayStatus() // Add success/failed

@@ -1,0 +1,43 @@
+---
+config:
+    theme: default
+    look: neo
+---
+
+sequenceDiagram
+    title UC-04 Audit Capture
+    actor User
+    participant UI as AuditCaptureScreen (UI)
+    participant VM as AuditViewModel
+    participant Perm as PermissionManager
+    participant Repo as AuditRepository
+
+    User ->> UI: tap Capture Audit or nav from Search/Scan
+    UI ->> VM: startAuditCommand()
+    VM ->> Repo: startAudit(storeId, sectionId?)
+    Repo ->> VM: Audit
+
+    User ->> UI: enter count, note
+    UI ->> VM: onFieldsChanged(count, note?)
+    VM ->> Repo: addItem(auditId, skuId, qty, note?)
+
+    User ->> UI: attach photo (optional)
+    alt Select from gallery
+        VM ->> Perm: hasStoragePermission()
+        alt Permission granted
+            User ->> UI: selects photo
+            UI ->> VM: upload photo           
+        else Denied
+            VM ->> UI: showPermissionErr(), retry
+        end
+    else Take photo
+        VM ->> Perm: hasCameraPermission()
+        alt Permission granted
+            VM ->> CameraService: capturePhoto()
+            CameraService ->> VM: Photo(uri)
+        else Denied
+            VM ->> UI: showPermissionErr(), retry
+        end
+    end
+    VM ->> Repo: attachPhoto(itemId, uri)
+    VM ->> UI: item saved (toast)

@@ -1,0 +1,20 @@
+---
+config:
+    theme: default
+    look: neo
+---
+
+sequenceDiagram
+    title UC-06 Share Report
+    actor User
+    participant UI as ReportScreen (UI)
+    participant VM as ReportViewModel
+    participant Share as ShareService
+    participant Nav as AppNav
+
+    User ->> UI: tap Share
+    UI ->> VM: shareCommand()
+    VM ->> Share: Intent.ACTION_SEND_MULTIPLE(uris)
+    Share ->> VM: return methods
+    VM ->> UI: choose target app (e.g., email, text)
+    VM ->> Nav: navigateToHome()
