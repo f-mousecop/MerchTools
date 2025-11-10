@@ -1,0 +1,58 @@
+// Check if audit already exists
+AuditRepository.openOrCreate(storeId: Id, sectionId?: Id): 
+
+if exists audit where completedAt is null and 
+    storeId==storeId and sectionId==sectionId
+    return audit
+else:
+    return insert Audit { storeId, sectionId, startedAt=now(), createdBy=String}
+
+
+// Validate count and add audit item
+AuditRepository.addAuditItem(auditId, skuId, count, note?):
+
+    validate count >= 0
+    SET item = AuditItem { auditId, skuId, count, note? }
+    insert item
+    return item
+
+// Attach photo
+AuditRepository.attachPhoto(auditId, uri):
+
+    if not fileExists(uri): throw FileMissing
+    insert Photo { auditItemId, uri, createdAt=now() }
+
+// Scan SKU
+SkuRepository.getByUpc(upc):
+
+    return query Sku where upc == upc limit 1
+
+// Search SKU
+SkuRepository.search(query):
+
+    return query Sku where name LIKE query or brand LIKE query
+        order by name
+
+// Add SKU
+SkuRepository.add(sku):
+
+    SET sku = Sku { skuId, upc, casePack?, brand }
+    insert sku
+    return sku
+    
+// Report generator
+ReportGenerator.generatePdf(auditId):
+
+    compose cover: store, section, timestamp
+    for each AuditItem:
+        render line: SKU (brand/name/size), count, note
+        render line: upc
+        if photos exist: append after upc
+    write to file /reports/{auditId}-{timestamp}.generatePdf
+    return uri
+
+// Sharing
+intent = ACTION_SEND_MULTIPLE
+intent.putParcelableArrayListExtra(EXTRA_STREAM, [pdfUri])
+intent.setType("application/pdf")
+startActivity(chooser(intent))

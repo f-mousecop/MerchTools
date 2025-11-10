@@ -1,0 +1,29 @@
+// Key interfaces that use cases rely on
+interface BarcodeScanner {
+    function scan() return Result<String> // returns UPC details
+}
+
+interface SkuRepository {
+    function getByUpc(upc: String) 
+        return Sku? // returns SKU
+    function search(text: String) 
+        return List<Sku> // returns list of SKUs that match
+    function add(sku: Sku) 
+        return Sku // adds SKU to catalog
+}
+
+interface AuditRepository {
+    function openOrCreate(storeId: Id, sectionId?: Id) 
+        return Audit // opens current audit or starts new
+    function addAuditItem(auditId: Id, skuId: Id, count: Int, note: String?) 
+        return AuditItem
+    function attachPhoto(auditItemId: Id, fileUri: String) 
+        return Photo
+    function getHistory() 
+        return List<Audit> // returns list of audits
+}
+
+interface ReportGenerator {
+    function generatePdf(auditId: Id) 
+        return ReportFile // {uri, bytes?, path}
+}

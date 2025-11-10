@@ -1,0 +1,57 @@
+---
+config:
+  theme: default
+  look: neo
+  layout: elk
+  elk:
+    nodePlacementStrategy: NETWORK_SIMPLEX
+  class:
+    hideEmptyMembersBox: true
+---
+
+classDiagram
+direction LR
+    class Store {
+        +id: Long
+        +name: String
+        +address: String?
+    }
+    class Section {
+        +id: Long
+        +storeId: Long
+        +name: String
+    }
+    class Audit {
+        +id: Long
+        +storeId: Long
+        +sectionId: Long?
+        +startedAt: Instant
+        +completedAt: Instant
+        +createdBy: String?
+    }
+    class AuditItem {
+        +id: Long
+        +auditId: Long
+        +skuId: Long
+        +count: Int
+        +note: String?
+    }
+    class Photo {
+        +id: Long
+        +auditItemId: Long
+        +uri: String
+        +createdAt: Instant
+    }
+    class Sku {
+        +id: Long
+        +upc: String
+        +casePack: String?
+        +brand: String
+    }
+
+    Store "1" --> "*" Audit
+    Store "1" --> "*" Section
+    Store "1" --> "*" Sku
+    Audit "1" --> "*" AuditItem
+    AuditItem "1" --> "1" Sku
+    AuditItem "0" --> "*" Photo

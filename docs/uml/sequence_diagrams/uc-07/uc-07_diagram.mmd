@@ -1,0 +1,28 @@
+---
+config:
+    theme: default
+    look: neo
+---
+
+sequenceDiagram
+    title UC-07 View History
+    actor User
+    participant UI as HistoryScreen (UI)
+    participant VM as HistoryViewModel
+    participant Repo as AuditRepository
+    participant Nav as AppNav
+
+    User ->> UI: user opens History
+    UI ->> VM: open History
+    VM ->> Repo: getHistory()
+    alt No audits found
+        Repo ->> VM: List is empty
+        VM ->> UI: show "No reports yet"
+    else Audits found
+        Repo ->> VM: List<Audit>
+    end
+    VM ->> UI: display past audits (newest first)
+
+    User ->> UI: selects Audit from History
+    UI ->> VM: selects Audit
+    VM ->> Nav: navigateToReportScreen()
