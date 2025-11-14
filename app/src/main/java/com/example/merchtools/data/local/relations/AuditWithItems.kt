@@ -1,10 +1,11 @@
-package com.example.merchtools.data.relations
+package com.example.merchtools.data.local.relations
 
 import androidx.room.Embedded
 import androidx.room.Relation
-import com.example.merchtools.data.entity.AuditEntity
-import com.example.merchtools.data.entity.AuditItemEntity
-import com.example.merchtools.data.entity.SkuEntity
+import com.example.merchtools.data.local.entity.AuditEntity
+import com.example.merchtools.data.local.entity.AuditItemEntity
+import com.example.merchtools.data.local.entity.PhotoEntity
+import com.example.merchtools.data.local.entity.SkuEntity
 
 /**
  * Data class to hold audit item and relevant fields.
@@ -25,7 +26,7 @@ data class AuditItemWithSkuAndPhoto(
         parentColumn = "auditItemId",
         entityColumn = "auditItemId"
     )
-    val photos: List<com.example.merchtools.data.entity.PhotoEntity>
+    val photos: List<PhotoEntity>
 )
 
 /**

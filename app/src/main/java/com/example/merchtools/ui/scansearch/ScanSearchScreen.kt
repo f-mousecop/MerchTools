@@ -1,9 +1,8 @@
-package com.example.merchtools.ui.home
+package com.example.merchtools.ui.scansearch
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
@@ -23,16 +22,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.merchtools.ui.MerchToolsDestinations
+import com.example.merchtools.ui.MerchToolsDestinations.SCAN_ROUTE
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(
-    navigateToItemUpdate: () -> Unit,
+fun ScanSearchScreen(
     navController: NavController,
     modifier: Modifier = Modifier,
     navigateToItemEntry: () -> Unit,
+    navigateToItemUpdate: (Int) -> Unit
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -48,29 +48,10 @@ fun HomeScreen(
                             .calculateEndPadding(LocalLayoutDirection.current)
                     )
             ) {
-                Icon(Icons.Filled.Add, contentDescription = "Add"
-                )
+                Icon(Icons.Filled.Add, contentDescription = "Add")
             }
-        },
+        }
     ) { paddingValues ->
-        HomeBody(
-            onItemClick = navigateToItemUpdate,
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = paddingValues,
-        )
-    }
-}
-
-@Composable
-private fun HomeBody(
-    onItemClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(0.dp),
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier,
-    ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -78,14 +59,16 @@ private fun HomeBody(
         ) {
             Column(modifier = Modifier.align(Alignment.Center)) {
                 Greeting(
-                    name = "Android",
-                    modifier = Modifier.padding(contentPadding)
+                    name = "Search and Scan",
+                    modifier = Modifier.padding(paddingValues)
                 )
             }
 
         }
     }
 }
+
+
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
     Text(

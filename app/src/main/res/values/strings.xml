@@ -1,3 +1,17 @@
 <resources>
     <string name="app_name">Merch Tools</string>
+    <string name="back_button">Back</string>
+    <string name="delete">Delete</string>
+    <string name="delete_question">Are you sure you want to delete?</string>
+    <string name="store_name">Store Name</string>
+    <string name="store_address">Store Address</string>
+    <string name="store_section_name">Store Section Name</string>
+    <string name="sku">SKU</string>
+    <string name="upc">UPC</string>
+    <string name="item_name">Item Name</string>
+    <string name="case_pack">Case Pack</string>
+    <string name="brand">Brand</string>
+    <string name="invalid_count">Invalid Count, must be >= 0</string>
+    <string name="invalid">Case Pack</string>
+
 </resources>

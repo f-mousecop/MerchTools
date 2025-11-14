@@ -1,10 +1,9 @@
-package com.example.merchtools.data.relations
+package com.example.merchtools.data.local.relations
 
 import androidx.room.Embedded
 import androidx.room.Relation
-import com.example.merchtools.data.entity.AuditItemEntity
-import com.example.merchtools.data.entity.SectionEntity
-import com.example.merchtools.data.entity.StoreEntity
+import com.example.merchtools.data.local.entity.SectionEntity
+import com.example.merchtools.data.local.entity.StoreEntity
 
 /**
  * This class captures the relationship between an [StoreEntity] and a list of 0 or more attached [SectionEntity]'s

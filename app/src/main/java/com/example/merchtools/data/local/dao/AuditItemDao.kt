@@ -1,4 +1,4 @@
-package com.example.merchtools.data.dao
+package com.example.merchtools.data.local.dao
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -7,8 +7,8 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import com.example.merchtools.data.entity.AuditItemEntity
-import com.example.merchtools.data.relations.AuditItemWithPhotos
+import com.example.merchtools.data.local.entity.AuditItemEntity
+import com.example.merchtools.data.local.relations.AuditItemWithPhotos
 import kotlinx.coroutines.flow.Flow
 
 @Dao

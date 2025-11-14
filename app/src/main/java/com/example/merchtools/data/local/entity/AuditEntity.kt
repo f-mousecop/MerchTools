@@ -1,4 +1,4 @@
-package com.example.merchtools.data.entity
+package com.example.merchtools.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
