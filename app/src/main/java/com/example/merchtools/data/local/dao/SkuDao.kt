@@ -25,4 +25,11 @@ interface SkuDao {
 
     @Query("SELECT * FROM skus ORDER BY brand, name")
     fun getAllSkus(): Flow<List<SkuEntity>>
+
+    @Query("""
+        SELECT * FROM skus
+        WHERE name LIKE '%' || :query || '%'
+        ORDER BY brand, name
+    """)
+    fun searchSkus(query: String): Flow<List<SkuEntity>>
 }

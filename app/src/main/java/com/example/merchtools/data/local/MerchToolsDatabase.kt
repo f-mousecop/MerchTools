@@ -36,14 +36,22 @@ import com.example.merchtools.data.util.InstantConverter
 )
 @TypeConverters(InstantConverter::class)
 abstract class MerchToolsDatabase : RoomDatabase() {
-    abstract fun storeDao(): StoreDao
+    abstract val storeDao: StoreDao
+    abstract val sectionDao: SectionDao
+    abstract val skuDao: SkuDao
+    abstract val auditDao: AuditDao
+    abstract val auditItemDao: AuditItemDao
+    abstract val photoDao: PhotoDao
+
+
+    /*abstract fun storeDao(): StoreDao
     abstract fun sectionDao(): SectionDao
     abstract fun skuDao(): SkuDao
     abstract fun auditDao(): AuditDao
     abstract fun auditItemDao(): AuditItemDao
-    abstract fun photoDao(): PhotoDao
+    abstract fun photoDao(): PhotoDao*/
 
-    companion object {
+    /*companion object {
         @Volatile
         private var Instance: MerchToolsDatabase? = null
 
@@ -55,15 +63,15 @@ abstract class MerchToolsDatabase : RoomDatabase() {
                     MerchToolsDatabase::class.java,
                     "merch_tools_database"
                 )
-                    /**
+                    *//**
                      * Setting this option in your app's database builder means that Room
                      * permanently deletes all data from the tables in your database when it
                      * attempts to perform a migration with no defined migration path.
-                     */
+                     *//*
                     .fallbackToDestructiveMigration(false)
                     .build()
                     .also { Instance = it }
             }
         }
-    }
+    }*/
 }
