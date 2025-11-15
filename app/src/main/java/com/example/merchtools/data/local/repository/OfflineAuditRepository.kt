@@ -1,16 +1,18 @@
-package com.example.merchtools.data.local
+package com.example.merchtools.data.local.repository
 
 import com.example.merchtools.data.local.dao.AuditDao
-import com.example.merchtools.data.local.relations.AuditWithItems
-import com.example.merchtools.data.local.repository.AuditRepository
+import com.example.merchtools.domain.repository.AuditRepository
 import com.example.merchtools.data.mappers.toAudit
 import com.example.merchtools.data.mappers.toAuditEntity
 import com.example.merchtools.data.mappers.toDomain
 import com.example.merchtools.domain.model.Audit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class OfflineAuditRepository(val auditDao: AuditDao) : AuditRepository {
+@Singleton
+class OfflineAuditRepository @Inject constructor(val auditDao: AuditDao) : AuditRepository {
     override fun getAllAuditsStream(auditId: Long): Flow<List<Audit>> {
         return auditDao.getAllAudits(auditId).map { entityList ->
             entityList.map { it.toDomain() }

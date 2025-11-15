@@ -1,4 +1,4 @@
-package com.example.merchtools.data.local.repository
+package com.example.merchtools.domain.repository
 
 import com.example.merchtools.domain.model.AuditItem
 import com.example.merchtools.domain.model.Photo

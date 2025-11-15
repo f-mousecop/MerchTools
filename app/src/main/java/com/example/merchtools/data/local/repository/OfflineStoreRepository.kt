@@ -1,15 +1,22 @@
-package com.example.merchtools.data.local
+package com.example.merchtools.data.local.repository
 
 import com.example.merchtools.data.local.dao.StoreDao
-import com.example.merchtools.data.local.repository.StoreRepository
+import com.example.merchtools.domain.repository.StoreRepository
 import com.example.merchtools.data.mappers.toDomain
 import com.example.merchtools.data.mappers.toStore
 import com.example.merchtools.data.mappers.toStoreEntity
 import com.example.merchtools.domain.model.Store
+import com.example.merchtools.domain.model.Section
+import com.example.merchtools.data.local.relations.StoreWithSections
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class OfflineStoreRepository(val storeDao: StoreDao) : StoreRepository {
+@Singleton
+class OfflineStoreRepository @Inject constructor(
+    val storeDao: StoreDao
+) : StoreRepository {
     override fun getAllStoresStream(): Flow<List<Store>> {
         return storeDao.getAllStores().map { entityList ->
             // For each list emitted by the flow, map every entity in that list to a domain model.
@@ -38,6 +45,14 @@ class OfflineStoreRepository(val storeDao: StoreDao) : StoreRepository {
         storeDao.update(store.toStoreEntity())
     }
 
+    /**
+     * We need to grab [Store] and any assigned/recorded
+     * [Section] for that store
+     * @param storeId The ID of the store we want to get the data from
+     * @return A [Store] object with its [Section]s
+     * @see StoreDao.getStoreWithSections
+     * @see StoreWithSections
+     */
     override fun getStoreWithSections(storeId: Long): Store? {
         // Call the DAO to get the data-layer object
         val storeWithSections = storeDao.getStoreWithSections(storeId)

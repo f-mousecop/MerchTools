@@ -1,4 +1,4 @@
-package com.example.merchtools.data.local.repository
+package com.example.merchtools.domain.repository
 
 import com.example.merchtools.domain.model.Sku
 import com.example.merchtools.data.local.entity.SkuEntity
@@ -36,5 +36,8 @@ interface SkuRepository {
      */
     suspend fun update(sku: Sku)
 
-    fun searchSkus(query: String): Flow<List<Sku>>
+    fun searchSkus(
+        fetchFromRemote: Boolean,
+        query: String
+    ): Flow<List<Sku>>
 }

@@ -1,7 +1,7 @@
 package com.example.merchtools.di
 
-import com.example.merchtools.data.local.OfflineStoreRepository
-import com.example.merchtools.data.local.repository.StoreRepository
+import com.example.merchtools.data.local.repository.OfflineStoreRepository
+import com.example.merchtools.domain.repository.StoreRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

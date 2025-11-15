@@ -1,6 +1,8 @@
-package com.example.merchtools.data.local.repository
-
+package com.example.merchtools.domain.repository
+import com.example.merchtools.data.local.repository.OfflineStoreRepository
 import com.example.merchtools.domain.model.Store
+import com.example.merchtools.util.Resource
+import com.example.merchtools.data.local.relations.StoreWithSections
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -40,6 +42,8 @@ interface StoreRepository {
 
     /**
      * Retrieves the store with all associated sections, if applicable
+     * @see StoreWithSections
+     * @see OfflineStoreRepository.getStoreWithSections
      */
     fun getStoreWithSections(storeId: Long): Store?
 }

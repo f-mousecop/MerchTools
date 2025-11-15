@@ -5,7 +5,7 @@
 
 ---
 
-- Implement repositories
+- [x] Implement repositories
 - Implement Data modules
 - Configure dependency injection 
-- Map Room entities to domain layer
+- [x] Map Room entities to domain layer
