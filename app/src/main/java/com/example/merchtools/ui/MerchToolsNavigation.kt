@@ -1,3 +1,4 @@
+/*
 package com.example.merchtools.ui
 
 import androidx.navigation.NavController
@@ -12,9 +13,11 @@ import com.example.merchtools.ui.MerchToolsScreens.REPORT_SCREEN
 import com.example.merchtools.ui.MerchToolsScreens.SCAN_SCREEN
 import com.example.merchtools.ui.MerchToolsScreens.SEARCH_SCREEN
 
+*/
 /**
  * Screens used in Merch Tools
- */
+ *//*
+
 private object MerchToolsScreens {
     const val HOME_SCREEN = "home"
     const val SCAN_SCREEN = "scan"
@@ -25,9 +28,11 @@ private object MerchToolsScreens {
     const val HISTORY_SCREEN = "history"
 }
 
+*/
 /**
  * Destination args
- */
+ *//*
+
 object MerchToolsArgs {
     const val USER_MESSAGE_ARG = "userMessage"
     const val AUDIT_ID_ARG = "auditId"
@@ -35,9 +40,11 @@ object MerchToolsArgs {
     const val AUDIT_ITEM_ID_ARG = "auditItemId"
 }
 
+*/
 /**
  * Destinations used in MerchTools navigation
- */
+ *//*
+
 object MerchToolsDestinations {
     const val HOME_ROUTE = HOME_SCREEN
     const val SCAN_ROUTE = SCAN_SCREEN
@@ -92,4 +99,4 @@ class MerchToolsNavigation(private val navController: NavController) {
             }
         )
     }
-}
+}*/

@@ -8,7 +8,9 @@ import com.example.merchtools.data.mappers.toStoreEntity
 import com.example.merchtools.domain.model.Store
 import com.example.merchtools.domain.model.Section
 import com.example.merchtools.data.local.relations.StoreWithSections
+import com.example.merchtools.util.Resource
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -17,17 +19,49 @@ import javax.inject.Singleton
 class OfflineStoreRepository @Inject constructor(
     val storeDao: StoreDao
 ) : StoreRepository {
-    override fun getAllStoresStream(): Flow<List<Store>> {
-        return storeDao.getAllStores().map { entityList ->
-            // For each list emitted by the flow, map every entity in that list to a domain model.
-            entityList.map { it.toStore() }
+    override fun getAllStoresStream(): Flow<Resource<List<Store>>> {
+        return flow {
+            emit(Resource.Loading(true))
+            try {
+                // Start listening to the DAOs flow
+                storeDao.getAllStores().map { entityList ->
+                    // For each list emitted by the DAO, map entities to domain model
+                    entityList.map { it.toStore() }
+                }.collect { storeList ->
+                    // Emit Success with the data for each new list
+                    emit(Resource.Success(storeList))
+                }
+            } catch (e: Exception) {
+                // Emit Error if an exception occurs
+                e.printStackTrace()
+                emit(Resource.Error("An error occurred: ${e.message}"))
+            } finally {
+                // Emit a final loading(false) state when the flow completes
+                // or is canceled
+                emit(Resource.Loading(false))
+            }
         }
     }
 
-    override fun getStoreStream(storeId: Long): Flow<Store?> {
-        return storeDao.getStore(storeId).map { entity ->
-            // If the entity is not null, map it. Otherwise keep it null
-            entity?.toStore()
+    override fun getStoreStream(storeId: Long): Flow<Resource<Store>> {
+        return flow {
+            emit(Resource.Loading(true))
+
+            try {
+                storeDao.getStore(storeId).map { entity ->
+                    // If the entity is not null, map it. Otherwise keep it null
+                    entity?.toStore()
+                }.collect { store ->
+                    emit(Resource.Success(store))
+                }
+            }
+            catch (e: Exception) {
+                e.printStackTrace()
+                emit(Resource.Error("An error occurred: ${e.message}"))
+            }
+            finally {
+                emit(Resource.Loading(false))
+            }
         }
     }
 
@@ -53,12 +87,23 @@ class OfflineStoreRepository @Inject constructor(
      * @see StoreDao.getStoreWithSections
      * @see StoreWithSections
      */
-    override fun getStoreWithSections(storeId: Long): Store? {
-        // Call the DAO to get the data-layer object
-        val storeWithSections = storeDao.getStoreWithSections(storeId)
+    override fun getStoreWithSections(storeId: Long): Resource<Store> {
+        return try {
+            // Show loading state before operation begins
+            // ViewModel handles this
 
-        // Convert the data-layer object to the domain object
-        // ?.let is a safe call that only executes the block if the result is not null
-        return storeWithSections?.toDomain()
+            // Perform the db operation
+            val storeWithSections = storeDao.getStoreWithSections(storeId)
+
+            // Map the result to the domain layer and wrap in Resource.Success
+            // If storeWithSections is null, toDomain() will also be null
+            val domainStore = storeWithSections?.toDomain()
+            Resource.Success(domainStore)
+        }
+        catch (e: Exception) {
+            // If an exception occurs, return Resource.Error
+            e.printStackTrace()
+            Resource.Error("An error occurred: ${e.message}")
+        }
     }
 }

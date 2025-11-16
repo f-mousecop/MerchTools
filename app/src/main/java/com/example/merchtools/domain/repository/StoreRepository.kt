@@ -14,13 +14,13 @@ interface StoreRepository {
      * Retrieve all Stores from the data source
      * @return List of Stores
      */
-    fun getAllStoresStream(): Flow<List<Store>>
+    fun getAllStoresStream(): Flow<Resource<List<Store>>>
 
     /**
      * Retrieve a store from the data source with the storeId
      * @see storeId
      * */
-    fun getStoreStream(storeId: Long): Flow<Store?>
+    fun getStoreStream(storeId: Long): Flow<Resource<Store>>
 
     /**
      * Insert a store into the data source
@@ -45,5 +45,5 @@ interface StoreRepository {
      * @see StoreWithSections
      * @see OfflineStoreRepository.getStoreWithSections
      */
-    fun getStoreWithSections(storeId: Long): Store?
+    fun getStoreWithSections(storeId: Long): Resource<Store>
 }

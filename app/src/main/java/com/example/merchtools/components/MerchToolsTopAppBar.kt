@@ -14,15 +14,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.merchtools.R
-import com.example.merchtools.ui.MerchToolsNavGraph
 
 /**
  * Top level composable representing screens for the application
  */
-@Composable
-fun MerchToolsApp(navController: NavHostController = rememberNavController()) {
-    MerchToolsNavGraph(navController = navController)
-}
 
 /**
  * App bar to display title and conditionally display the back navigation button

@@ -1,95 +1,85 @@
 package com.example.merchtools.ui.home
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SmallFloatingActionButton
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootGraph
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+
 
 @OptIn(ExperimentalMaterial3Api::class)
+@Destination<RootGraph>(start = true)
 @Composable
 fun HomeScreen(
-    navigateToItemUpdate: () -> Unit,
-    navController: NavController,
-    modifier: Modifier = Modifier,
-    navigateToItemEntry: () -> Unit,
+    navigator: DestinationsNavigator,
+    viewModel: HomeViewModel = hiltViewModel()
 ) {
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        topBar = {
-            TopAppBar(title = { Text("Home") })
-        },
-        floatingActionButton = {
-            SmallFloatingActionButton(
-                onClick = navigateToItemEntry,
-                modifier = Modifier
-                    .padding(
-                        end = WindowInsets.safeDrawing.asPaddingValues()
-                            .calculateEndPadding(LocalLayoutDirection.current)
-                    )
-            ) {
-                Icon(Icons.Filled.Add, contentDescription = "Add"
-                )
-            }
-        },
-    ) { paddingValues ->
-        HomeBody(
-            onItemClick = navigateToItemUpdate,
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = paddingValues,
-        )
-    }
-}
+    val swipeRefreshState = rememberPullToRefreshState()
+    val state = viewModel.state
 
-@Composable
-private fun HomeBody(
-    onItemClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(0.dp),
-) {
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier,
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.surfaceDim)
-        ) {
-            Column(modifier = Modifier.align(Alignment.Center)) {
-                Greeting(
-                    name = "Android",
-                    modifier = Modifier.padding(contentPadding)
+        OutlinedTextField(
+            value = state.searchQuery,
+            onValueChange = {
+                viewModel.onEvent(
+                    HomeEvent.OnSearchQueryChange(it)
                 )
+            },
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
+            placeholder = {
+                Text(text = "Search...")
+            },
+            maxLines = 1,
+            singleLine = true
+        )
+        PullToRefreshBox(
+            state = swipeRefreshState,
+            isRefreshing = viewModel.state.isRefreshing,
+            onRefresh = {
+                viewModel.onEvent(HomeEvent.Refresh)
             }
-
+        ) {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(state.stores.size) { i ->
+                    val store = state.stores[i]
+                    StoreItem(
+                        store = store,
+                        modifier = Modifier.fillMaxWidth()
+                            .clickable {
+                                viewModel.onButtonClicked()
+                            }
+                    )
+                    if(i < state.stores.size) {
+                        HorizontalDivider(modifier = Modifier
+                            .padding(horizontal = 8.dp)
+                            .height(12.dp)
+                        )
+                    }
+                }
+            }
         }
     }
-}
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
 }

@@ -60,7 +60,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.navigation.compose)
-    implementation("androidx.compose.material:material-icons-extended-android:1.7.0-beta01")
+    implementation(libs.androidx.compose.material.icons.extended.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -84,6 +84,12 @@ dependencies {
     implementation(libs.androidx.camera.view)
 
     // Hilt dependency injection
-    implementation("com.google.dagger:hilt-android:2.57.2")
-    ksp("com.google.dagger:hilt-android-compiler:2.57.2")
+    implementation("androidx.hilt:hilt-lifecycle-viewmodel-compose:1.3.0")
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.android.compiler)
+
+    // Navigation
+    implementation(libs.compose.destinations.core.v230)
+    ksp(libs.compose.destinations.ksp.v230)
+    implementation(libs.compose.destinations.bottom.sheet.v230)
 }

@@ -6,17 +6,15 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 
-/*@Module
+@Module
 @InstallIn(SingletonComponent::class)
 abstract class RepositoryModule {
 
-    @Singleton
     @Binds
-    abstract fun bindStoreRepository(repository: OfflineStoreRepository): StoreRepository
-
-}*/
-
-/** TODO
- *  Finish implementing data modules with the rest of the repositories **/
+    @Singleton
+    abstract fun bindStoreRepository(
+        offlineStoreRepository: OfflineStoreRepository
+    ): StoreRepository
+}
