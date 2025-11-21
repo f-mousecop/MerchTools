@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
+import com.ramcosta.composedestinations.generated.destinations.SearchScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 
@@ -67,10 +68,12 @@ fun HomeScreen(
                     val store = state.stores[i]
                     StoreItem(
                         store = store,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
                             .clickable {
-                                viewModel.onButtonClicked()
+                                navigator.navigate(SearchScreenDestination)
                             }
+                            .padding(16.dp)
                     )
                     if(i < state.stores.size) {
                         HorizontalDivider(modifier = Modifier

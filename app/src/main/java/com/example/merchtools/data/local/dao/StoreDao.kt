@@ -29,6 +29,15 @@ interface StoreDao {
     @Query("SELECT * from stores ORDER BY name ASC")
     fun getAllStores(): Flow<List<StoreEntity>>
 
+    @Query(
+        """
+            SELECT *
+            FROM stores
+            WHERE LOWER(name) LIKE '%' || LOWER(:query) || '%'
+        """
+    )
+    fun searchStores(query: String): Flow<List<StoreEntity>>
+
     /** We want to load a given [StoreEntity] with its [SectionEntity]'s
      * returning a list of Sections that belong to the Store. */
     @Transaction

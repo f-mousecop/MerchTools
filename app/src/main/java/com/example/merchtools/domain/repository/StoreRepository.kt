@@ -40,6 +40,8 @@ interface StoreRepository {
      */
     suspend fun updateStore(store: Store)
 
+    fun searchStoresStream(query: String): Flow<Resource<List<Store>>>
+
     /**
      * Retrieves the store with all associated sections, if applicable
      * @see StoreWithSections

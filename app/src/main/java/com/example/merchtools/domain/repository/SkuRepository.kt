@@ -2,6 +2,7 @@ package com.example.merchtools.domain.repository
 
 import com.example.merchtools.domain.model.Sku
 import com.example.merchtools.data.local.entity.SkuEntity
+import com.example.merchtools.util.Resource
 import kotlinx.coroutines.flow.Flow
 
 interface SkuRepository {
@@ -9,14 +10,14 @@ interface SkuRepository {
      * Retrieve all SKUs from the data source
      * @return List of SKUs
      */
-    fun getAllSkusStream(): Flow<List<Sku>>
+    fun getAllSkusStream(): Flow<Resource<List<Sku>>>
 
     /**
      * Retrieve a SKU from the data source with the skuId
      * @see [SkuEntity]
      * @return [Sku]
      */
-    fun getSkuStream(skuId: Long): Flow<Sku?>
+    fun getSkuStream(skuId: Long): Flow<Resource<Sku?>>
 
     /**
      * Insert a SKU into the data source
@@ -39,5 +40,5 @@ interface SkuRepository {
     fun searchSkus(
         fetchFromRemote: Boolean,
         query: String
-    ): Flow<List<Sku>>
+    ): Flow<Resource<List<Sku>>>
 }

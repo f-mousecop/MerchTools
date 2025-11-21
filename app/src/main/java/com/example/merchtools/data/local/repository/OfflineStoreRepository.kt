@@ -22,6 +22,19 @@ class OfflineStoreRepository @Inject constructor(
     override fun getAllStoresStream(): Flow<Resource<List<Store>>> {
         return flow {
             emit(Resource.Loading(true))
+
+            /*val storeListing = storeDao.searchStores(query)
+            emit(Resource.Success(
+                data = storeListing.map { it.toStore() }
+            ))
+
+            val isDbEmpty = storeListing.isEmpty() && query.isBlank()
+            val loadFromCache = !isDbEmpty
+            if (loadFromCache) {
+                emit(Resource.Loading(false))
+                return@flow
+            }*/
+
             try {
                 // Start listening to the DAOs flow
                 storeDao.getAllStores().map { entityList ->
@@ -31,6 +44,7 @@ class OfflineStoreRepository @Inject constructor(
                     // Emit Success with the data for each new list
                     emit(Resource.Success(storeList))
                 }
+
             } catch (e: Exception) {
                 // Emit Error if an exception occurs
                 e.printStackTrace()
@@ -77,6 +91,27 @@ class OfflineStoreRepository @Inject constructor(
 
     override suspend fun updateStore(store: Store) {
         storeDao.update(store.toStoreEntity())
+    }
+
+    override fun searchStoresStream(
+        query: String
+    ): Flow<Resource<List<Store>>> {
+        return flow {
+            emit(Resource.Loading(true))
+
+            try {
+                storeDao.searchStores(query).map { entityList ->
+                    entityList.map { it.toStore() }
+                }.collect { storeList ->
+                    emit(Resource.Success(storeList))
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                emit(Resource.Error("An error occurred: ${e.message}"))
+            } finally {
+                emit(Resource.Loading(false))
+            }
+        }
     }
 
     /**

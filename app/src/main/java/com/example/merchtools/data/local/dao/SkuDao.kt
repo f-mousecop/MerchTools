@@ -28,7 +28,8 @@ interface SkuDao {
 
     @Query("""
         SELECT * FROM skus
-        WHERE name LIKE '%' || :query || '%'
+        WHERE lower(name) LIKE '%' || LOWER(:query) || '%'
+        OR lower(brand) LIKE '%' || LOWER(:query) || '%'
         ORDER BY brand, name
     """)
     fun searchSkus(query: String): Flow<List<SkuEntity>>

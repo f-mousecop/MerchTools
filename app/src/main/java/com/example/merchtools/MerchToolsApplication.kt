@@ -8,9 +8,4 @@ import dagger.hilt.android.HiltAndroidApp
  * object's lifecycle and for dependency injection.
  * */
 @HiltAndroidApp
-class MerchToolsApplication : Application() {
-
-    override fun onCreate() {
-        super.onCreate()
-    }
-}
+class MerchToolsApplication : Application()
