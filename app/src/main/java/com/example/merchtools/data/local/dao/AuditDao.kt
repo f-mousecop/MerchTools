@@ -22,8 +22,9 @@ interface AuditDao {
     @Delete
     suspend fun delete(audit: AuditEntity)
 
+    @Transaction
     @Query("SELECT * FROM audits WHERE auditId = :id")
-    fun getAudit(id: Long): Flow<AuditEntity?>
+    fun getAudit(id: Long): Flow<AuditWithItems?>
 
     // in-progress audit
     @Transaction
@@ -31,8 +32,8 @@ interface AuditDao {
     suspend fun getCurrentAuditWithItems(): AuditWithItems? // fetch Audit with Audit Items and Photos
 
     @Transaction
-    @Query("SELECT * FROM audits WHERE auditId = :id") // fetch Audit with Audit Items and Photos
-    fun getAllAudits(id: Long): Flow<List<AuditWithItems>>
+    @Query("SELECT * FROM audits ORDER by startedAt DESC") // fetch Audit with Audit Items and Photos
+    fun getAllAudits(): Flow<List<AuditWithItems>>
 
     @Transaction
     @Query("SELECT * FROM audits ORDER BY startedAt DESC")

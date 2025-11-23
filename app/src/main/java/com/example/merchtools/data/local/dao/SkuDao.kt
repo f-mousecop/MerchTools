@@ -20,8 +20,8 @@ interface SkuDao {
     @Delete
     suspend fun delete(sku: SkuEntity)
 
-    @Query("SELECT * FROM skus WHERE skuId = :id")
-    fun getSku(id: Long): Flow<SkuEntity?>
+    @Query("SELECT * FROM skus WHERE upc = :upc LIMIT 1")
+    fun getSkuByUpc(upc: String): Flow<SkuEntity?>
 
     @Query("SELECT * FROM skus ORDER BY brand, name")
     fun getAllSkus(): Flow<List<SkuEntity>>

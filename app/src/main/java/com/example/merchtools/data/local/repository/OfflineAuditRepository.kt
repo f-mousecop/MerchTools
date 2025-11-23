@@ -1,28 +1,63 @@
 package com.example.merchtools.data.local.repository
 
 import com.example.merchtools.data.local.dao.AuditDao
+import com.example.merchtools.data.local.relations.AuditWithItems
 import com.example.merchtools.domain.repository.AuditRepository
 import com.example.merchtools.data.mappers.toAudit
 import com.example.merchtools.data.mappers.toAuditEntity
 import com.example.merchtools.data.mappers.toDomain
 import com.example.merchtools.domain.model.Audit
+import com.example.merchtools.util.Resource
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class OfflineAuditRepository @Inject constructor(val auditDao: AuditDao) : AuditRepository {
-    override fun getAllAuditsStream(auditId: Long): Flow<List<Audit>> {
-        return auditDao.getAllAudits(auditId).map { entityList ->
-            entityList.map { it.toDomain() }
+    override fun getAllAuditsStream(): Flow<Resource<List<Audit>>> {
+        return flow {
+            emit(Resource.Loading(true))
+
+            try {
+                auditDao.getAllAudits().map { entityList ->
+                    entityList.map { it.toDomain() }
+                }.collect { auditList ->
+                    emit(Resource.Success(auditList))
+                }
+            } catch (e: Exception) {
+                emit(Resource.Error(e.message.toString()))
+            } finally {
+                emit(Resource.Loading(false))
+            }
         }
     }
 
-    override fun getAuditStream(auditId: Long): Flow<Audit?> {
-        return auditDao.getAudit(auditId).map { entity ->
-            entity?.toAudit()
-        }
+    override fun getAuditStream(auditId: Long): Flow<Resource<Audit?>> {
+        return auditDao.getAudit(auditId)
+            .map<AuditWithItems?, Resource<Audit?>> { auditWithItems ->
+                Resource.Success(auditWithItems?.toDomain())
+            }
+            .catch { e ->
+                emit(Resource.Error(e.message.toString()))
+            }
+        /*return flow {
+            emit(Resource.Loading(true))
+
+            try {
+                auditDao.getAudit(auditId).map { entity ->
+                    entity?.toAudit()
+                }.collect { audit ->
+                    emit(Resource.Success(audit))
+                }
+            } catch (e: Exception) {
+                emit(Resource.Error(e.message.toString()))
+            } finally {
+                emit(Resource.Loading(false))
+            }
+        }*/
     }
 
     override suspend fun deleteAudit(audit: Audit) {
@@ -46,9 +81,23 @@ class OfflineAuditRepository @Inject constructor(val auditDao: AuditDao) : Audit
         return auditWithItems?.toDomain()
     }
 
-    override fun getAuditHistory(): Flow<List<Audit>> {
-        return auditDao.getAuditHistory().map { entityList ->
-            entityList.map { it.toAudit() }
+    override fun getAuditHistory(): Flow<Resource<List<Audit>>> {
+        return flow {
+            emit(Resource.Loading(true))
+
+            try {
+                auditDao.getAuditHistory().map { entityList ->
+                    entityList.map { it.toAudit() }
+                }.collect { auditList ->
+                    emit(Resource.Success(auditList))
+                }
+            } catch (e: Exception) {
+                emit(Resource.Error(e.message.toString()))
+            } finally {
+                emit(Resource.Loading(false))
+        }
+        /*return auditDao.getAuditHistory().map { entityList ->
+            entityList.map { it.toAudit() }*/
         }
     }
 }

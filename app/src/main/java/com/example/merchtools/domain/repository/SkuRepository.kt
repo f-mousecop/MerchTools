@@ -17,7 +17,7 @@ interface SkuRepository {
      * @see [SkuEntity]
      * @return [Sku]
      */
-    fun getSkuStream(skuId: Long): Flow<Resource<Sku?>>
+    fun getSkuStream(upc: String): Flow<Resource<Sku?>>
 
     /**
      * Insert a SKU into the data source

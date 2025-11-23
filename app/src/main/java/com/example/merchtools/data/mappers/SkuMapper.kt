@@ -5,6 +5,7 @@ import com.example.merchtools.domain.model.Sku
 
 fun SkuEntity.toSku(): Sku {
     return Sku(
+        skuId = skuId,
         upc = upc,
         name = name,
         casePack = casePack,
@@ -14,6 +15,7 @@ fun SkuEntity.toSku(): Sku {
 
 fun Sku.toSkuEntity(): SkuEntity {
     return SkuEntity(
+        skuId = skuId,
         upc = upc,
         name = name,
         casePack = casePack,

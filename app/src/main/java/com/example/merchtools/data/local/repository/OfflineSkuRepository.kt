@@ -33,12 +33,12 @@ class OfflineSkuRepository @Inject constructor(val skuDao: SkuDao) : SkuReposito
         }
     }
 
-    override fun getSkuStream(skuId: Long): Flow<Resource<Sku?>> {
+    override fun getSkuStream(upc: String): Flow<Resource<Sku?>> {
         return flow {
             emit(Resource.Loading(true))
 
             try {
-                skuDao.getSku(skuId).map { entity ->
+                skuDao.getSkuByUpc(upc).map { entity ->
                     // If the entity is not null, map it. Otherwise keep it null
                     entity?.toSku()
                 }.collect { sku ->

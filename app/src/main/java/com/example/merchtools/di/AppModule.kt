@@ -3,6 +3,8 @@ package com.example.merchtools.di
 import android.app.Application
 import androidx.room.Room
 import com.example.merchtools.data.local.MerchToolsDatabase
+import com.example.merchtools.data.local.dao.AuditDao
+import com.example.merchtools.data.local.dao.AuditItemDao
 import com.example.merchtools.data.local.dao.SkuDao
 import com.example.merchtools.data.local.dao.StoreDao
 import dagger.Module
@@ -35,5 +37,17 @@ object AppModule {
     @Singleton
     fun providesSkuDao(db: MerchToolsDatabase): SkuDao {
         return db.skuDao
+    }
+
+    @Provides
+    @Singleton
+    fun providesAuditDao(db: MerchToolsDatabase) : AuditDao {
+        return db.auditDao
+    }
+
+    @Provides
+    @Singleton
+    fun providesAuditItemDao(db: MerchToolsDatabase) : AuditItemDao {
+        return db.auditItemDao
     }
 }

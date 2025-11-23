@@ -13,5 +13,7 @@
     <string name="brand">Brand</string>
     <string name="invalid_count">Invalid Count, must be >= 0</string>
     <string name="invalid">Case Pack</string>
-
+    <string name="start_audit">Start Audit</string>
+    <string name="open_audit">Open Audit</string>
+    <string name="audit_history">Audit History</string>
 </resources>

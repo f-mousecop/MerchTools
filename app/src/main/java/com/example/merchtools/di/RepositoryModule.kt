@@ -36,7 +36,7 @@ abstract class RepositoryModule {
     @Singleton
     abstract fun bindPhotoRepository(
         offlinePhotoRepository: OfflineStoreRepository
-    ): PhotoRepository
+    ): PhotoRepository*/
 
     @Binds
     @Singleton
@@ -48,5 +48,5 @@ abstract class RepositoryModule {
     @Singleton
     abstract fun bindAuditItemRepository(
         offlineAuditItemRepository: OfflineAuditItemRepository
-    ): AuditItemRepository*/
+    ): AuditItemRepository
 }
