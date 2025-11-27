@@ -35,29 +35,9 @@ class OfflineAuditRepository @Inject constructor(val auditDao: AuditDao) : Audit
         }
     }
 
-    override fun getAuditStream(auditId: Long): Flow<Resource<Audit?>> {
+    override fun getAuditStream(auditId: Long): Flow<Audit?> {
         return auditDao.getAudit(auditId)
-            .map<AuditWithItems?, Resource<Audit?>> { auditWithItems ->
-                Resource.Success(auditWithItems?.toDomain())
-            }
-            .catch { e ->
-                emit(Resource.Error(e.message.toString()))
-            }
-        /*return flow {
-            emit(Resource.Loading(true))
-
-            try {
-                auditDao.getAudit(auditId).map { entity ->
-                    entity?.toAudit()
-                }.collect { audit ->
-                    emit(Resource.Success(audit))
-                }
-            } catch (e: Exception) {
-                emit(Resource.Error(e.message.toString()))
-            } finally {
-                emit(Resource.Loading(false))
-            }
-        }*/
+            .map { it?.toDomain() }
     }
 
     override suspend fun deleteAudit(audit: Audit) {
@@ -81,6 +61,25 @@ class OfflineAuditRepository @Inject constructor(val auditDao: AuditDao) : Audit
         return auditWithItems?.toDomain()
     }
 
+    override suspend fun getCurrentAuditId(): Long? {
+        return getCurrentAuditWithItems()?.auditId
+    }
+
+    override suspend fun startNewAudit(
+        storeId: Long,
+        createdBy: String,
+    ): Long {
+        val newAudit = Audit(
+            auditId = 0L,
+            storeId = storeId,
+            startedAt = System.currentTimeMillis(),
+            completedAt = null,
+            createdBy = createdBy,
+            items = emptyList()
+        )
+        return auditDao.insert(newAudit.toAuditEntity())
+    }
+
     override fun getAuditHistory(): Flow<Resource<List<Audit>>> {
         return flow {
             emit(Resource.Loading(true))
@@ -96,8 +95,6 @@ class OfflineAuditRepository @Inject constructor(val auditDao: AuditDao) : Audit
             } finally {
                 emit(Resource.Loading(false))
         }
-        /*return auditDao.getAuditHistory().map { entityList ->
-            entityList.map { it.toAudit() }*/
         }
     }
 }

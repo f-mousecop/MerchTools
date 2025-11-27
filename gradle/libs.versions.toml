@@ -22,6 +22,8 @@ materialIconsExtendedAndroid = "1.7.8"
 roomCompiler = "2.8.3"
 navigationRuntimeKtx = "2.9.6"
 navigationCompose = "2.9.6"
+uiGraphics = "1.9.5"
+foundation = "1.9.5"
 
 [libraries]
 androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "cameraCore" }
@@ -61,6 +63,8 @@ androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navig
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 ksp = { module = "io.github.raamcosta.compose-destinations:ksp", version.ref = "core" }
 ksp-v230 = { module = "io.github.raamcosta.compose-destinations:ksp", version.ref = "ksp" }
+androidx-compose-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics", version.ref = "uiGraphics" }
+androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundation" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

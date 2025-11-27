@@ -24,7 +24,7 @@ import androidx.room.PrimaryKey
 data class AuditItemEntity(
     @PrimaryKey(autoGenerate = true) val auditItemId: Long = 0,
     val auditId: Long,
-    val skuId: Long,
+    val skuId: Long?,
     val count: Int,
     val note: String?
 )

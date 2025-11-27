@@ -19,6 +19,6 @@ data class AuditEntity(
     @PrimaryKey(autoGenerate = true) val auditId: Long = 0,
     val storeId: Long,
     val startedAt: Long,
-    val completedAt: Long,
+    val completedAt: Long?,
     val createdBy: String?
 )

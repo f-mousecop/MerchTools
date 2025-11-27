@@ -24,7 +24,9 @@ object AppModule {
             app,
             MerchToolsDatabase::class.java,
             "merch_tools_db"
-        ).build()
+        )
+            .fallbackToDestructiveMigration(false)
+            .build()
     }
 
     @Provides

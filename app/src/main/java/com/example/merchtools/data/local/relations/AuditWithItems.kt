@@ -21,7 +21,7 @@ data class AuditItemWithSkuAndPhoto(
         parentColumn = "skuId",
         entityColumn = "skuId"
     )
-    val sku: SkuEntity,
+    val sku: SkuEntity?,
     @Relation(
         parentColumn = "auditItemId",
         entityColumn = "auditItemId"

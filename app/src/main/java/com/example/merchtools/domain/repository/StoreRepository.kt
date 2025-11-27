@@ -40,6 +40,8 @@ interface StoreRepository {
      */
     suspend fun updateStore(store: Store)
 
+    suspend fun ensureDefaultStore(): Long
+
     fun searchStoresStream(query: String): Flow<Resource<List<Store>>>
 
     /**

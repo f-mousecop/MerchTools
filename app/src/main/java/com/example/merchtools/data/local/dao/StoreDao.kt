@@ -17,6 +17,9 @@ interface StoreDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(store: StoreEntity): Long
 
+    @Query("SELECT * from stores LIMIT 1")
+    suspend fun getFirstStore(): StoreEntity?
+
     @Update
     suspend fun update(store: StoreEntity)
 

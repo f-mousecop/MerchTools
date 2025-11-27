@@ -1,6 +1,7 @@
 package com.example.merchtools.ui.home
 
 sealed class HomeEvent {
-    object Refresh: HomeEvent()
-    data class OnSearchQueryChange(val query: String): HomeEvent()
+    data object StartAuditClicked : HomeEvent()
+    data object OpenAuditClicked : HomeEvent()
+    data class LoadAudit(val auditId: Long): HomeEvent()
 }

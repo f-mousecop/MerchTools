@@ -1,6 +1,7 @@
 package com.example.merchtools.data.local.repository
 
 import com.example.merchtools.data.local.dao.StoreDao
+import com.example.merchtools.data.local.entity.StoreEntity
 import com.example.merchtools.domain.repository.StoreRepository
 import com.example.merchtools.data.mappers.toDomain
 import com.example.merchtools.data.mappers.toStore
@@ -91,6 +92,18 @@ class OfflineStoreRepository @Inject constructor(
 
     override suspend fun updateStore(store: Store) {
         storeDao.update(store.toStoreEntity())
+    }
+
+    override suspend fun ensureDefaultStore(): Long {
+        val existing = storeDao.getFirstStore()
+        if (existing != null) return existing.storeId
+
+        // If non, insert default store
+        val defaultStore = StoreEntity(
+            name = "Default store",
+            address = null
+        )
+        return storeDao.insert(defaultStore)
     }
 
     override fun searchStoresStream(

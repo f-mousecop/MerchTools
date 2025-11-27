@@ -15,30 +15,32 @@ import com.example.merchtools.domain.repository.SkuRepository
 import com.example.merchtools.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class AuditViewModel @Inject constructor(
     private val auditRepository: AuditRepository,
-    private val auditItemRepository: AuditItemRepository,
     private val skuRepository: SkuRepository,
+    private val auditItemRepository: AuditItemRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-//    private val auditId: Long = checkNotNull(savedStateHandle["auditId"])
+    private val auditId: Long = checkNotNull(savedStateHandle["auditId"])
     var state by mutableStateOf(AuditState())
         private set
 
     private var auditJob: Job? = null
 
-    /*init {
+    init {
         viewModelScope.launch {
             getAuditStream(auditId)
         }
-    }*/
+    }
 
     fun onEvent(event: AuditEvent) {
         when (event) {
@@ -130,7 +132,7 @@ class AuditViewModel @Inject constructor(
             } else {
                 AuditItem(
                     auditId = state.audit.auditId,
-                    skuId = 0L,
+                    skuId = null,
                     count = 0,
                     note = null,
                     sku = Sku(upc = upc, name = "", casePack = null, brand = "")
@@ -149,7 +151,7 @@ class AuditViewModel @Inject constructor(
     private fun addNewItem() {
         val newItem = AuditItem(
             auditId = state.audit.auditId,
-            skuId = 0L,
+            skuId = null,
             count = 0,
             note = null,
             sku = Sku(upc = "", name = "", casePack = null, brand = "")
@@ -169,25 +171,24 @@ class AuditViewModel @Inject constructor(
 
     private fun getAuditStream(auditId: Long) {
         auditJob?.cancel()
-
         auditJob = auditRepository
             .getAuditStream(auditId)
-            .onEach { result ->
-                when (result) {
-                    is Resource.Success -> {
-                        result.data?.let { audit ->
-                            state = state.copy(
-                                audit = audit
-                            )
-                        }
-                    }
-                    is Resource.Error -> {
-                        state = state.copy(error = result.message)
-                    }
-                    is Resource.Loading -> {
-                        state = state.copy(isLoading = result.isLoading)
-                    }
+            .onStart {
+                state = state.copy(isLoading = true, error = null)
+            }
+            .onEach { audit ->
+                audit?.let {
+                    state = state.copy(
+                        audit = it,
+                        isLoading = false
+                    )
                 }
+            }
+            .catch { e ->
+                state = state.copy(
+                    error = e.message ?: "Unknown error",
+                    isLoading = false
+                )
             }
             .launchIn(viewModelScope)
     }

@@ -24,7 +24,7 @@ interface AuditRepository {
      * @param auditId the id of the [Audit] to retrieve
      * @return [Audit]
      * */
-    fun getAuditStream(auditId: Long): Flow<Resource<Audit?>>
+    fun getAuditStream(auditId: Long): Flow<Audit?>
 
     /**
      * Delete an [Audit] from the data source
@@ -50,6 +50,14 @@ interface AuditRepository {
      * @return [AuditWithItems]
      */
     suspend fun getCurrentAuditWithItems(): Audit?
+
+    /**
+     * Returns the current Audit's ID for data sharing with [AuditItemRepository]
+     * @return [Long]
+     */
+    suspend fun getCurrentAuditId(): Long?
+
+    suspend fun startNewAudit(storeId: Long, createdBy: String): Long
 
     /**
      * Fetches a list of [Audit] containing [AuditItem]'s and associated

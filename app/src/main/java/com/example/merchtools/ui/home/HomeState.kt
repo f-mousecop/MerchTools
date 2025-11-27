@@ -1,11 +1,10 @@
 package com.example.merchtools.ui.home
 
+import com.example.merchtools.domain.model.Audit
 import com.example.merchtools.domain.model.Store
 
 data class HomeState(
-    val stores: List<Store> = emptyList(),
+    val audit: Audit? = null,
     val isLoading: Boolean = false,
-    val isRefreshing: Boolean = false,
-    val searchQuery: String = "",
     val error: String? = null
 )

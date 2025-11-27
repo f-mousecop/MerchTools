@@ -7,11 +7,18 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.merchtools.data.local.mock.MockStores
+import com.example.merchtools.domain.repository.AuditRepository
 import com.example.merchtools.domain.repository.StoreRepository
 import com.example.merchtools.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -20,104 +27,81 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val storeRepository: StoreRepository
+    private val storeRepository: StoreRepository,
+    private val auditRepository: AuditRepository,
 ) : ViewModel() {
 
     var state by mutableStateOf(HomeState())
+        private set
 
-    private var searchJob: Job? = null
+    private val _uiEffect = MutableSharedFlow<HomeUiEffect>()
+    val uiEffect = _uiEffect.asSharedFlow()
 
-    init {
-        viewModelScope.launch {
-//            seedMockStores()
-            getAllStoresStream()
-        }
-    }
+    private var auditJob: Job? = null
 
-    /**
-     * MOCK store list to display on home screen
-     */
-    private suspend fun seedMockStores() {
-        MockStores.stores.forEach { store ->
-            storeRepository.insertStore(store)
-        }
-    }
 
     fun onEvent(event: HomeEvent) {
         when (event) {
-            is HomeEvent.Refresh -> {
-                getAllStoresStream(fetchFromRemote = false)
-                viewModelScope.launch {
-                    seedMockStores()
-                }
+            is HomeEvent.StartAuditClicked -> {
+                startAudit()
             }
-            is HomeEvent.OnSearchQueryChange -> {
-                state = state.copy(searchQuery = event.query)
-                searchJob?.cancel()
-                searchJob = viewModelScope.launch {
-                    delay(500L)
-                    searchAllStores()
-                }
+            is HomeEvent.OpenAuditClicked -> {
+                openAudit()
+            }
+            is HomeEvent.LoadAudit -> {
+                getAuditStream(event.auditId)
             }
         }
     }
 
-    private fun getAllStoresStream(
-        query: String = state.searchQuery.lowercase(),
-        fetchFromRemote: Boolean = false
-    ) {
-        viewModelScope.launch {
-            storeRepository
-                .getAllStoresStream()
-                .collect { result ->
-                    when (result) {
-                        is Resource.Success -> {
-                            result.data?.let { stores ->
-                                state = state.copy(
-                                    stores = stores
-                                )
-                            }
-                        }
-                        is Resource.Error -> {
-                            state = state.copy(error = result.message)
-                        }
-                        is Resource.Loading -> {
-                            state = state.copy(isLoading = result.isLoading)
-                        }
-                    }
-                }
+    private fun openAudit() {
+        auditJob?.cancel()
+        auditJob = viewModelScope.launch {
+            val currentAuditId = auditRepository.getCurrentAuditId()
+            if(currentAuditId != null) {
+                _uiEffect.emit(HomeUiEffect.NavigateToAudit(currentAuditId))
+            } else {
+                _uiEffect.emit(HomeUiEffect.ShowMessage("No audit in progress"))
+            }
         }
     }
 
-    private fun searchAllStores(
-        query: String = state.searchQuery.lowercase()
-    ) {
-        viewModelScope.launch {
-            storeRepository
-                .searchStoresStream(query)
-                .collect { result ->
-                    when (result) {
-                        is Resource.Success -> {
-                            result.data?.let { stores ->
-                                state = state.copy(
-                                    stores = stores
-                                )
-                            }
-                        }
-                        is Resource.Error -> {
-                            state = state.copy(error = result.message)
-                        }
-                        is Resource.Loading -> {
-                            state = state.copy(isLoading = result.isLoading)
-                        }
-                    }
-                }
+    private fun startAudit() {
+        auditJob?.cancel()
+        auditJob = viewModelScope.launch {
+            try {
+                val storeId = storeRepository.ensureDefaultStore()
+                val newId = auditRepository.startNewAudit(
+                    storeId = storeId,
+                    createdBy = ""
+                )
+                _uiEffect.emit(HomeUiEffect.NavigateToAudit(newId))
+            } catch (e: Exception) {
+                _uiEffect.emit(HomeUiEffect.ShowMessage(e.message ?: "Unknown error"))
+            }
+
         }
     }
 
-    fun onButtonClicked() {
-        viewModelScope.launch {
-            storeRepository.deleteStore(MockStores.stores[2])
-        }
+    private fun getAuditStream(auditId: Long) {
+        auditJob?.cancel()
+        auditJob = auditRepository
+            .getAuditStream(auditId)
+            .onStart {
+                state = state.copy(isLoading = true, error = null)
+            }
+            .onEach { audit ->
+                state = state.copy(
+                    audit = audit,
+                    isLoading = false
+                )
+            }
+            .catch { e ->
+                state = state.copy(
+                    error = e.message ?: "Unknown error",
+                    isLoading = false
+                )
+            }
+            .launchIn(viewModelScope)
     }
 }

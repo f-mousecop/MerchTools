@@ -13,7 +13,7 @@ fun AuditItemWithSkuAndPhoto.toAuditItem(): AuditItem {
         note = this.auditItem.note,
 
         // Data from the related SkuEntity mapped to a domain Sku
-        sku = this.sku.toSku(),
+        sku = this.sku?.toSku(),
 
         // Data from the related PhotoEntities mapped to a list of domain Photos
         photos = this.photos.map { it.toPhoto() }

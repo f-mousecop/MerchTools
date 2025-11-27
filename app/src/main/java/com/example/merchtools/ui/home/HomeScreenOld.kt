@@ -22,6 +22,7 @@ import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.SearchScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
+/*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreenOld(
@@ -83,4 +84,4 @@ fun HomeScreenOld(
             }
         }
     }
-}
+}*/

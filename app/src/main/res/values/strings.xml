@@ -8,6 +8,9 @@
     <string name="store_section_name">Store Section Name</string>
     <string name="sku">SKU</string>
     <string name="upc">UPC</string>
+    <string name="count">Count</string>
+    <string name="decrease_quantity">Decrease Quantity</string>
+    <string name="increase_quantity">Increase Quantity</string>
     <string name="item_name">Item Name</string>
     <string name="case_pack">Case Pack</string>
     <string name="brand">Brand</string>
