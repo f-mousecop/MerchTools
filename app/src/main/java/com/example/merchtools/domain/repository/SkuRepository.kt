@@ -19,11 +19,19 @@ interface SkuRepository {
      */
     fun getSkuStream(upc: String): Flow<Resource<Sku?>>
 
+    suspend fun getSkuByUpc(upc: String): Sku?
+
     /**
      * Insert a SKU into the data source
      * @see [SkuEntity]
      */
     suspend fun insert(sku: Sku)
+
+    /**
+     * Insert a SKU into the data source and return the new rowId
+     * @see [SkuEntity]
+     */
+    suspend fun upsertAndReturnId(sku: Sku): Long
 
     /**
      * Delete SKU from the data source

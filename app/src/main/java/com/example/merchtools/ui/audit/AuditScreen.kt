@@ -1,7 +1,6 @@
 package com.example.merchtools.ui.audit
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -10,24 +9,25 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults.contentPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -35,8 +35,8 @@ import com.example.merchtools.R
 import com.example.merchtools.ui.theme.MerchToolsTheme
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
+import com.ramcosta.composedestinations.generated.destinations.HomeScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 
 @Destination<RootGraph>
 @Composable
@@ -45,8 +45,21 @@ fun AuditScreen(
     navigator: DestinationsNavigator,
     viewModel: AuditViewModel = hiltViewModel()
 ) {
+    val uiEffect = viewModel.uiEffect
     val snackbarHostState = remember { SnackbarHostState() }
     val state = viewModel.state
+
+    LaunchedEffect(Unit) {
+        uiEffect.collect { effect ->
+            when (effect) {
+            is AuditUiEffect.ShowMessage -> {
+                snackbarHostState.showSnackbar(
+                    message = effect.message
+                )
+            }
+            }
+        }
+    }
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -54,6 +67,9 @@ fun AuditScreen(
         AuditScreenContent(
             state = state,
             onEvent = viewModel::onEvent,
+            onClick = {
+                navigator.navigate(HomeScreenDestination())
+            },
             modifier = Modifier.padding(innerPadding)
         )
     }
@@ -63,12 +79,30 @@ fun AuditScreen(
 fun AuditScreenContent(
     state: AuditState,
     onEvent: (AuditEvent) -> Unit,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    AuditScreenBody(
+        state = state,
+        onEvent = onEvent,
+        onClick = onClick,
+        modifier = Modifier.fillMaxSize()
+    )
+}
+
+@Composable
+fun AuditScreenBody(
+    state: AuditState,
+    onEvent: (AuditEvent) -> Unit,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var newAuditItem by rememberSaveable { mutableStateOf("") }
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
-            .padding(dimensionResource(R.dimen.padding_medium))
+            .padding(dimensionResource(R.dimen.padding_medium)),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(
             modifier = Modifier
@@ -78,7 +112,15 @@ fun AuditScreenContent(
             Button(
                 modifier = Modifier.weight(1f),
                 shape = MaterialTheme.shapes.small,
-                onClick = { onEvent(AuditEvent.AddNewItem) }
+                onClick = {
+                    if (newAuditItem.isNotBlank()) {
+                        onEvent(AuditEvent.BarcodeScanned(newAuditItem))
+                        newAuditItem = ""
+                    } else {
+                        onEvent(AuditEvent.AddNewItem)
+                        newAuditItem = ""
+                    }
+                }
             ) {
                 Text("Add Item")
             }
@@ -90,31 +132,16 @@ fun AuditScreenContent(
                 Text("Scan Barcode")
             }
         }
-
-        AuditScreenBody(
-            state = state,
-            onEvent = onEvent,
-            modifier = Modifier.fillMaxSize()
-        )
-    }
-}
-
-@Composable
-fun AuditScreenBody(
-    state: AuditState,
-    onEvent: (AuditEvent) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    var newAuditItem by rememberSaveable { mutableStateOf("") }
-    Column(
-        modifier = modifier
-            .padding(dimensionResource(R.dimen.padding_medium))
-    ) {
         OutlinedTextField(
             value = newAuditItem,
-            onValueChange = { newAuditItem = it },
+            onValueChange = { newText ->
+                newAuditItem = newText
+            },
             label = { Text("Enter or scan UPC") },
             modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number
+            ),
             singleLine = true
         )
 
@@ -126,11 +153,13 @@ fun AuditScreenBody(
             )
         } else {
             LazyColumn(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(
                     dimensionResource(R.dimen.padding_small)
                 ),
                 contentPadding = PaddingValues(
+                    top = dimensionResource(R.dimen.padding_medium),
                     bottom = dimensionResource(R.dimen.padding_medium)
                 ),
             ) {
@@ -139,6 +168,7 @@ fun AuditScreenBody(
                 ) { item ->
                     InventoryItem(
                         item = item,
+                        onClick = onClick,
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
@@ -153,7 +183,8 @@ fun AuditScreenPreview() {
     MerchToolsTheme {
         AuditScreenContent(
             state = AuditState(),
-            onEvent = {}
+            onEvent = {},
+            onClick = {}
         )
     }
 }

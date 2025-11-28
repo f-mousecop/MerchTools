@@ -7,33 +7,34 @@ import com.example.merchtools.domain.model.AuditItem
 fun AuditItemWithSkuAndPhoto.toAuditItem(): AuditItem {
     return AuditItem(
         // Data from the embedded auditItem
-        auditId = this.auditItem.auditId,
-        skuId = this.auditItem.skuId,
-        count = this.auditItem.count,
-        note = this.auditItem.note,
+        auditItemId = auditItem.auditItemId,
+        auditId = auditItem.auditId,
+        count = auditItem.count,
+        note = auditItem.note,
 
         // Data from the related SkuEntity mapped to a domain Sku
-        sku = this.sku?.toSku(),
+        sku = sku?.toSku(),
 
         // Data from the related PhotoEntities mapped to a list of domain Photos
-        photos = this.photos.map { it.toPhoto() }
+        photos = photos.map { it.toPhoto() }
     )
 }
 
 fun AuditItemEntity.toDomain(): AuditItem {
     return AuditItem(
-        auditId = this.auditId,
-        skuId = this.skuId,
-        count = this.count,
-        note = this.note
+        auditItemId = auditItemId,
+        auditId = auditId,
+        count = count,
+        note = note
     )
 }
 
 fun AuditItem.toAuditItemEntity(): AuditItemEntity {
     return AuditItemEntity(
-        auditId = this.auditId,
-        skuId = this.skuId,
-        count = this.count,
-        note = this.note
+        auditItemId = auditItemId,
+        auditId = auditId,
+        skuId = sku?.skuId?.takeIf { it != 0L },
+        count = count,
+        note = note
     )
 }

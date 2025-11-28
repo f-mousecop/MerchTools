@@ -7,6 +7,7 @@ import com.example.merchtools.data.mappers.toSkuEntity
 import com.example.merchtools.domain.model.Sku
 import com.example.merchtools.util.Resource
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -52,10 +53,27 @@ class OfflineSkuRepository @Inject constructor(val skuDao: SkuDao) : SkuReposito
         }
     }
 
+    override suspend fun getSkuByUpc(upc: String): Sku? {
+        return skuDao.getSkuByUpc(upc).firstOrNull()?.toSku()
+    }
+
     override suspend fun insert(sku: Sku) {
         // We must map the domain model back to an entity before giving it back
         // to the DAO
         skuDao.insert(sku.toSkuEntity())
+    }
+
+    override suspend fun upsertAndReturnId(sku: Sku): Long {
+        // Try to insert with IGNORE, returns -1 if UPC already exists
+        val insertedId = skuDao.insert(sku.toSkuEntity())
+        if (insertedId != -1L) {
+            return insertedId
+        }
+
+        // If we got -1L, UPC already exists and fetch that row and return its id
+        val existing = skuDao.getSkuByUpc(sku.upc).firstOrNull()
+            ?: error("SKU with UPC ${sku.upc} should exist but was not found")
+        return existing.skuId
     }
 
     override suspend fun delete(sku: Sku) {

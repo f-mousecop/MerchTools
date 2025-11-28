@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -30,11 +31,15 @@ import com.example.merchtools.domain.model.Sku
 @Composable
 fun InventoryItem(
     item: AuditItem,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
 ) {
     Card(
         modifier = modifier,
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        shape = RoundedCornerShape(4.dp),
+        enabled = true,
+        onClick = onClick
     ) {
         Row(
             modifier = Modifier
@@ -93,21 +98,6 @@ fun InventoryItem(
                             )
                         }
                     }
-                    Card(
-                        modifier = Modifier
-                            .width(64.dp)
-                            .height(64.dp),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-                    ) {
-                        Column(
-                            modifier = Modifier.align(Alignment.CenterHorizontally)
-                        ) {
-                            Text(
-                                "Photo",
-                                textAlign = TextAlign.Center
-                            )
-                        }
-                    }
                 }
             }
         }
@@ -120,7 +110,6 @@ fun InventoryItemPreview() {
     InventoryItem(
         item = AuditItem(
             auditId = 2,
-            skuId = 1,
             count = 3,
             note = "",
             sku = Sku(
@@ -130,6 +119,7 @@ fun InventoryItemPreview() {
                 casePack = null,
                 brand = "Pepsi"
             ),
-        )
+        ),
+        onClick = {}
     )
 }

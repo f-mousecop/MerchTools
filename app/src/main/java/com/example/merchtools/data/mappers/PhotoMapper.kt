@@ -5,6 +5,7 @@ import com.example.merchtools.domain.model.Photo
 
 fun PhotoEntity.toPhoto(): Photo {
     return Photo(
+        photoId = photoId,
         auditItemId = auditItemId,
         uri = uri,
         createdAt = createdAt
@@ -13,6 +14,7 @@ fun PhotoEntity.toPhoto(): Photo {
 
 fun Photo.toPhotoEntity(): PhotoEntity {
     return PhotoEntity(
+        photoId = photoId,
         auditItemId = auditItemId,
         uri = uri,
         createdAt = createdAt

@@ -15,6 +15,8 @@ import com.example.merchtools.domain.repository.SkuRepository
 import com.example.merchtools.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -33,6 +35,9 @@ class AuditViewModel @Inject constructor(
     private val auditId: Long = checkNotNull(savedStateHandle["auditId"])
     var state by mutableStateOf(AuditState())
         private set
+
+    private val _uiEffect = MutableSharedFlow<AuditUiEffect>()
+    val uiEffect = _uiEffect.asSharedFlow()
 
     private var auditJob: Job? = null
 
@@ -90,54 +95,85 @@ class AuditViewModel @Inject constructor(
 
     private fun removeItem(itemIndex: Int) {
         val currentItems = state.audit.items.toMutableList()
-        if (itemIndex in currentItems.indices) {
-            currentItems.removeAt(itemIndex)
-            state = state.copy(
-                audit = state.audit.copy(
-                    items = currentItems
+        try {
+            if (itemIndex in currentItems.indices) {
+                currentItems.removeAt(itemIndex)
+                state = state.copy(
+                    audit = state.audit.copy(
+                        items = currentItems
+                    )
                 )
-            )
+            }
+        } catch (e: Exception) {
+            viewModelScope.launch {
+                _uiEffect.emit(AuditUiEffect.ShowMessage(e.message ?: "Unknown error"))
+            }
         }
+
     }
 
     private fun updateItem(itemIndex: Int, item: AuditItem) {
         val currentItems = state.audit.items.toMutableList()
-        if (itemIndex in currentItems.indices) {
-            currentItems[itemIndex] = item
-            state = state.copy(
-                audit = state.audit.copy(
-                    items = currentItems
+        try {
+            if (itemIndex in currentItems.indices) {
+                currentItems[itemIndex] = item
+                state = state.copy(
+                    audit = state.audit.copy(
+                        items = currentItems
+                    )
                 )
-            )
+            }
+        } catch (e: Exception) {
+            viewModelScope.launch {
+                _uiEffect.emit(AuditUiEffect.ShowMessage(e.message ?: "Unknown error"))
+            }
         }
+
     }
 
     private fun findSkuByUpc(upc: String) {
         viewModelScope.launch {
-//            val sku = skuRepository.getSkuStream(upc)
-            val sku = if (upc == "123") {
-                Sku(upc = "123", name = "Test", casePack = "Test", brand = "Test")
+
+            val existingSku = skuRepository.getSkuByUpc(upc)
+            val sku = if (existingSku != null) {
+                existingSku
             } else {
-                null
+                _uiEffect.emit(AuditUiEffect.ShowMessage("SKU not found"))
+                val placeHolder = if (upc == "123") {
+                    Sku(
+                        upc = "123",
+                        name = "Product 1",
+                        casePack = "Case Pack",
+                        brand = "Brand"
+                    )
+                } else {
+                    Sku(
+                        upc = upc,
+                        name = "",
+                        casePack = null,
+                        brand = ""
+                    )
+                }
+
+                /**
+                 * Might not want this...
+                 */
+                val newId = try {
+                    skuRepository.upsertAndReturnId(placeHolder)
+                } catch (e: Exception) {
+                    _uiEffect.emit(AuditUiEffect.ShowMessage(e.message ?: "Unknown error"))
+                    return@launch
+                }
+                placeHolder.copy(skuId = newId)
             }
 
-            val newItem = if (sku != null) {
-                AuditItem(
-                    auditId = state.audit.auditId,
-                    skuId = sku.skuId,
-                    count = 0,
-                    note = null,
-                    sku = sku
-                )
-            } else {
-                AuditItem(
-                    auditId = state.audit.auditId,
-                    skuId = null,
-                    count = 0,
-                    note = null,
-                    sku = Sku(upc = upc, name = "", casePack = null, brand = "")
-                )
-            }
+            val newItem = AuditItem(
+                auditId = auditId,
+                count = 0,
+                note = null,
+                sku = sku
+            )
+
 
             val currentItems = state.audit.items
             state = state.copy(
@@ -145,13 +181,17 @@ class AuditViewModel @Inject constructor(
                     items = currentItems + newItem
                 )
             )
+            try {
+                auditItemRepository.insertAuditItem(newItem)
+            } catch (e: Exception) {
+                _uiEffect.emit(AuditUiEffect.ShowMessage(e.message ?: "Unknown error"))
+            }
         }
     }
 
     private fun addNewItem() {
         val newItem = AuditItem(
-            auditId = state.audit.auditId,
-            skuId = null,
+            auditId = auditId,
             count = 0,
             note = null,
             sku = Sku(upc = "", name = "", casePack = null, brand = "")
@@ -165,7 +205,12 @@ class AuditViewModel @Inject constructor(
         )
 
         viewModelScope.launch {
-            auditItemRepository.insertAuditItem(newItem)
+            try {
+                auditItemRepository.insertAuditItem(newItem)
+                _uiEffect.emit(AuditUiEffect.ShowMessage("New blank audit item added"))
+            } catch (e: Exception) {
+                _uiEffect.emit(AuditUiEffect.ShowMessage(e.message ?: "Unknown error"))
+            }
         }
     }
 
