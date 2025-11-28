@@ -35,6 +35,7 @@ import com.example.merchtools.R
 import com.example.merchtools.ui.theme.MerchToolsTheme
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
+import com.ramcosta.composedestinations.generated.destinations.EditAuditItemScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.HomeScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
@@ -52,11 +53,14 @@ fun AuditScreen(
     LaunchedEffect(Unit) {
         uiEffect.collect { effect ->
             when (effect) {
-            is AuditUiEffect.ShowMessage -> {
-                snackbarHostState.showSnackbar(
-                    message = effect.message
-                )
-            }
+                is AuditUiEffect.NavigateToEditAuditItem -> {
+                    navigator.navigate(EditAuditItemScreenDestination(effect.auditItemId))
+                }
+                is AuditUiEffect.ShowMessage -> {
+                    snackbarHostState.showSnackbar(
+                        message = effect.message
+                    )
+                }
             }
         }
     }
@@ -68,7 +72,7 @@ fun AuditScreen(
             state = state,
             onEvent = viewModel::onEvent,
             onClick = {
-                navigator.navigate(HomeScreenDestination())
+                viewModel.onEvent(AuditEvent.EditAuditItem)
             },
             modifier = Modifier.padding(innerPadding)
         )

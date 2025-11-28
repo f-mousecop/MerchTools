@@ -26,3 +26,4 @@
 - [x] Audit Screen (implemented Add Item for adding a blank Audit Item to the list; added a add by 
 UPC text field - fills in SKU details if match is found)
 - [x] SKU list with search functionality; displays SKU details (UPC, name, case pack, brand)
+- [ ] Started working on EditAuditItemScreen (user clicks AuditItem card in Audit list, nav -> EditAuditItem)

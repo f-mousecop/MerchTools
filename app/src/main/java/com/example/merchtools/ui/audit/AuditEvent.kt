@@ -9,6 +9,9 @@ sealed class AuditEvent {
     // Event for when a user adds a new, blank item to the audit
     data object AddNewItem : AuditEvent()
 
+    data object EditAuditItem : AuditEvent()
+
+
     // Event for when a barcode is successfully scanned
     // carries the raw UPC value to the ViewModel to fetch the SKU
     data class BarcodeScanned(val upc: String) : AuditEvent()

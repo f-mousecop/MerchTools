@@ -52,6 +52,9 @@ class AuditViewModel @Inject constructor(
             is AuditEvent.AddNewItem -> {
                 addNewItem()
             }
+            is AuditEvent.EditAuditItem -> {
+                editAuditItem()
+            }
             // Do I need to copy the upc from the UI state?
             is AuditEvent.BarcodeScanned -> {
                 findSkuByUpc(event.upc)
@@ -77,6 +80,8 @@ class AuditViewModel @Inject constructor(
         }
     }
 
+
+
     private fun addPhotoToItem(itemIndex: Int) {
         TODO("Not yet implemented")
     }
@@ -91,6 +96,18 @@ class AuditViewModel @Inject constructor(
 
     private fun discardChanges() {
         TODO("Not yet implemented")
+    }
+
+    private fun editAuditItem() {
+        auditJob?.cancel()
+        auditJob = viewModelScope.launch {
+            try {
+                val currentItem = state.audit.items[1]
+                _uiEffect.emit(AuditUiEffect.NavigateToEditAuditItem(currentItem.auditItemId))
+            } catch (e: Exception) {
+                _uiEffect.emit(AuditUiEffect.ShowMessage(e.message ?: "Unknown error"))
+            }
+        }
     }
 
     private fun removeItem(itemIndex: Int) {
