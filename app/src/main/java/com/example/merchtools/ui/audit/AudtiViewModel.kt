@@ -6,13 +6,10 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.merchtools.domain.model.Audit
 import com.example.merchtools.domain.model.AuditItem
-import com.example.merchtools.domain.model.Sku
-import com.example.merchtools.domain.repository.AuditItemRepository
 import com.example.merchtools.domain.repository.AuditRepository
-import com.example.merchtools.domain.repository.SkuRepository
-import com.example.merchtools.util.Resource
+import com.example.merchtools.domain.use_case.AddAuditItemUseCase
+import com.example.merchtools.domain.use_case.SearchSkuUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -26,9 +23,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AuditViewModel @Inject constructor(
+    private val addAuditItemUseCase: AddAuditItemUseCase,
+    private val searchSkuUseCase: SearchSkuUseCase,
     private val auditRepository: AuditRepository,
-    private val skuRepository: SkuRepository,
-    private val auditItemRepository: AuditItemRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -52,12 +49,15 @@ class AuditViewModel @Inject constructor(
             is AuditEvent.AddNewItem -> {
                 addNewItem()
             }
+            is AuditEvent.AddItemBySearch -> {
+                findSkuByUpc(event.upc)
+            }
             is AuditEvent.EditAuditItem -> {
-                editAuditItem()
+                editAuditItem(event.auditItemId)
             }
             // Do I need to copy the upc from the UI state?
             is AuditEvent.BarcodeScanned -> {
-                findSkuByUpc(event.upc)
+                scanBarcode()
             }
             is AuditEvent.OnItemChanged -> {
                 updateItem(event.itemIndex, event.item)
@@ -80,6 +80,14 @@ class AuditViewModel @Inject constructor(
         }
     }
 
+    private fun scanBarcode() {
+        viewModelScope.launch {
+            _uiEffect.emit(
+                AuditUiEffect.ShowMessage("Barcode scanner not yet implemented")
+            )
+            return@launch
+        }
+    }
 
 
     private fun addPhotoToItem(itemIndex: Int) {
@@ -98,15 +106,9 @@ class AuditViewModel @Inject constructor(
         TODO("Not yet implemented")
     }
 
-    private fun editAuditItem() {
-        auditJob?.cancel()
-        auditJob = viewModelScope.launch {
-            try {
-                val currentItem = state.audit.items[1]
-                _uiEffect.emit(AuditUiEffect.NavigateToEditAuditItem(currentItem.auditItemId))
-            } catch (e: Exception) {
-                _uiEffect.emit(AuditUiEffect.ShowMessage(e.message ?: "Unknown error"))
-            }
+    private fun editAuditItem(auditItemId: Long) {
+        viewModelScope.launch {
+            _uiEffect.emit(AuditUiEffect.NavigateToEditAuditItem(auditItemId))
         }
     }
 
@@ -150,83 +152,50 @@ class AuditViewModel @Inject constructor(
 
     private fun findSkuByUpc(upc: String) {
         viewModelScope.launch {
+            try {
+                val sku = searchSkuUseCase.byUpc(upc)
 
-            val existingSku = skuRepository.getSkuByUpc(upc)
-            val sku = if (existingSku != null) {
-                existingSku
-            } else {
-                _uiEffect.emit(AuditUiEffect.ShowMessage("SKU not found"))
-                val placeHolder = if (upc == "123") {
-                    Sku(
-                        upc = "123",
-                        name = "Product 1",
-                        casePack = "Case Pack",
-                        brand = "Brand"
-                    )
-                } else {
-                    Sku(
-                        upc = upc,
-                        name = "",
-                        casePack = null,
-                        brand = ""
-                    )
-                }
-
-                /**
-                 * Might not want this...
-                 */
-                val newId = try {
-                    skuRepository.upsertAndReturnId(placeHolder)
-                } catch (e: Exception) {
-                    _uiEffect.emit(AuditUiEffect.ShowMessage(e.message ?: "Unknown error"))
+                if (sku == null) {
+                    _uiEffect.emit(
+                        AuditUiEffect.ShowMessage("No SKU found for UPC: $upc"))
                     return@launch
                 }
-                placeHolder.copy(skuId = newId)
-            }
 
-            val newItem = AuditItem(
-                auditId = auditId,
-                count = 0,
-                note = null,
-                sku = sku
-            )
+                val newItem = addAuditItemUseCase(auditId, sku)
 
-
-            val currentItems = state.audit.items
-            state = state.copy(
-                audit = state.audit.copy(
-                    items = currentItems + newItem
+                val currentItems = state.audit.items
+                state = state.copy(
+                    audit = state.audit.copy(
+                        items = currentItems + newItem
+                    )
                 )
-            )
-            try {
-                auditItemRepository.insertAuditItem(newItem)
             } catch (e: Exception) {
-                _uiEffect.emit(AuditUiEffect.ShowMessage(e.message ?: "Unknown error"))
+                _uiEffect.emit(
+                    AuditUiEffect.ShowMessage(e.message ?: "Unknown error")
+                )
             }
         }
     }
 
     private fun addNewItem() {
-        val newItem = AuditItem(
-            auditId = auditId,
-            count = 0,
-            note = null,
-            sku = Sku(upc = "", name = "", casePack = null, brand = "")
-        )
-
-        val currentItems = state.audit.items
-        state = state.copy(
-            audit = state.audit.copy(
-                items = currentItems + newItem
-            )
-        )
-
         viewModelScope.launch {
             try {
-                auditItemRepository.insertAuditItem(newItem)
-                _uiEffect.emit(AuditUiEffect.ShowMessage("New blank audit item added"))
+                val newItem = addAuditItemUseCase(auditId)
+
+                val currentItems = state.audit.items
+                state = state.copy(
+                    audit = state.audit.copy(
+                        items = currentItems + newItem
+                    )
+                )
+
+                _uiEffect.emit(
+                    AuditUiEffect.ShowMessage("New blank audit item added")
+                )
             } catch (e: Exception) {
-                _uiEffect.emit(AuditUiEffect.ShowMessage(e.message ?: "Unknown error"))
+                _uiEffect.emit(
+                    AuditUiEffect.ShowMessage(e.message ?: "Unknown error")
+                )
             }
         }
     }

@@ -40,14 +40,12 @@ import com.example.merchtools.R
 
 @Composable
 fun QuantityStepper(
+    value: Int,
     modifier: Modifier = Modifier,
-    initialValue: Int = 0,
     minValue: Int = 0,
     maxValue: Int = 200,
     onValueChange: (Int) -> Unit
 ) {
-    var quantity by remember { mutableStateOf(initialValue) }
-
     val shape = RoundedCornerShape(10.dp)
 
     Column(
@@ -73,11 +71,10 @@ fun QuantityStepper(
             StepperButton(
                 icon = Icons.Default.Remove,
                 contentDescription = stringResource(R.string.decrease_quantity),
-                enabled = quantity > minValue
+                enabled = value > minValue
             ) {
-                if (quantity > minValue) {
-                    quantity--
-                    onValueChange(quantity)
+                if (value > minValue) {
+                    onValueChange(value - 1)
                 }
             }
 
@@ -91,13 +88,16 @@ fun QuantityStepper(
                 contentAlignment = Alignment.Center
             ) {
                 OutlinedTextField(
-                    value = quantity.toString(),
+                    value = value.toString(),
                     onValueChange = { newValue ->
-                        val newQuantity = newValue.toIntOrNull() ?: minValue
-                        if (newQuantity in minValue..maxValue) {
-                            quantity = newQuantity
-                            onValueChange(quantity)
+                        val parsed = newValue.toIntOrNull()
+                        val newQuantity = when {
+                            parsed == null -> minValue
+                            parsed < minValue -> minValue
+                            parsed > maxValue -> maxValue
+                            else -> parsed
                         }
+                        onValueChange(newQuantity)
                     },
                     modifier = Modifier
                         .width(64.dp),
@@ -115,11 +115,10 @@ fun QuantityStepper(
             StepperButton(
                 icon = Icons.Default.Add,
                 contentDescription = stringResource(R.string.increase_quantity),
-                enabled = quantity < maxValue
+                enabled = value < maxValue
             ) {
-                if (quantity < maxValue) {
-                    quantity++
-                    onValueChange(quantity)
+                if (value < maxValue) {
+                    onValueChange(value + 1)
                 }
             }
         }
@@ -160,8 +159,8 @@ fun QuantityStepperPreview(
     modifier: Modifier = Modifier
 ) {
     QuantityStepper(
+        value = 1,
         modifier = modifier,
-        initialValue = 1,
         minValue = 0,
         maxValue = 200,
         onValueChange = {}

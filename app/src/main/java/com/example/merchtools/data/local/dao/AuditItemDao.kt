@@ -9,6 +9,7 @@ import androidx.room.Transaction
 import androidx.room.Update
 import com.example.merchtools.data.local.entity.AuditItemEntity
 import com.example.merchtools.data.local.relations.AuditItemWithPhotos
+import com.example.merchtools.data.local.relations.AuditItemWithSkuAndPhoto
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -31,4 +32,8 @@ interface AuditItemDao {
     @Transaction
     @Query("SELECT * FROM audit_items WHERE auditId = :auditId")
     suspend fun getAuditItemsWithPhotos(auditId: Long): List<AuditItemWithPhotos>
+
+    @Transaction
+    @Query("SELECT * FROM audit_items WHERE auditItemId =:auditItemId")
+    fun getAuditItemWithSkuAndPhoto(auditItemId: Long): Flow<AuditItemWithSkuAndPhoto?>
 }

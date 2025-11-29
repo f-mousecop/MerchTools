@@ -20,6 +20,7 @@ import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -35,6 +36,7 @@ import com.ramcosta.composedestinations.generated.destinations.AuditScreenDestin
 import com.ramcosta.composedestinations.generated.destinations.SearchScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
+import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -47,6 +49,7 @@ fun HomeScreen(
 
     val uiEffect = viewModel.uiEffect
     val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
     val state = viewModel.state
 
     LaunchedEffect(Unit) {
@@ -56,9 +59,11 @@ fun HomeScreen(
                 navigator.navigate(AuditScreenDestination(effect.auditId))
             }
             is HomeUiEffect.ShowMessage -> {
-                snackbarHostState.showSnackbar(
-                    message = effect.message
-                )
+                scope.launch {
+                    snackbarHostState.showSnackbar(
+                        message = effect.message
+                    )
+                }
             }
             }
         }

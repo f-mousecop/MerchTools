@@ -11,6 +11,8 @@ import androidx.navigation.compose.rememberNavController
 import com.example.merchtools.components.DetailedNavDrawer
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.generated.NavGraphs
+import com.ramcosta.composedestinations.generated.destinations.AuditScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.EditAuditItemScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.HomeScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.SearchScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -30,6 +32,8 @@ fun MerchToolsApp() {
     val title = when (currentDestination?.route) {
         HomeScreenDestination.route -> "Home"
         SearchScreenDestination.route -> "Search SKU"
+        AuditScreenDestination.route -> "Audit"
+        EditAuditItemScreenDestination.route -> "Edit Audit Item"
         else -> "Merch Tools"
     }
 
@@ -40,7 +44,7 @@ fun MerchToolsApp() {
                 popUpTo(navController.graph.startDestinationId) {
                     inclusive = false
                 }
-//                launchSingleTop = true
+                launchSingleTop = true
             }
         },
         onNavigateSearch = {
@@ -48,9 +52,17 @@ fun MerchToolsApp() {
                 popUpTo(navController.graph.startDestinationId) {
                     inclusive = false
                 }
-//                launchSingleTop = true
+                launchSingleTop = true
             }
-        }
+        },
+        /*onNavigateAudit = {
+            navController.navigate(AuditScreenDestination(auditId = 0L).route) {
+                popUpTo(navController.graph.startDestinationId) {
+                    inclusive = false
+                }
+                launchSingleTop = true
+            }
+        }*/
     ) { innerPadding ->
         DestinationsNavHost(
             navGraph = NavGraphs.root,

@@ -22,6 +22,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -38,6 +39,7 @@ import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.EditAuditItemScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.HomeScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import kotlinx.coroutines.launch
 
 @Destination<RootGraph>
 @Composable
@@ -47,6 +49,7 @@ fun AuditScreen(
     viewModel: AuditViewModel = hiltViewModel()
 ) {
     val uiEffect = viewModel.uiEffect
+    val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     val state = viewModel.state
 
@@ -57,9 +60,12 @@ fun AuditScreen(
                     navigator.navigate(EditAuditItemScreenDestination(effect.auditItemId))
                 }
                 is AuditUiEffect.ShowMessage -> {
-                    snackbarHostState.showSnackbar(
-                        message = effect.message
-                    )
+                    scope.launch {
+                        snackbarHostState.showSnackbar(
+                            message = effect.message
+                        )
+                    }
+
                 }
             }
         }
@@ -71,9 +77,6 @@ fun AuditScreen(
         AuditScreenContent(
             state = state,
             onEvent = viewModel::onEvent,
-            onClick = {
-                viewModel.onEvent(AuditEvent.EditAuditItem)
-            },
             modifier = Modifier.padding(innerPadding)
         )
     }
@@ -83,13 +86,11 @@ fun AuditScreen(
 fun AuditScreenContent(
     state: AuditState,
     onEvent: (AuditEvent) -> Unit,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
+    modifier: Modifier = Modifier
 ) {
     AuditScreenBody(
         state = state,
         onEvent = onEvent,
-        onClick = onClick,
         modifier = Modifier.fillMaxSize()
     )
 }
@@ -98,7 +99,6 @@ fun AuditScreenContent(
 fun AuditScreenBody(
     state: AuditState,
     onEvent: (AuditEvent) -> Unit,
-    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var newAuditItem by rememberSaveable { mutableStateOf("") }
@@ -118,7 +118,7 @@ fun AuditScreenBody(
                 shape = MaterialTheme.shapes.small,
                 onClick = {
                     if (newAuditItem.isNotBlank()) {
-                        onEvent(AuditEvent.BarcodeScanned(newAuditItem))
+                        onEvent(AuditEvent.AddItemBySearch(newAuditItem))
                         newAuditItem = ""
                     } else {
                         onEvent(AuditEvent.AddNewItem)
@@ -131,7 +131,7 @@ fun AuditScreenBody(
             Button(
                 modifier = Modifier.weight(1f),
                 shape = MaterialTheme.shapes.small,
-                onClick = { onEvent(AuditEvent.BarcodeScanned("123")) }
+                onClick = { onEvent(AuditEvent.BarcodeScanned) }
             ) {
                 Text("Scan Barcode")
             }
@@ -168,11 +168,15 @@ fun AuditScreenBody(
                 ),
             ) {
                 items(
-                    items = state.audit.items
+                    items = state.audit.items,
+                    key = { item ->
+                        item.auditItemId
+                    }
                 ) { item ->
+                    // Navigate to edit audit item screen passing the auditItemId
                     InventoryItem(
                         item = item,
-                        onClick = onClick,
+                        onClick = { onEvent(AuditEvent.EditAuditItem(item.auditItemId)) },
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
@@ -187,8 +191,7 @@ fun AuditScreenPreview() {
     MerchToolsTheme {
         AuditScreenContent(
             state = AuditState(),
-            onEvent = {},
-            onClick = {}
+            onEvent = {}
         )
     }
 }

@@ -71,6 +71,8 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.extended.android)
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.compose.animation)
+    implementation(libs.room.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

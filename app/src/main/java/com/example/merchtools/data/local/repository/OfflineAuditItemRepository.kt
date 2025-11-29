@@ -1,6 +1,7 @@
 package com.example.merchtools.data.local.repository
 
 import com.example.merchtools.data.local.dao.AuditItemDao
+import com.example.merchtools.data.mappers.toAuditItem
 import com.example.merchtools.domain.repository.AuditItemRepository
 import com.example.merchtools.data.mappers.toAuditItemEntity
 import com.example.merchtools.data.mappers.toDomain
@@ -12,8 +13,10 @@ import javax.inject.Singleton
 
 @Singleton
 class OfflineAuditItemRepository @Inject constructor (val auditItemDao: AuditItemDao) : AuditItemRepository {
-    override fun getAuditItemStream(auditId: Long): Flow<AuditItem?> {
-        return auditItemDao.getAuditItem(auditId).map { it?.toDomain() }
+    override fun getAuditItemStream(auditItemId: Long): Flow<AuditItem?> {
+        return auditItemDao
+            .getAuditItemWithSkuAndPhoto(auditItemId)
+            .map { it?.toAuditItem() }
     }
 
     override fun getAllAuditItemsStream(auditId: Long): Flow<List<AuditItem>> {

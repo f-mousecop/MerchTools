@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AssignmentInd
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LocalShipping
 import androidx.compose.material.icons.filled.Menu
@@ -16,6 +17,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -38,6 +40,7 @@ fun DetailedNavDrawer(
     title: String,
     onNavigateHome: () -> Unit,
     onNavigateSearch: () -> Unit,
+//    onNavigateAudit: () -> Unit,
     modifier: Modifier = Modifier,
     content: @Composable (PaddingValues) -> Unit
     ) {
@@ -73,6 +76,8 @@ fun DetailedNavDrawer(
                         }
                     )
 
+                    HorizontalDivider(modifier = Modifier, thickness = 2.dp, color = MaterialTheme.colorScheme.outlineVariant)
+
                     NavigationDrawerItem(
                         label = {Text("Search SKUs")},
                         selected = false,
@@ -84,6 +89,18 @@ fun DetailedNavDrawer(
                             onNavigateSearch()
                         }
                     )
+
+                    /*NavigationDrawerItem(
+                        label = {Text("Audit")},
+                        selected = false,
+                        icon = { Icon(Icons.Default.AssignmentInd, contentDescription = null)},
+                        onClick = {
+                            scope.launch {
+                                drawerState.close()
+                            }
+                            onNavigateAudit()
+                        }
+                    )*/
                 }
             }
         }
