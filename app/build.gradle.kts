@@ -104,4 +104,7 @@ dependencies {
     implementation(libs.compose.destinations.core.v230)
     ksp(libs.compose.destinations.ksp.v230)
     implementation(libs.compose.destinations.bottom.sheet.v230)
+
+    // Activity photo picker
+    implementation("androidx.activity:activity-ktx:1.12.0")
 }

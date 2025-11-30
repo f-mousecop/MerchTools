@@ -1,22 +1,32 @@
 package com.example.merchtools.ui.audit
 
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -27,6 +37,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.dimensionResource
@@ -80,7 +92,9 @@ fun EditAuditItemScreen(
     }
 
     Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+        contentColor = MaterialTheme.colorScheme.secondary
     ) { innerPadding ->
         EditAuditItemScreenContent(
             state = state,
@@ -121,14 +135,6 @@ fun EditAuditItemScreenContent(
             modifier = Modifier,
             content = { Text(stringResource(R.string.save_action)) }
         )
-        /*Button(
-            onClick = { onEvent(AuditItemEvent.SaveAuditItem) },
-            enabled = state.isEntryValid,
-            shape = MaterialTheme.shapes.small,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(stringResource(R.string.save_action))
-        }*/
     }
 }
 
@@ -149,11 +155,23 @@ fun AuditItemInputForm(
     ) {
         Text(
             text = stringResource(R.string.sku),
-            style = MaterialTheme.typography.titleMedium,
+            style = MaterialTheme.typography.headlineSmall,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth()
         )
-        HorizontalDivider()
+        HorizontalDivider(
+            Modifier.border(
+                2.dp,
+                Brush.horizontalGradient(
+                    0.0f to Color.Black,
+                    1.0f to MaterialTheme.colorScheme.outline,
+                    startX = 0.0f,
+                    endX = 100.0f
+                ),
+                RoundedCornerShape(12.dp)
+            ),
+            thickness = 2.dp
+        )
 
         OutlinedTextField(
             value = upc,
@@ -170,7 +188,13 @@ fun AuditItemInputForm(
                 imeAction = ImeAction.Next
             ),
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true
+            singleLine = true,
+            colors = OutlinedTextFieldDefaults.colors(
+                unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                disabledTextColor = MaterialTheme.colorScheme.secondary,
+                disabledLabelColor = MaterialTheme.colorScheme.secondary
+            )
         )
 
         OutlinedTextField(
@@ -181,7 +205,11 @@ fun AuditItemInputForm(
                 onValueChange(AuditItemEvent.OnNameChanged(newText))
             },
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true
+            singleLine = true,
+            colors = OutlinedTextFieldDefaults.colors(
+                unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            )
         )
 
         OutlinedTextField(
@@ -192,7 +220,11 @@ fun AuditItemInputForm(
                 onValueChange(AuditItemEvent.OnCasePackChanged(newText))
             },
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true
+            singleLine = true,
+            colors = OutlinedTextFieldDefaults.colors(
+                unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            )
         )
 
         OutlinedTextField(
@@ -203,13 +235,17 @@ fun AuditItemInputForm(
                 onValueChange(AuditItemEvent.OnBrandChanged(newText))
             },
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true
+            singleLine = true,
+            colors = OutlinedTextFieldDefaults.colors(
+                unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            )
         )
         HorizontalDivider()
 
         Text(
             text = "Edit Details",
-            style = MaterialTheme.typography.titleMedium,
+            style = MaterialTheme.typography.headlineSmall,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth()
         )
@@ -230,7 +266,11 @@ fun AuditItemInputForm(
             onValueChange = { newText ->
                 onValueChange(AuditItemEvent.OnNoteChanged(newText))
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            colors = OutlinedTextFieldDefaults.colors(
+                unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            )
         )
 
         Row(
@@ -241,7 +281,11 @@ fun AuditItemInputForm(
                 onClick = { onValueChange(AuditItemEvent.AddPhotoToItem) },
                 enabled = true,
                 shape = MaterialTheme.shapes.small,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onSecondary
+                )
             ) {
                 Text(stringResource(R.string.add_photo))
             }
@@ -250,7 +294,11 @@ fun AuditItemInputForm(
                 onClick = { onValueChange(AuditItemEvent.RemovePhotoFromItem) },
                 enabled = true,
                 shape = MaterialTheme.shapes.small,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onSecondary
+                )
             ) {
                 Text(stringResource(R.string.remove_photo))
             }
@@ -271,10 +319,28 @@ fun AuditItemInputForm(
     }
 }
 
+@Composable
+fun ImagePicker(
+    pickMedia: () -> Unit
+)
+{
+    val pickMedia = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        if (uri != null) {
+            Log.d("PhotoPicker", "Selected URI: $uri")
+        } else {
+            Log.d("PhotoPicker", "No media selected")
+        }
+    }
+
+    pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+    val mimeType = "image/jpeg"
+    pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.SingleMimeType(mimeType)))
+}
+
 @Preview(showBackground = true)
 @Composable
 fun EditAuditItemScreenPreview() {
-    MerchToolsTheme() {
+    MerchToolsTheme {
         EditAuditItemScreenContent(
             state = AuditItemState(),
             onEvent = {}

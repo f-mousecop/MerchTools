@@ -1,12 +1,17 @@
 package com.example.merchtools.components
 
+import android.R.attr.content
+import android.R.id.content
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AssignmentInd
@@ -24,14 +29,21 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.merchtools.ui.theme.MerchToolsTheme
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -51,7 +63,11 @@ fun DetailedNavDrawer(
         drawerState = drawerState,
         gesturesEnabled = true,
         drawerContent = {
-            ModalDrawerSheet {
+            ModalDrawerSheet(
+                drawerContainerColor = MaterialTheme.colorScheme.surfaceDim,
+                drawerContentColor = MaterialTheme.colorScheme.secondary,
+                drawerShape = RectangleShape
+            ) {
                 Column(
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
@@ -61,7 +77,15 @@ fun DetailedNavDrawer(
                     Text(
                         "Merch Tools Menu",
                         modifier = Modifier.padding(16.dp),
-                        style = MaterialTheme.typography.titleLarge
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    HorizontalDivider(
+                        modifier = Modifier
+                            .padding(vertical = 4.dp),
+                        thickness = 2.dp,
+                        color = MaterialTheme.colorScheme.outline
                     )
 
                     NavigationDrawerItem(
@@ -73,10 +97,16 @@ fun DetailedNavDrawer(
                                 drawerState.close()
                             }
                             onNavigateHome()
-                        }
+                        },
+                        colors = NavigationDrawerItemDefaults.colors(
+                            unselectedContainerColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                            unselectedTextColor = MaterialTheme.colorScheme.onSecondary,
+                            unselectedIconColor = MaterialTheme.colorScheme.onSecondary,
+                        ),
+                        shape = RoundedCornerShape(4.dp)
                     )
 
-                    HorizontalDivider(modifier = Modifier, thickness = 2.dp, color = MaterialTheme.colorScheme.outlineVariant)
+                    Spacer(Modifier.padding(vertical = 4.dp))
 
                     NavigationDrawerItem(
                         label = {Text("Search SKUs")},
@@ -87,8 +117,15 @@ fun DetailedNavDrawer(
                                 drawerState.close()
                             }
                             onNavigateSearch()
-                        }
+                        },
+                        colors = NavigationDrawerItemDefaults.colors(
+                            unselectedContainerColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                            unselectedTextColor = MaterialTheme.colorScheme.onSecondary,
+                            unselectedIconColor = MaterialTheme.colorScheme.onSecondary,
+                        ),
+                        shape = RoundedCornerShape(4.dp)
                     )
+
 
                     /*NavigationDrawerItem(
                         label = {Text("Audit")},
@@ -107,11 +144,13 @@ fun DetailedNavDrawer(
     ) {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
-            containerColor = MaterialTheme.colorScheme.background,
-            contentColor = MaterialTheme.colorScheme.onBackground,
             topBar = {
                 TopAppBar(
-                    title = { Text(title) },
+                    title = { Text(
+                        title,
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    ) },
                     navigationIcon = {
                         IconButton(onClick = {
                             scope.launch {
@@ -121,14 +160,38 @@ fun DetailedNavDrawer(
                                     drawerState.close()
                                 }
                             }
-                        }) {
-                            Icon(Icons.Default.Menu, contentDescription = "Menu")
                         }
-                    }
+                        ) {
+                            Icon(
+                                Icons.Default.Menu,
+                                contentDescription = "Menu",
+                                modifier = Modifier.size(32.dp)
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceDim,
+                        titleContentColor = MaterialTheme.colorScheme.secondary,
+                        navigationIconContentColor = MaterialTheme.colorScheme.secondary,
+                        actionIconContentColor = MaterialTheme.colorScheme.secondary
+                    )
                 )
             }
         ) { innerPadding ->
             content(innerPadding)
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DetailedNavDrawerPreview() {
+    MerchToolsTheme() {
+        DetailedNavDrawer(
+            title = "Home",
+            onNavigateHome = {},
+            onNavigateSearch = {},
+            content = {}
+        )
     }
 }

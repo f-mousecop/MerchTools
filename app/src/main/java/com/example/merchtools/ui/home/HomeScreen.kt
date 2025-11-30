@@ -8,19 +8,34 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Assessment
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -70,7 +85,8 @@ fun HomeScreen(
     }
 
     Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        containerColor = MaterialTheme.colorScheme.surfaceVariant
     ) { innerPadding ->
         HomeScreenContent(
             state = state,
@@ -93,6 +109,8 @@ fun HomeScreenContent(
     onNavigateToAuditHistory: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var showDialog by remember { mutableStateOf(false) }
+    var userName by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
@@ -111,15 +129,78 @@ fun HomeScreenContent(
                 Button(
                     modifier = Modifier.fillMaxWidth(),
                     shape = MaterialTheme.shapes.small,
-                    onClick = { onEvent(HomeEvent.StartAuditClicked) }
+                    onClick = { showDialog = true },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onSecondary
+                    )
                 ) {
                     Text(stringResource(R.string.start_audit))
+                }
+
+                if (showDialog) {
+                    AlertDialog(
+                        onDismissRequest = { showDialog = false },
+                        title = { Text(stringResource(R.string.start_audit)) },
+                        text = {
+                            OutlinedTextField(
+                                value = userName,
+                                onValueChange = { userName = it },
+                                label = { Text("Created by") },
+                                singleLine = true,
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedTextColor = MaterialTheme.colorScheme.surface,
+                                    focusedLabelColor = MaterialTheme.colorScheme.surface
+                                ))
+                        },
+                        confirmButton = {
+                            TextButton(
+                                onClick = {
+                                    onEvent(HomeEvent.StartAuditClicked(userName))
+                                    showDialog = false
+                                },
+                                colors = ButtonDefaults.textButtonColors(
+                                    contentColor = MaterialTheme.colorScheme.surface
+                                )
+                            ) {
+                                Text("OK")
+                            }
+                        },
+                        dismissButton = {
+                            TextButton(
+                                onClick = { showDialog = false },
+                                colors = ButtonDefaults.textButtonColors(
+                                    contentColor = MaterialTheme.colorScheme.surface
+                                )
+                            ) {
+                                Text("Cancel")
+                            }
+                        },
+                        icon = {
+                            Icon(
+                                Icons.Default.Assessment,
+                                contentDescription = stringResource(R.string.start_audit),
+                                modifier = Modifier.size(48.dp)
+                            )
+                        },
+                        shape = RoundedCornerShape(8.dp),
+                        containerColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                        titleContentColor = MaterialTheme.colorScheme.onSecondary,
+                        textContentColor = MaterialTheme.colorScheme.onSecondary,
+                        iconContentColor = MaterialTheme.colorScheme.onSecondary,
+                        tonalElevation = 4.dp
+                    )
                 }
 
                 Button(
                     modifier = Modifier.fillMaxWidth(),
                     shape = MaterialTheme.shapes.small,
-                    onClick = { onEvent(HomeEvent.OpenAuditClicked) }
+                    onClick = { onEvent(HomeEvent.OpenAuditClicked) },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onSecondary
+                    )
                 ) {
                     Text(stringResource(R.string.open_audit))
                 }
@@ -127,7 +208,11 @@ fun HomeScreenContent(
                 Button(
                     modifier = Modifier.fillMaxWidth(),
                     shape = MaterialTheme.shapes.small,
-                    onClick = { onNavigateToAuditHistory() }
+                    onClick = { onNavigateToAuditHistory() },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onSecondary
+                    )
                 ) {
                     Text(stringResource(R.string.audit_history))
                 }

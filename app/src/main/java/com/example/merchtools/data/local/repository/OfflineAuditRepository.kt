@@ -1,22 +1,25 @@
 package com.example.merchtools.data.local.repository
 
 import com.example.merchtools.data.local.dao.AuditDao
-import com.example.merchtools.data.local.relations.AuditWithItems
-import com.example.merchtools.domain.repository.AuditRepository
 import com.example.merchtools.data.mappers.toAudit
 import com.example.merchtools.data.mappers.toAuditEntity
 import com.example.merchtools.data.mappers.toDomain
 import com.example.merchtools.domain.model.Audit
+import com.example.merchtools.domain.repository.AuditRepository
 import com.example.merchtools.util.Resource
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import java.time.Clock
+import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class OfflineAuditRepository @Inject constructor(val auditDao: AuditDao) : AuditRepository {
+class OfflineAuditRepository @Inject constructor(
+    val auditDao: AuditDao,
+    private val clock: Clock
+) : AuditRepository {
     override fun getAllAuditsStream(): Flow<Resource<List<Audit>>> {
         return flow {
             emit(Resource.Loading(true))
@@ -69,10 +72,11 @@ class OfflineAuditRepository @Inject constructor(val auditDao: AuditDao) : Audit
         storeId: Long,
         createdBy: String,
     ): Long {
+        val now = Instant.now(clock)
         val newAudit = Audit(
             auditId = 0L,
             storeId = storeId,
-            startedAt = System.currentTimeMillis(),
+            startedAt = now,
             completedAt = null,
             createdBy = createdBy,
             items = emptyList()

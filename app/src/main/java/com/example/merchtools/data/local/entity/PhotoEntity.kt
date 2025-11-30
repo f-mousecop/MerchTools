@@ -3,6 +3,7 @@ package com.example.merchtools.data.local.entity
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import java.time.Instant
 
 // entity data class for Photo object (attached to Audit Item)
 @Entity(tableName = "photos",
@@ -19,5 +20,5 @@ data class PhotoEntity(
     @PrimaryKey(autoGenerate = true) val photoId: Long = 0,
     val auditItemId: Long,
     val uri: String,
-    val createdAt: Long
+    val createdAt: Instant
 )

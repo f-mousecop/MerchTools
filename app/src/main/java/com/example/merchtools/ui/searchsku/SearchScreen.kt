@@ -1,5 +1,6 @@
 package com.example.merchtools.ui.searchsku
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -10,7 +11,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
@@ -29,58 +32,63 @@ fun SearchScreen(
     navigator: DestinationsNavigator,
     viewModel: SearchViewModel = hiltViewModel()
 ) {
-    val swipeRefreshState = rememberPullToRefreshState()
-    val state = viewModel.state
+    Scaffold(
+        containerColor = MaterialTheme.colorScheme.surfaceVariant
+    ) { innerPadding ->
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        OutlinedTextField(
-            value = state.searchQuery,
-            onValueChange = {
-                viewModel.onEvent(
-                    SearchSkuEvent.OnSearchQueryChange(it)
-                )
-            },
+        val swipeRefreshState = rememberPullToRefreshState()
+        val state = viewModel.state
+        Column(
             modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
-            placeholder = {
-                Text(text = "Search")
-            },
-            maxLines = 1,
-            singleLine = true
-        )
-        Spacer(Modifier.height(16.dp))
-
-        PullToRefreshBox(
-            state = swipeRefreshState,
-            isRefreshing = viewModel.state.isRefreshing,
-            onRefresh = {
-                viewModel.onEvent(SearchSkuEvent.Refresh)
-            }
+                .fillMaxSize()
+                .padding(innerPadding)
         ) {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                items(state.skus.size) { i ->
-                    val sku = state.skus[i]
-                    SkuItem(
-                        sku = sku,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                // TODO navigate to SKU details
-                            }
-                            .padding(16.dp)
+            OutlinedTextField(
+                value = state.searchQuery,
+                onValueChange = {
+                    viewModel.onEvent(
+                        SearchSkuEvent.OnSearchQueryChange(it)
                     )
-                    if (i < state.skus.size) {
-                        HorizontalDivider(modifier = Modifier
-                            .padding(horizontal = 8.dp)
-                            .height(12.dp)
+                },
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth(),
+                placeholder = {
+                    Text(text = "Search")
+                },
+                maxLines = 1,
+                singleLine = true
+            )
+            Spacer(Modifier.height(16.dp))
+
+            PullToRefreshBox(
+                state = swipeRefreshState,
+                isRefreshing = viewModel.state.isRefreshing,
+                onRefresh = {
+                    viewModel.onEvent(SearchSkuEvent.Refresh)
+                }
+            ) {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                ) {
+                    items(state.skus.size) { i ->
+                        val sku = state.skus[i]
+                        SkuItem(
+                            sku = sku,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    // TODO navigate to SKU details
+                                }
+                                .padding(16.dp)
                         )
+                        if (i < state.skus.size) {
+                            HorizontalDivider(
+                                modifier = Modifier
+                                    .padding(horizontal = 8.dp)
+                                    .height(12.dp)
+                            )
+                        }
                     }
                 }
             }

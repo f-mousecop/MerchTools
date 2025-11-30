@@ -1,18 +1,14 @@
 package com.example.merchtools.ui.home
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.merchtools.data.local.mock.MockStores
 import com.example.merchtools.domain.repository.AuditRepository
 import com.example.merchtools.domain.repository.StoreRepository
-import com.example.merchtools.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.catch
@@ -43,7 +39,7 @@ class HomeViewModel @Inject constructor(
     fun onEvent(event: HomeEvent) {
         when (event) {
             is HomeEvent.StartAuditClicked -> {
-                startAudit()
+                startAudit(event.userName)
             }
             is HomeEvent.OpenAuditClicked -> {
                 openAudit()
@@ -66,14 +62,14 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun startAudit() {
+    private fun startAudit(userName: String) {
         auditJob?.cancel()
         auditJob = viewModelScope.launch {
             try {
                 val storeId = storeRepository.ensureDefaultStore()
                 val newId = auditRepository.startNewAudit(
                     storeId = storeId,
-                    createdBy = ""
+                    createdBy = userName
                 )
                 _uiEffect.emit(HomeUiEffect.NavigateToAudit(newId))
             } catch (e: Exception) {

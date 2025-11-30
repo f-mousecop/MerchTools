@@ -30,6 +30,8 @@ UPC text field - fills in SKU details if match is found)
   - [x] Implemented the screen UI
   - [x] All fields required (pre-filled UPC, SKU details, editable note and count stepper)
   - [ ] Need to implement proper add photo
+- [x] Configured type converter to display correct started at time and store object in the database
+- [x] Fixed theming issue on physical device (dynamicColor = false)
 
 ---
 
@@ -46,17 +48,13 @@ UPC text field - fills in SKU details if match is found)
 
 ---
 
-<img src="docs/screenshots/Screenshot_20251129_084006.png" alt="text" height="400"/>
-<img src="docs/screenshots/Screenshot_20251129_084104.png" alt="text" height="400"/>
-<img src="docs/screenshots/Screenshot_20251129_084118.png" alt="text" height="400"/>
-<img src="docs/screenshots/Screenshot_20251129_084129.png" alt="text" height="400"/>
+<img src="docs/screenshots/Screenshot_20251129_084006.png" alt="text" height="400"/> <img src="docs/screenshots/Screenshot_20251129_084104.png" alt="text" height="400"/>
+<img src="docs/screenshots/Screenshot_20251129_084118.png" alt="text" height="400"/> <img src="docs/screenshots/Screenshot_20251129_084129.png" alt="text" height="400"/>
 
 ---
 
-<img src="docs/screenshots/Screenshot_20251129_085636.png" alt="text" height="400"/>
-<img src="docs/screenshots/Screenshot_20251129_085654.png" alt="text" height="400"/>
-<img src="docs/screenshots/Screenshot_20251129_085703.png" alt="text" height="400"/>
-<img src="docs/screenshots/Screenshot_20251129_085709.png" alt="text" height="400"/>
+<img src="docs/screenshots/Screenshot_20251129_085636.png" alt="text" height="400"/> <img src="docs/screenshots/Screenshot_20251129_085654.png" alt="text" height="400"/>
+<img src="docs/screenshots/Screenshot_20251129_085703.png" alt="text" height="400"/> <img src="docs/screenshots/Screenshot_20251129_085709.png" alt="text" height="400"/>
 
 
 

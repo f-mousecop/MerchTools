@@ -1,17 +1,14 @@
 package com.example.merchtools.data.util
 
 import androidx.room.TypeConverter
-import kotlin.time.ExperimentalTime
-import kotlin.time.Instant
+import java.time.Instant
 
 internal class InstantConverter {
-    @OptIn(ExperimentalTime::class)
     @TypeConverter
     fun longToInstant(value: Long?): Instant? =
-        value?.let(Instant::fromEpochMilliseconds)
+        value?.let({ Instant.ofEpochMilli(it) })
 
-    @OptIn(ExperimentalTime::class)
     @TypeConverter
     fun instantToLong(instant: Instant?): Long? =
-        instant?.toEpochMilliseconds()
+        instant?.toEpochMilli()
 }

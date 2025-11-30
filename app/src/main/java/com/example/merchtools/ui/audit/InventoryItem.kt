@@ -39,7 +39,11 @@ fun InventoryItem(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         shape = RoundedCornerShape(4.dp),
         enabled = true,
-        onClick = onClick
+        onClick = onClick,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.onSecondaryContainer,
+            contentColor = MaterialTheme.colorScheme.onSecondary
+        )
     ) {
         Row(
             modifier = Modifier

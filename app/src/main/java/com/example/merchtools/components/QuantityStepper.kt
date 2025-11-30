@@ -50,18 +50,18 @@ fun QuantityStepper(
 
     Column(
         modifier = Modifier,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
             text = stringResource(R.string.count),
-            style = MaterialTheme.typography.bodyMedium,
-            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.bodyLarge,
+            textAlign = TextAlign.Center
         )
         Row(
             modifier = modifier
                 .wrapContentWidth()
                 .background(
-                    color = MaterialTheme.colorScheme.surfaceVariant,
+                    color = MaterialTheme.colorScheme.inverseSurface,
                     shape = RoundedCornerShape(16.dp)
                 )
                 .padding(6.dp),
@@ -135,9 +135,9 @@ private fun StepperButton(
     Surface(
         shape = RoundedCornerShape(10.dp),
         color = if (enabled)
-            MaterialTheme.colorScheme.primaryContainer
+            MaterialTheme.colorScheme.onSecondaryContainer
         else
-            MaterialTheme.colorScheme.inverseSurface,
+            MaterialTheme.colorScheme.inverseOnSurface,
         tonalElevation = if (enabled) 2.dp else 0.dp
     ) {
         IconButton(
@@ -147,7 +147,7 @@ private fun StepperButton(
             Icon(
                 imageVector = icon,
                 contentDescription = contentDescription,
-                tint = MaterialTheme.colorScheme.onPrimaryContainer
+                tint = MaterialTheme.colorScheme.onSecondary
             )
         }
     }
