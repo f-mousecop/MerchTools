@@ -20,6 +20,9 @@ interface SkuDao {
     @Delete
     suspend fun delete(sku: SkuEntity)
 
+    @Query("SELECT * FROM skus WHERE skuId = :skuId LIMIT 1")
+    fun getSkuById(skuId: Long): Flow<SkuEntity?>
+
     @Query("SELECT * FROM skus WHERE upc = :upc LIMIT 1")
     fun getSkuByUpc(upc: String): Flow<SkuEntity?>
 

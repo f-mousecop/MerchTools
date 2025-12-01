@@ -4,11 +4,13 @@ import com.example.merchtools.data.local.repository.OfflineAuditItemRepository
 import com.example.merchtools.data.local.repository.OfflineAuditRepository
 import com.example.merchtools.data.local.repository.OfflineSkuRepository
 import com.example.merchtools.data.local.repository.OfflineStoreRepository
+import com.example.merchtools.data.util.ZxingBarcodeGenerator
 import com.example.merchtools.domain.repository.AuditItemRepository
 import com.example.merchtools.domain.repository.AuditRepository
 import com.example.merchtools.domain.repository.PhotoRepository
 import com.example.merchtools.domain.repository.SkuRepository
 import com.example.merchtools.domain.repository.StoreRepository
+import com.example.merchtools.domain.util.BarcodeGenerator
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -49,4 +51,10 @@ abstract class RepositoryModule {
     abstract fun bindAuditItemRepository(
         offlineAuditItemRepository: OfflineAuditItemRepository
     ): AuditItemRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindBarcodeGenerator(
+        impl: ZxingBarcodeGenerator
+    ): BarcodeGenerator
 }

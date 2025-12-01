@@ -83,6 +83,7 @@ dependencies {
 
     // ML kit barcode scanning
     implementation(libs.barcode.scanning)
+    implementation("com.google.zxing:core:3.5.4")
 
     // Room
     implementation(libs.androidx.room.runtime)
@@ -96,7 +97,7 @@ dependencies {
     implementation(libs.androidx.camera.view)
 
     // Hilt dependency injection
-    implementation("androidx.hilt:hilt-lifecycle-viewmodel-compose:1.3.0")
+    implementation(libs.androidx.hilt.lifecycle.viewmodel.compose)
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
 
@@ -106,5 +107,10 @@ dependencies {
     implementation(libs.compose.destinations.bottom.sheet.v230)
 
     // Activity photo picker
-    implementation("androidx.activity:activity-ktx:1.12.0")
+    implementation(libs.androidx.activity.ktx)
+    implementation(libs.androidx.activity.compose.v1120)
+
+    // Coil image loading library
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
 }

@@ -34,6 +34,10 @@ class OfflineSkuRepository @Inject constructor(val skuDao: SkuDao) : SkuReposito
         }
     }
 
+    override suspend fun getSkyByIdStream(skuId: Long): Sku? {
+        return skuDao.getSkuById(skuId).firstOrNull()?.toSku()
+    }
+
     override fun getSkuStream(upc: String): Flow<Resource<Sku?>> {
         return flow {
             emit(Resource.Loading(true))
@@ -57,10 +61,10 @@ class OfflineSkuRepository @Inject constructor(val skuDao: SkuDao) : SkuReposito
         return skuDao.getSkuByUpc(upc).firstOrNull()?.toSku()
     }
 
-    override suspend fun insert(sku: Sku) {
+    override suspend fun insert(sku: Sku): Long {
         // We must map the domain model back to an entity before giving it back
         // to the DAO
-        skuDao.insert(sku.toSkuEntity())
+        return skuDao.insert(sku.toSkuEntity())
     }
 
     override suspend fun upsertAndReturnId(sku: Sku): Long {

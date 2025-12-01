@@ -42,6 +42,12 @@ UPC text field - fills in SKU details if match is found)
 - [ ] Implement barcodescanner
 - [ ] Implement proper SKU catalog and ability to add SKU via manual entry or scan
 
+# IMPORTANT
+
+- Need to fix add sku use case, currently when adding SKU the skuID is not passed to edit sku screen
+- When clicking SKU in list, the skuID is passed, but when clicked saved the changes do not reflect
+  - Made changes to SkuRepository - changed getSkuById from Flow<Sku?> to Sku?
+
 ---
 
 ## Screenshots

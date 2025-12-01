@@ -12,6 +12,8 @@ interface SkuRepository {
      */
     fun getAllSkusStream(): Flow<Resource<List<Sku>>>
 
+    suspend fun getSkyByIdStream(skuId: Long): Sku?
+
     /**
      * Retrieve a SKU from the data source with the skuId
      * @see [SkuEntity]
@@ -25,7 +27,7 @@ interface SkuRepository {
      * Insert a SKU into the data source
      * @see [SkuEntity]
      */
-    suspend fun insert(sku: Sku)
+    suspend fun insert(sku: Sku): Long
 
     /**
      * Insert a SKU into the data source and return the new rowId

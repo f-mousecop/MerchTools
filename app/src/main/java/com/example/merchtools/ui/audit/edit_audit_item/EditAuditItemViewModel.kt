@@ -1,10 +1,5 @@
-package com.example.merchtools.ui.audit
+package com.example.merchtools.ui.audit.edit_audit_item
 
-import android.util.Log
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -15,6 +10,10 @@ import com.example.merchtools.domain.model.AuditItem
 import com.example.merchtools.domain.model.Sku
 import com.example.merchtools.domain.repository.AuditItemRepository
 import com.example.merchtools.domain.repository.SkuRepository
+import com.example.merchtools.domain.util.BarcodeGenerator
+import com.example.merchtools.ui.audit.edit_audit_item.AuditItemEvent
+import com.example.merchtools.ui.audit.edit_audit_item.AuditItemState
+import com.example.merchtools.ui.audit.edit_audit_item.AuditItemUiEffect
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -31,6 +30,7 @@ import javax.inject.Inject
 class EditAuditItemViewModel @Inject constructor(
     private val auditItemRepository: AuditItemRepository,
     private val skuRepository: SkuRepository,
+    private val barcodeGenerator: BarcodeGenerator,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -40,6 +40,10 @@ class EditAuditItemViewModel @Inject constructor(
 
     private val _uiEffect = MutableSharedFlow<AuditItemUiEffect>()
     val uiEffect = _uiEffect.asSharedFlow()
+
+    val barcodeGen: BarcodeGenerator
+        get() = barcodeGenerator
+
     private var auditItemJob: Job? = null
 
     init {

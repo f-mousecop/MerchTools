@@ -1,4 +1,4 @@
-package com.example.merchtools.ui.audit
+package com.example.merchtools.ui.audit.edit_audit_item
 
 import com.example.merchtools.domain.model.AuditItem
 

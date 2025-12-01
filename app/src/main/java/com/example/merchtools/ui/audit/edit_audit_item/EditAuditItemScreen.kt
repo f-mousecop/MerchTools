@@ -1,10 +1,9 @@
-package com.example.merchtools.ui.audit
+package com.example.merchtools.ui.audit.edit_audit_item
 
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -13,12 +12,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -44,9 +41,6 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -54,11 +48,11 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.merchtools.R
 import com.example.merchtools.components.ProgressButton
 import com.example.merchtools.components.QuantityStepper
+import com.example.merchtools.domain.util.BarcodeGenerator
 import com.example.merchtools.ui.theme.MerchToolsTheme
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Destination<RootGraph>
@@ -99,6 +93,7 @@ fun EditAuditItemScreen(
         EditAuditItemScreenContent(
             state = state,
             onEvent = viewModel::onEvent,
+            barcodeGenerator = viewModel.barcodeGen,
             modifier = Modifier
                 .padding(
                     start = innerPadding.calculateStartPadding(LocalLayoutDirection.current),
@@ -115,6 +110,7 @@ fun EditAuditItemScreen(
 fun EditAuditItemScreenContent(
     state: AuditItemState,
     onEvent: (AuditItemEvent) -> Unit,
+    barcodeGenerator: BarcodeGenerator,
     modifier: Modifier = Modifier
 ) {
     val scope = rememberCoroutineScope()
@@ -126,6 +122,7 @@ fun EditAuditItemScreenContent(
         AuditItemInputForm(
             state = state,
             onValueChange = onEvent,
+            barcodeGenerator = barcodeGenerator,
             modifier = Modifier.fillMaxWidth()
         )
         ProgressButton(
@@ -142,11 +139,11 @@ fun EditAuditItemScreenContent(
 fun AuditItemInputForm(
     state: AuditItemState,
     onValueChange: (AuditItemEvent) -> Unit = {},
+    barcodeGenerator: BarcodeGenerator,
     modifier: Modifier = Modifier,
     enabled: Boolean = true
 ) {
     val sku = state.auditItem.sku
-    val isUpcEditable = sku == null || sku.skuId == 0L
     val upc = sku?.upc.orEmpty()
 
     Column(
@@ -173,7 +170,15 @@ fun AuditItemInputForm(
             thickness = 2.dp
         )
 
-        OutlinedTextField(
+        SkuItem(
+            upc = upc,
+            name = state.auditItem.sku?.name ?: "",
+            casePack = state.auditItem.sku?.casePack ?: "",
+            brand = state.auditItem.sku?.brand ?: "",
+            barcodeGenerator = barcodeGenerator
+        )
+
+        /*OutlinedTextField(
             value = upc,
             enabled = isUpcEditable,
             readOnly = !isUpcEditable,
@@ -240,7 +245,7 @@ fun AuditItemInputForm(
                 unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
                 focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
             )
-        )
+        )*/
         HorizontalDivider()
 
         Text(
@@ -341,9 +346,10 @@ fun ImagePicker(
 @Composable
 fun EditAuditItemScreenPreview() {
     MerchToolsTheme {
-        EditAuditItemScreenContent(
+        /*EditAuditItemScreenContent(
             state = AuditItemState(),
-            onEvent = {}
-        )
+            onEvent = {},
+            barcodeGenerator = BarcodeGenerator
+        )*/
     }
 }
