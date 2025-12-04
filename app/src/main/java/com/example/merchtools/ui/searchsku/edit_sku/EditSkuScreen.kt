@@ -10,7 +10,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -148,8 +152,17 @@ fun EditSkuInputForm(
             value = state.sku.upc,
             enabled = true,
             label = { Text(stringResource(R.string.upc)) },
+            placeholder = { Text("12 digit UPC number")},
+            supportingText = { Text(stringResource(R.string.invalid_upc)) },
             onValueChange = { newValue ->
                 onValueChange(EditSkuEvent.OnUpcChanged(newValue))
+            },
+            isError = !state.isUpcValid,
+            trailingIcon = @Composable {
+                if (!state.isUpcValid) Icon(Icons.Filled.Error, "error")
+                else {
+                    Icon(Icons.Filled.Check, contentDescription = "valid")
+                }
             },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number,
@@ -168,9 +181,46 @@ fun EditSkuInputForm(
         OutlinedTextField(
             value = state.sku.name,
             enabled = true,
-            label = { Text(stringResource(R.string.item_name)) },
+            label = { Text(stringResource(R.string.sku_number)) },
             onValueChange = { newText ->
                 onValueChange(EditSkuEvent.OnNameChanged(newText))
+            },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Next
+            ),
+            isError = !state.isEntryValid,
+            trailingIcon = @Composable {
+                if (!state.isEntryValid) Icon(Icons.Filled.Error, "error")
+                else {
+                    Icon(Icons.Filled.Check, contentDescription = "valid")
+                }
+            },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true,
+            colors = OutlinedTextFieldDefaults.colors(
+                unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            )
+        )
+
+
+        OutlinedTextField(
+            value = state.sku.brand,
+            enabled = true,
+            label = { Text(stringResource(R.string.brand)) },
+            onValueChange = { newText ->
+                onValueChange(EditSkuEvent.OnBrandChanged(newText))
+            },
+            keyboardOptions = KeyboardOptions(
+                imeAction = ImeAction.Next
+            ),
+            isError = !state.isEntryValid,
+            trailingIcon = @Composable {
+                if (!state.isEntryValid) Icon(Icons.Filled.Error, "error")
+                else {
+                    Icon(Icons.Filled.Check, contentDescription = "valid")
+                }
             },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
@@ -187,21 +237,9 @@ fun EditSkuInputForm(
             onValueChange = { newText ->
                 onValueChange(EditSkuEvent.OnCasePackChanged(newText))
             },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            colors = OutlinedTextFieldDefaults.colors(
-                unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            )
-        )
-
-        OutlinedTextField(
-            value = state.sku.brand,
-            enabled = true,
-            label = { Text(stringResource(R.string.brand)) },
-            onValueChange = { newText ->
-                onValueChange(EditSkuEvent.OnBrandChanged(newText))
-            },
+            keyboardOptions = KeyboardOptions(
+                imeAction = ImeAction.Next
+            ),
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             colors = OutlinedTextFieldDefaults.colors(

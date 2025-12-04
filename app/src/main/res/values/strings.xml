@@ -11,16 +11,18 @@
     <string name="count">Count</string>
     <string name="decrease_quantity">Decrease Quantity</string>
     <string name="increase_quantity">Increase Quantity</string>
-    <string name="item_name">Item Name</string>
+    <string name="sku_number">SKU Number</string>
     <string name="case_pack">Case Pack</string>
     <string name="brand">Brand</string>
     <string name="item_notes">Note</string>
     <string name="add_photo">Add Photo</string>
     <string name="remove_photo">Remove Photo"</string>
     <string name="invalid_count">Invalid Count, must be >= 0</string>
+    <string name="invalid_upc">UPC must be 12 digits</string>
     <string name="invalid">Case Pack</string>
     <string name="start_audit">Start Audit</string>
     <string name="open_audit">Open Audit</string>
     <string name="audit_history">Audit History</string>
     <string name="save_action">Save Changes</string>
+    <string name="discard_changes">Discard Changes</string>
 </resources>

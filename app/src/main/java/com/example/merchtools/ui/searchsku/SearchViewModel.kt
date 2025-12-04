@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.merchtools.data.local.mock.MockSkus
 import com.example.merchtools.domain.repository.SkuRepository
 import com.example.merchtools.domain.use_case.AddSkuUseCase
+import com.example.merchtools.domain.use_case.SearchSkuUseCase
 import com.example.merchtools.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -22,7 +23,8 @@ import javax.inject.Inject
 class SearchViewModel @Inject constructor(
     private val addSkuUseCase: AddSkuUseCase,
     private val savedStateHandle: SavedStateHandle,
-    private val skuRepository: SkuRepository
+    private val skuRepository: SkuRepository,
+    private val searchSkuUseCase: SearchSkuUseCase
 ): ViewModel() {
     var state by mutableStateOf(SearchSkuState())
         private set
@@ -31,12 +33,10 @@ class SearchViewModel @Inject constructor(
     val uiEffect = _uiEffect.asSharedFlow()
 
     private var searchJob: Job? = null
-
+    private var skuListJob: Job? = null
 
     init {
-        viewModelScope.launch {
-            getAllSkusStream()
-        }
+        getAllSkusStream()
     }
 
     fun onEvent(event: SearchSkuEvent) {
@@ -77,10 +77,6 @@ class SearchViewModel @Inject constructor(
                 val newSku = addSkuUseCase()
                 val newSkuId = newSku.skuId
 
-                val currentItems = state.skus
-                state = state.copy(
-                    skus = currentItems + newSku
-                )
                 _uiEffect.emit(
                     SearchSkuUiEffect.NavigateToSkuDetails(newSkuId)
                 )
@@ -98,8 +94,8 @@ class SearchViewModel @Inject constructor(
         fetchFromRemote: Boolean = false
     ) {
         viewModelScope.launch {
-            skuRepository
-                .searchSkus(false, query)
+            searchSkuUseCase
+                .catalog(query)
                 .collect { result ->
                     when (result) {
                         is Resource.Success -> {
@@ -128,7 +124,8 @@ class SearchViewModel @Inject constructor(
     }
 
     private fun getAllSkusStream() {
-        viewModelScope.launch {
+        skuListJob?.cancel()
+        skuListJob = viewModelScope.launch {
             skuRepository
                 .getAllSkusStream()
                 .collect { result ->

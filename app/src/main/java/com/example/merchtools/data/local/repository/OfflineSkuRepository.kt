@@ -34,8 +34,10 @@ class OfflineSkuRepository @Inject constructor(val skuDao: SkuDao) : SkuReposito
         }
     }
 
-    override suspend fun getSkyByIdStream(skuId: Long): Sku? {
-        return skuDao.getSkuById(skuId).firstOrNull()?.toSku()
+    override fun getSkyByIdStream(skuId: Long): Flow<Sku?> {
+        return skuDao.getSkuById(skuId).map { entity ->
+            entity?.toSku()
+        }
     }
 
     override fun getSkuStream(upc: String): Flow<Resource<Sku?>> {

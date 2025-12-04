@@ -4,6 +4,7 @@ import com.example.merchtools.domain.model.Sku
 
 data class EditSkuState(
     val sku: Sku = Sku(),
+    val isUpcValid: Boolean = false,
     val isEntryValid: Boolean = false,
     val isLoading: Boolean = false,
     val error: String? = null

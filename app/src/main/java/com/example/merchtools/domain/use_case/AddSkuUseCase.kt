@@ -20,13 +20,16 @@ class AddSkuUseCase @Inject constructor(
 ){
     suspend operator fun invoke(): Sku {
         val newSku = Sku(
+            skuId = 0,
             upc = "",
             name = "",
             casePack = null,
             brand = ""
         )
 
-        skuRepository.insert(newSku)
-        return newSku
+        // Make sure to return the new sku id after inserting it
+        // for navigation to edit sku screen
+        val id = skuRepository.insert(newSku)
+        return newSku.copy(skuId = id)
     }
 }

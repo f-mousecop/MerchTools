@@ -3,9 +3,11 @@ package com.example.merchtools.ui.searchsku.edit_sku
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.merchtools.domain.model.Sku
 import com.example.merchtools.domain.repository.SkuRepository
 import com.example.merchtools.ui.searchsku.SearchSkuUiEffect
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -40,34 +42,48 @@ class EditSkuViewModel @Inject constructor(
     fun onEvent(event: EditSkuEvent) {
         when (event) {
             is EditSkuEvent.OnUpcChanged -> {
+                val updated = state.sku.copy(upc = event.userInput)
                 state = state.copy(
-                    sku = state.sku.copy(
-                        upc = event.userInput),
-                    isEntryValid = true)
+                    sku = updated,
+                    isUpcValid = validateUpc(updated)
+                )
+                println("DEBUG: isEntryValid: ${state.isEntryValid}")
             }
             is EditSkuEvent.OnNameChanged -> {
+                val updated = state.sku.copy(name = event.userInput)
                 state = state.copy(
-                    sku = state.sku.copy(
-                        name = event.userInput),
-                    isEntryValid = true)
+                    sku = updated,
+                    isEntryValid = validateOtherFields(updated)
+                )
             }
             is EditSkuEvent.OnCasePackChanged -> {
+                val updated = state.sku.copy(casePack = event.userInput)
                 state = state.copy(
-                    sku = state.sku.copy(
-                        casePack = event.userInput),
-                    isEntryValid = true)
+                    sku = updated,
+                    isEntryValid = validateOtherFields(updated)
+                )
             }
             is EditSkuEvent.OnBrandChanged -> {
+                val updated = state.sku.copy(brand = event.userInput)
                 state = state.copy(
-                    sku = state.sku.copy(
-                        brand = event.userInput),
-                    isEntryValid = true)
+                    sku = updated,
+                    isEntryValid = validateOtherFields(updated)
+                )
             }
             is EditSkuEvent.SaveSku -> {
                 saveSku()
             }
         }
     }
+
+    private fun validateUpc(sku: Sku): Boolean {
+        return (sku.upc.length in 12..<13 && sku.upc.isDigitsOnly())
+    }
+
+    private fun validateOtherFields(sku: Sku): Boolean {
+        return (sku.name.isNotEmpty() && sku.brand.isNotEmpty())
+    }
+
 
     private fun saveSku() {
         viewModelScope.launch {
@@ -91,16 +107,9 @@ class EditSkuViewModel @Inject constructor(
 
     private fun getSkuStream(skuId: Long) {
         editSkuJob?.cancel()
-        editSkuJob = viewModelScope.launch {
-            try {
-                skuRepository
-                    .getSkyByIdStream(skuId)
-                println("DEBUG: stream emitted sku = $skuId")
-            } catch (e: Exception) {
-                _uiEffect.emit(SearchSkuUiEffect.ShowMessage(e.message ?: "Unknown error"))
-            }
-        }
-            /*.onStart {
+        editSkuJob = skuRepository
+            .getSkyByIdStream(skuId)
+            .onStart {
                 state = state.copy(isLoading = true, error = null)
             }
             .onEach { sku ->
@@ -108,7 +117,9 @@ class EditSkuViewModel @Inject constructor(
                 sku?.let {
                     state = state.copy(
                         sku = it,
-                        isLoading = false
+                        isLoading = false,
+                        isUpcValid = validateUpc(it),
+                        isEntryValid = validateOtherFields(it)
                     )
                 }
             }
@@ -117,8 +128,9 @@ class EditSkuViewModel @Inject constructor(
                     error = e.message ?: "Unknown error",
                     isLoading = false
                 )
+                _uiEffect.emit(SearchSkuUiEffect.ShowMessage(e.message ?: "Unknown error"))
             }
-            .launchIn(viewModelScope)*/
+            .launchIn(viewModelScope)
     }
 
 }

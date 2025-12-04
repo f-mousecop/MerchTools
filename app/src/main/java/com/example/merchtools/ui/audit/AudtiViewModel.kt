@@ -99,7 +99,15 @@ class AuditViewModel @Inject constructor(
     }
 
     private fun saveAudit() {
-        TODO("Not yet implemented")
+        auditJob?.cancel()
+        auditJob = viewModelScope.launch {
+            try {
+                auditRepository.updateAudit(state.audit)
+                _uiEffect.emit(AuditUiEffect.ShowMessage("Audit saved"))
+            } catch (e: Exception) {
+                _uiEffect.emit(AuditUiEffect.ShowMessage(e.message ?: "Unknown error"))
+            }
+        }
     }
 
     private fun discardChanges() {
@@ -169,6 +177,9 @@ class AuditViewModel @Inject constructor(
                         items = currentItems + newItem
                     )
                 )
+                _uiEffect.emit(
+                    AuditUiEffect.ShowMessage("New audit item added with UPC: $upc")
+                )
             } catch (e: Exception) {
                 _uiEffect.emit(
                     AuditUiEffect.ShowMessage(e.message ?: "Unknown error")
@@ -180,17 +191,8 @@ class AuditViewModel @Inject constructor(
     private fun addNewItem() {
         viewModelScope.launch {
             try {
-                val newItem = addAuditItemUseCase(auditId)
-
-                val currentItems = state.audit.items
-                state = state.copy(
-                    audit = state.audit.copy(
-                        items = currentItems + newItem
-                    )
-                )
-
                 _uiEffect.emit(
-                    AuditUiEffect.ShowMessage("New blank audit item added")
+                    AuditUiEffect.ShowMessage("Enter a valid UPC to add audit item")
                 )
             } catch (e: Exception) {
                 _uiEffect.emit(

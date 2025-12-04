@@ -150,8 +150,9 @@ fun HomeScreenContent(
                                 singleLine = true,
                                 modifier = Modifier.fillMaxWidth(),
                                 colors = OutlinedTextFieldDefaults.colors(
-                                    focusedTextColor = MaterialTheme.colorScheme.surface,
-                                    focusedLabelColor = MaterialTheme.colorScheme.surface
+                                    focusedTextColor = MaterialTheme.colorScheme.onSecondary,
+                                    focusedLabelColor = MaterialTheme.colorScheme.onSecondary,
+                                    unfocusedLabelColor = MaterialTheme.colorScheme.onSecondary
                                 ))
                         },
                         confirmButton = {

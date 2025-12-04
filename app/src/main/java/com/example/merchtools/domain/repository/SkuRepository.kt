@@ -12,7 +12,7 @@ interface SkuRepository {
      */
     fun getAllSkusStream(): Flow<Resource<List<Sku>>>
 
-    suspend fun getSkyByIdStream(skuId: Long): Sku?
+    fun getSkyByIdStream(skuId: Long): Flow<Sku?>
 
     /**
      * Retrieve a SKU from the data source with the skuId

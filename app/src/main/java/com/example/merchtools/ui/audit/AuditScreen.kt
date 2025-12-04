@@ -33,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -42,6 +43,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.merchtools.R
+import com.example.merchtools.components.ProgressButton
 import com.example.merchtools.ui.theme.MerchToolsTheme
 import com.example.merchtools.util.toDisplayString
 import com.ramcosta.composedestinations.annotation.Destination
@@ -101,11 +103,11 @@ fun AuditScreenContent(
     onEvent: (AuditEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    AuditScreenBody(
-        state = state,
-        onEvent = onEvent,
-        modifier = Modifier.fillMaxSize()
-    )
+        AuditScreenBody(
+            state = state,
+            onEvent = onEvent,
+            modifier = Modifier.fillMaxSize()
+        )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -196,6 +198,14 @@ fun AuditScreenBody(
             ) {
                 Text("Scan Barcode")
             }
+
+            /*ProgressButton(
+                isLoading = state.isLoading,
+                enabled = true,
+                onClick = { onEvent(AuditEvent.SaveAudit) },
+                modifier = Modifier,
+                content = { Text(stringResource(R.string.save_action)) }
+            )*/
         }
         OutlinedTextField(
             value = newAuditItem,

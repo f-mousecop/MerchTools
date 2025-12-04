@@ -86,7 +86,7 @@ fun SearchScreen(
         ) {
             Row(
                 modifier = Modifier
-                    .padding(bottom = dimensionResource(R.dimen.padding_small))
+                    .padding(horizontal = dimensionResource(R.dimen.padding_medium))
                     .align(Alignment.CenterHorizontally)
             ) {
                 Button(
@@ -149,13 +149,13 @@ fun SearchScreen(
                                 }
                                 .padding(16.dp)
                         )
-                        /*if (item < state.skus.last()) {
+                        if (item.skuId < state.skus.size) {
                             HorizontalDivider(
                                 modifier = Modifier
                                     .padding(horizontal = 8.dp)
                                     .height(12.dp)
                             )
-                        }*/
+                        }
                     }
                 }
             }
