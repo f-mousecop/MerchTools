@@ -41,11 +41,9 @@ class HomeViewModel @Inject constructor(
             is HomeEvent.StartAuditClicked -> {
                 startAudit(event.userName)
             }
+
             is HomeEvent.OpenAuditClicked -> {
                 openAudit()
-            }
-            is HomeEvent.LoadAudit -> {
-                getAuditStream(event.auditId)
             }
         }
     }
@@ -54,7 +52,7 @@ class HomeViewModel @Inject constructor(
         auditJob?.cancel()
         auditJob = viewModelScope.launch {
             val currentAuditId = auditRepository.getCurrentAuditId()
-            if(currentAuditId != null) {
+            if (currentAuditId != null) {
                 _uiEffect.emit(HomeUiEffect.NavigateToAudit(currentAuditId))
             } else {
                 _uiEffect.emit(HomeUiEffect.ShowMessage("No audit in progress"))
@@ -77,27 +75,5 @@ class HomeViewModel @Inject constructor(
             }
 
         }
-    }
-
-    private fun getAuditStream(auditId: Long) {
-        auditJob?.cancel()
-        auditJob = auditRepository
-            .getAuditStream(auditId)
-            .onStart {
-                state = state.copy(isLoading = true, error = null)
-            }
-            .onEach { audit ->
-                state = state.copy(
-                    audit = audit,
-                    isLoading = false
-                )
-            }
-            .catch { e ->
-                state = state.copy(
-                    error = e.message ?: "Unknown error",
-                    isLoading = false
-                )
-            }
-            .launchIn(viewModelScope)
     }
 }

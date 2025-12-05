@@ -7,11 +7,14 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.merchtools.domain.model.AuditItem
+import com.example.merchtools.domain.repository.AuditItemRepository
 import com.example.merchtools.domain.repository.AuditRepository
 import com.example.merchtools.domain.use_case.AddAuditItemUseCase
 import com.example.merchtools.domain.use_case.SearchSkuUseCase
+import com.example.merchtools.util.toDisplayString
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.catch
@@ -19,11 +22,13 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
+import java.time.Instant
 import javax.inject.Inject
 
 @HiltViewModel
 class AuditViewModel @Inject constructor(
     private val addAuditItemUseCase: AddAuditItemUseCase,
+    private val auditItemRepository: AuditItemRepository,
     private val searchSkuUseCase: SearchSkuUseCase,
     private val auditRepository: AuditRepository,
     savedStateHandle: SavedStateHandle
@@ -39,9 +44,7 @@ class AuditViewModel @Inject constructor(
     private var auditJob: Job? = null
 
     init {
-        viewModelScope.launch {
-            getAuditStream(auditId)
-        }
+        getAuditStream(auditId)
     }
 
     fun onEvent(event: AuditEvent) {
@@ -63,7 +66,7 @@ class AuditViewModel @Inject constructor(
                 updateItem(event.itemIndex, event.item)
             }
             is AuditEvent.RemoveItem -> {
-                removeItem(event.itemIndex)
+                removeItem(event.item)
             }
             is AuditEvent.AddPhotoToItem -> {
                 addPhotoToItem(event.itemIndex)
@@ -102,9 +105,19 @@ class AuditViewModel @Inject constructor(
         auditJob?.cancel()
         auditJob = viewModelScope.launch {
             try {
-                auditRepository.updateAudit(state.audit)
-                _uiEffect.emit(AuditUiEffect.ShowMessage("Audit saved"))
+                val now = Instant.now()
+                val updatedAudit = state.audit.copy(
+                    completedAt = now
+                )
+
+                state = state.copy(audit = updatedAudit, isLoading = true)
+
+                auditRepository.updateAudit(updatedAudit)
+
+                state = state.copy(isLoading = false)
+                _uiEffect.emit(AuditUiEffect.ShowMessage("Audit saved at: ${now.toDisplayString()}"))
             } catch (e: Exception) {
+                state = state.copy(isLoading = false)
                 _uiEffect.emit(AuditUiEffect.ShowMessage(e.message ?: "Unknown error"))
             }
         }
@@ -120,19 +133,19 @@ class AuditViewModel @Inject constructor(
         }
     }
 
-    private fun removeItem(itemIndex: Int) {
+    private fun removeItem(item: AuditItem) {
         val currentItems = state.audit.items.toMutableList()
-        try {
-            if (itemIndex in currentItems.indices) {
-                currentItems.removeAt(itemIndex)
+        viewModelScope.launch {
+            try {
                 state = state.copy(
                     audit = state.audit.copy(
                         items = currentItems
                     )
                 )
-            }
-        } catch (e: Exception) {
-            viewModelScope.launch {
+
+                auditItemRepository.deleteAuditItem(item)
+                _uiEffect.emit(AuditUiEffect.ShowMessage("Audit item removed"))
+            } catch (e: Exception) {
                 _uiEffect.emit(AuditUiEffect.ShowMessage(e.message ?: "Unknown error"))
             }
         }

@@ -19,7 +19,7 @@ sealed class AuditEvent {
     data class AddItemBySearch(val upc: String) : AuditEvent()
 
     // Event to remove a specific audit item
-    data class RemoveItem(val itemIndex: Int) : AuditEvent()
+    data class RemoveItem(val item: AuditItem) : AuditEvent()
 
     // Event to add a photo to a specific audit item
     data class AddPhotoToItem(val itemIndex: Int) : AuditEvent()

@@ -19,7 +19,7 @@ import java.time.Instant
 data class AuditEntity(
     @PrimaryKey(autoGenerate = true) val auditId: Long = 0,
     val storeId: Long,
-    val startedAt: Instant,
+    val startedAt: Instant?,
     val completedAt: Instant?,
     val createdBy: String?
 )

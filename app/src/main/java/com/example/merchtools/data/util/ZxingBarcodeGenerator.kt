@@ -7,6 +7,8 @@ import com.google.zxing.BarcodeFormat
 import com.google.zxing.MultiFormatWriter
 import com.google.zxing.common.BitMatrix
 import javax.inject.Inject
+import androidx.core.graphics.createBitmap
+import androidx.core.graphics.set
 
 /**
  * An implementation of the [BarcodeGenerator] interface that uses the ZXing (Zebra Crossing)
@@ -24,21 +26,26 @@ class ZxingBarcodeGenerator @Inject constructor(): BarcodeGenerator {
         widthPx: Int,
         heightPx: Int,
     ): Bitmap {
-        val bitMatrix: BitMatrix = MultiFormatWriter().encode(
-            upc,
-            BarcodeFormat.CODE_128,
-            widthPx,
-            heightPx
-        )
+        val bitMatrix: BitMatrix = try {
+            MultiFormatWriter().encode(
+                upc,
+                BarcodeFormat.UPC_A,
+                widthPx,
+                heightPx
+            )
+        } catch (e: IllegalArgumentException) {
+            MultiFormatWriter().encode(
+                upc,
+                BarcodeFormat.CODE_128,
+                widthPx,
+                heightPx
+            )
+        }
 
-        val bitmap = Bitmap.createBitmap(widthPx, heightPx, Bitmap.Config.ARGB_8888)
+        val bitmap = createBitmap(widthPx, heightPx)
         for (x in 0 until widthPx) {
             for (y in 0 until heightPx) {
-                bitmap.setPixel(
-                    x,
-                    y,
-                    if (bitMatrix[x, y]) Color.BLACK else Color.WHITE
-                )
+                bitmap[x, y] = if (bitMatrix[x, y]) Color.BLACK else Color.WHITE
             }
         }
         return bitmap

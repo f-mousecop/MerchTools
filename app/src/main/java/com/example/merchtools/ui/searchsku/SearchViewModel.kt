@@ -1,5 +1,6 @@
 package com.example.merchtools.ui.searchsku
 
+import android.database.sqlite.SQLiteConstraintException
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -7,6 +8,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.merchtools.data.local.mock.MockSkus
+import com.example.merchtools.domain.model.Sku
 import com.example.merchtools.domain.repository.SkuRepository
 import com.example.merchtools.domain.use_case.AddSkuUseCase
 import com.example.merchtools.domain.use_case.SearchSkuUseCase
@@ -53,6 +55,9 @@ class SearchViewModel @Inject constructor(
             is SearchSkuEvent.EditSku -> {
                 editSku(event.skuId)
             }
+            is SearchSkuEvent.RemoveSku -> {
+                removeSku(event.sku)
+            }
             is SearchSkuEvent.OnSearchQueryChange -> {
                 state = state.copy(searchQuery = event.query)
                 searchJob?.cancel()
@@ -60,6 +65,21 @@ class SearchViewModel @Inject constructor(
                     delay(500L)
                     searchAllSkus()
                 }
+            }
+        }
+    }
+
+    private fun removeSku(sku: Sku) {
+        val currentSkus = state.skus.toMutableList()
+        viewModelScope.launch {
+            try {
+                state = state.copy(
+                    skus = currentSkus
+                )
+
+                skuRepository.delete(sku)
+            } catch (e: Exception) {
+                _uiEffect.emit(SearchSkuUiEffect.ShowMessage(e.message ?: "Unknown error"))
             }
         }
     }

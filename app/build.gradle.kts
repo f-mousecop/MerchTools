@@ -28,7 +28,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.merchtools"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -67,7 +67,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.runtime.ktx)
-    implementation(libs.androidx.navigation.compose)
+//    implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.compose.material.icons.extended.android)
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.foundation)

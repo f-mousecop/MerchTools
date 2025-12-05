@@ -1,12 +1,9 @@
 package com.example.merchtools.components
 
-import android.R.attr.content
-import android.R.id.content
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -14,12 +11,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AssignmentInd
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.LocalShipping
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -36,28 +31,58 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.merchtools.ui.theme.MerchToolsTheme
+import com.ramcosta.composedestinations.generated.destinations.HistoryScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.HomeScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.SearchScreenDestination
 import kotlinx.coroutines.launch
+
+sealed class DrawerScreens(
+    val title: String,
+    val route: String,
+    val icon: ImageVector
+) {
+    object Home: DrawerScreens("Home",
+        HomeScreenDestination.route,
+        Icons.Default.Home
+    )
+    object Search: DrawerScreens("SKU Catalog",
+        SearchScreenDestination.route,
+        Icons.Default.Search
+    )
+    object History: DrawerScreens("Audit History",
+        HistoryScreenDestination.route,
+        Icons.Default.History
+    )
+}
+
+private val screens = listOf(
+    DrawerScreens.Home,
+    DrawerScreens.Search,
+    DrawerScreens.History
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailedNavDrawer(
     title: String,
-    onNavigateHome: () -> Unit,
-    onNavigateSearch: () -> Unit,
-//    onNavigateAudit: () -> Unit,
+    currentRoute: String?,
+    onDestinationClicked: (route: String) -> Unit,
     modifier: Modifier = Modifier,
     content: @Composable (PaddingValues) -> Unit
     ) {
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val selectedScreen = remember { mutableStateOf(screens[0]) }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -88,56 +113,31 @@ fun DetailedNavDrawer(
                         color = MaterialTheme.colorScheme.outline
                     )
 
-                    NavigationDrawerItem(
-                        label = {Text("Home")},
-                        selected = false,
-                        icon = { Icon(Icons.Default.Home, contentDescription = null)},
-                        onClick = {
-                            scope.launch {
-                                drawerState.close()
-                            }
-                            onNavigateHome()
-                        },
-                        colors = NavigationDrawerItemDefaults.colors(
-                            unselectedContainerColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                            unselectedTextColor = MaterialTheme.colorScheme.onSecondary,
-                            unselectedIconColor = MaterialTheme.colorScheme.onSecondary,
-                        ),
-                        shape = RoundedCornerShape(4.dp)
-                    )
+                    screens.forEach { screen ->
+                        val selected = screen.route == currentRoute
+                        NavigationDrawerItem(
+                            label = { Text(screen.title) },
+                            selected = selected,
+                            icon = { Icon(screen.icon, contentDescription = null) },
+                            onClick = {
+                                scope.launch {
+                                    drawerState.close()
+                                }
+                                if (!selected) {
+                                    onDestinationClicked(screen.route)
+                                    println("DEBUG: Selected: ${screen.route}")
+                                }
+                            },
+                            colors = NavigationDrawerItemDefaults.colors(
+                                unselectedContainerColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                                unselectedTextColor = MaterialTheme.colorScheme.onSecondary,
+                                unselectedIconColor = MaterialTheme.colorScheme.onSecondary,
+                            ),
+                            shape = RoundedCornerShape(4.dp)
+                        )
 
-                    Spacer(Modifier.padding(vertical = 4.dp))
-
-                    NavigationDrawerItem(
-                        label = {Text("Search SKUs")},
-                        selected = false,
-                        icon = { Icon(Icons.Default.Search, contentDescription = null)},
-                        onClick = {
-                            scope.launch {
-                                drawerState.close()
-                            }
-                            onNavigateSearch()
-                        },
-                        colors = NavigationDrawerItemDefaults.colors(
-                            unselectedContainerColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                            unselectedTextColor = MaterialTheme.colorScheme.onSecondary,
-                            unselectedIconColor = MaterialTheme.colorScheme.onSecondary,
-                        ),
-                        shape = RoundedCornerShape(4.dp)
-                    )
-
-
-                    /*NavigationDrawerItem(
-                        label = {Text("Audit")},
-                        selected = false,
-                        icon = { Icon(Icons.Default.AssignmentInd, contentDescription = null)},
-                        onClick = {
-                            scope.launch {
-                                drawerState.close()
-                            }
-                            onNavigateAudit()
-                        }
-                    )*/
+                        Spacer(Modifier.padding(vertical = 4.dp))
+                    }
                 }
             }
         }
@@ -189,8 +189,8 @@ fun DetailedNavDrawerPreview() {
     MerchToolsTheme() {
         DetailedNavDrawer(
             title = "Home",
-            onNavigateHome = {},
-            onNavigateSearch = {},
+            currentRoute = null,
+            onDestinationClicked = {},
             content = {}
         )
     }

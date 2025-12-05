@@ -1,19 +1,17 @@
 package com.example.merchtools.ui.searchsku
 
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -29,9 +27,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.merchtools.R
+import com.example.merchtools.ui.components.SwipeToDeleteContainer
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.EditSkuScreenDestination
@@ -82,11 +80,11 @@ fun SearchScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
+                .padding(dimensionResource(R.dimen.padding_medium))
         ) {
             Row(
                 modifier = Modifier
-                    .padding(horizontal = dimensionResource(R.dimen.padding_medium))
+//                    .padding(horizontal = dimensionResource(R.dimen.padding_medium))
                     .align(Alignment.CenterHorizontally)
             ) {
                 Button(
@@ -112,7 +110,7 @@ fun SearchScreen(
                     )
                 },
                 modifier = Modifier
-                    .padding(16.dp)
+                    .padding(vertical = dimensionResource(R.dimen.padding_small))
                     .fillMaxWidth(),
                 placeholder = {
                     Text(text = "Search")
@@ -120,7 +118,6 @@ fun SearchScreen(
                 maxLines = 1,
                 singleLine = true
             )
-            Spacer(Modifier.height(16.dp))
 
             PullToRefreshBox(
                 state = swipeRefreshState,
@@ -130,7 +127,15 @@ fun SearchScreen(
                 }
             ) {
                 LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(
+                        dimensionResource(R.dimen.padding_small)
+                    ),
+                    contentPadding = PaddingValues(
+                        top = dimensionResource(R.dimen.padding_medium),
+                        bottom = dimensionResource(R.dimen.padding_medium)
+                    )
                 ) {
                     items(
                         items = state.skus,
@@ -138,22 +143,17 @@ fun SearchScreen(
                             item.skuId
                         }
                     ) { item ->
-                        SkuItem(
-                            sku = item,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    viewModel.onEvent(
-                                        SearchSkuEvent.EditSku(item.skuId)
-                                    )
-                                }
-                                .padding(16.dp)
-                        )
-                        if (item.skuId < state.skus.size) {
-                            HorizontalDivider(
+                        SwipeToDeleteContainer(
+                            item = item,
+                            onDelete = { viewModel.onEvent(SearchSkuEvent.RemoveSku(item)) }
+                        ) {
+                            SkuItem(
+                                sku = item,
+                                onClick = {
+                                    viewModel.onEvent(SearchSkuEvent.EditSku(item.skuId))
+                                },
                                 modifier = Modifier
-                                    .padding(horizontal = 8.dp)
-                                    .height(12.dp)
+                                    .fillMaxWidth()
                             )
                         }
                     }
