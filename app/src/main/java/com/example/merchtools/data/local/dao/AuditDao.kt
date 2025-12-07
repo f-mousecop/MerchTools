@@ -32,7 +32,7 @@ interface AuditDao {
     suspend fun getCurrentAuditWithItems(): AuditWithItems? // fetch Audit with Audit Items and Photos
 
     @Transaction
-    @Query("SELECT * FROM audits ORDER by startedAt DESC") // fetch Audit with Audit Items and Photos
+    @Query("SELECT * FROM audits ORDER by completedAt DESC") // fetch Audit with Audit Items and Photos
     fun getAllAudits(): Flow<List<AuditWithItems>>
 
     @Transaction

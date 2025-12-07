@@ -13,11 +13,14 @@ import androidx.compose.material.icons.filled.Assessment
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -41,7 +44,7 @@ import com.example.merchtools.ui.theme.MerchToolsTheme
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.AuditScreenDestination
-import com.ramcosta.composedestinations.generated.destinations.SearchScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.HistoryScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.launch
 
@@ -84,7 +87,7 @@ fun HomeScreen(
             state = state,
             onEvent = viewModel::onEvent,
             onNavigateToAuditHistory = {
-                navigator.navigate(SearchScreenDestination())
+                navigator.navigate(HistoryScreenDestination())
             },
             modifier = Modifier.padding(innerPadding)
         )
@@ -102,7 +105,6 @@ fun HomeScreenContent(
     modifier: Modifier = Modifier
 ) {
     var showDialog by remember { mutableStateOf(false) }
-    var userName by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
@@ -121,11 +123,7 @@ fun HomeScreenContent(
                 Button(
                     modifier = Modifier.fillMaxWidth(),
                     shape = MaterialTheme.shapes.small,
-                    onClick = { showDialog = true },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onSecondary
-                    )
+                    onClick = { showDialog = true }
                 ) {
                     Text(stringResource(R.string.start_audit))
                 }
@@ -135,27 +133,24 @@ fun HomeScreenContent(
                         onDismissRequest = { showDialog = false },
                         title = { Text(stringResource(R.string.start_audit)) },
                         text = {
-                            OutlinedTextField(
-                                value = userName,
-                                onValueChange = { userName = it },
-                                label = { Text("Created by") },
-                                singleLine = true,
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedTextColor = MaterialTheme.colorScheme.onSecondary,
-                                    focusedLabelColor = MaterialTheme.colorScheme.onSecondary,
-                                    unfocusedLabelColor = MaterialTheme.colorScheme.onSecondary
-                                ))
+
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp)
+                            ) {
+                                DropDownMenuContent(
+                                    state = state,
+                                    onEvent = onEvent
+                                )
+                            }
                         },
                         confirmButton = {
                             TextButton(
                                 onClick = {
-                                    onEvent(HomeEvent.StartAuditClicked(userName))
+                                    onEvent(HomeEvent.StartAuditClicked)
                                     showDialog = false
                                 },
-                                colors = ButtonDefaults.textButtonColors(
-                                    contentColor = MaterialTheme.colorScheme.surface
-                                )
                             ) {
                                 Text("OK")
                             }
@@ -163,9 +158,6 @@ fun HomeScreenContent(
                         dismissButton = {
                             TextButton(
                                 onClick = { showDialog = false },
-                                colors = ButtonDefaults.textButtonColors(
-                                    contentColor = MaterialTheme.colorScheme.surface
-                                )
                             ) {
                                 Text("Cancel")
                             }
@@ -178,10 +170,6 @@ fun HomeScreenContent(
                             )
                         },
                         shape = RoundedCornerShape(8.dp),
-                        containerColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                        titleContentColor = MaterialTheme.colorScheme.onSecondary,
-                        textContentColor = MaterialTheme.colorScheme.onSecondary,
-                        iconContentColor = MaterialTheme.colorScheme.onSecondary,
                         tonalElevation = 4.dp
                     )
                 }
@@ -190,10 +178,6 @@ fun HomeScreenContent(
                     modifier = Modifier.fillMaxWidth(),
                     shape = MaterialTheme.shapes.small,
                     onClick = { onEvent(HomeEvent.OpenAuditClicked) },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onSecondary
-                    )
                 ) {
                     Text(stringResource(R.string.open_audit))
                 }
@@ -202,12 +186,67 @@ fun HomeScreenContent(
                     modifier = Modifier.fillMaxWidth(),
                     shape = MaterialTheme.shapes.small,
                     onClick = { onNavigateToAuditHistory() },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onSecondary
-                    )
                 ) {
                     Text(stringResource(R.string.audit_history))
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DropDownMenuContent(
+    state: HomeState,
+    onEvent: (HomeEvent) -> Unit
+) {
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))
+    ) {
+        OutlinedTextField(
+            value = state.userName,
+            onValueChange = { newName ->
+                onEvent(HomeEvent.OnUserNameChanged(newName)
+                )
+            },
+            label = { Text("Created by") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        ExposedDropdownMenuBox(
+            expanded = state.isExpanded,
+            onExpandedChange = { onEvent(HomeEvent.ExpandStoreMenu) },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            OutlinedTextField(
+                value = state.storeName,
+                onValueChange = { },
+                label = { Text("Store Name") },
+                readOnly = true,
+                trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(state.isExpanded)
+                },
+                modifier = Modifier
+                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
+                    .fillMaxWidth()
+            )
+            ExposedDropdownMenu(
+                expanded = state.isExpanded,
+                onDismissRequest = { onEvent(HomeEvent.CloseStoreMenu) }
+            ) {
+                state.stores.forEach { store ->
+                    DropdownMenuItem(
+                        text = { Text(store.name) },
+                        onClick = {
+                            onEvent(HomeEvent.OnStoreNameChanged(store.name, store.storeId))
+                            onEvent(HomeEvent.CloseStoreMenu)
+                        },
+                        contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
+                    )
                 }
             }
         }

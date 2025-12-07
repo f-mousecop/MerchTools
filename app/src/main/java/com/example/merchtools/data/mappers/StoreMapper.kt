@@ -6,6 +6,7 @@ import com.example.merchtools.domain.model.Store
 
 fun StoreEntity.toStore(): Store {
     return Store(
+        storeId = storeId,
         name = name,
         address = address
     )
@@ -13,6 +14,7 @@ fun StoreEntity.toStore(): Store {
 
 fun Store.toStoreEntity(): StoreEntity {
     return StoreEntity(
+        storeId = storeId,
         name = name,
         address = address
     )

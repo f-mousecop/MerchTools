@@ -1,9 +1,9 @@
-package com.example.merchtools.ui.history
+package com.example.merchtools.ui.report
 
 import com.example.merchtools.domain.model.Audit
 
-data class HistoryState(
-    val audits: List<Audit> = emptyList(),
+data class GenerateReportState(
+    val audit: Audit = Audit(),
     val isLoading: Boolean = false,
     val error: String? = null
 )

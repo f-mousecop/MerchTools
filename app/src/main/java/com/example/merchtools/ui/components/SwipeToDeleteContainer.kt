@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
@@ -41,6 +42,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.DurationUnit
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
@@ -101,7 +103,8 @@ fun <T> SwipeToDeleteContainer(
                 )
             },
             onDismiss = { SwipeToDismissBoxValue.EndToStart },
-            enableDismissFromEndToStart = true
+            enableDismissFromEndToStart = true,
+            enableDismissFromStartToEnd = false
         ) {
             content(item)
         }
@@ -135,7 +138,9 @@ fun DeleteBackground(
             Text(
                 text = "Delete?",
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onError
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onError,
+                modifier = Modifier.align(Alignment.CenterVertically)
             )
             Spacer(modifier = Modifier.width(20.dp))
 
@@ -143,8 +148,10 @@ fun DeleteBackground(
                 Icons.Default.Clear,
                 contentDescription = "Clear",
                 tint = MaterialTheme.colorScheme.onError,
-                modifier = Modifier.clickable {
-                    onCancel()
+                modifier = Modifier
+                    .size(32.dp)
+                    .clickable {
+                        onCancel()
                 }
             )
 
@@ -154,8 +161,10 @@ fun DeleteBackground(
                 Icons.Default.Delete,
                 contentDescription = "Delete",
                 tint = MaterialTheme.colorScheme.onError,
-                modifier = Modifier.clickable {
-                    onDelete()
+                modifier = Modifier
+                    .size(32.dp)
+                    .clickable {
+                        onDelete()
                 }
             )
         }

@@ -26,7 +26,7 @@ interface StoreRepository {
      * Insert a store into the data source
      * @see store
      * */
-    suspend fun insertStore(store: Store)
+    suspend fun insertStore(store: Store): Long
 
     /**
      * Delete store from the data source

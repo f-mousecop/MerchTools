@@ -9,8 +9,11 @@ import androidx.lifecycle.viewModelScope
 import com.example.merchtools.domain.model.AuditItem
 import com.example.merchtools.domain.repository.AuditItemRepository
 import com.example.merchtools.domain.repository.AuditRepository
+import com.example.merchtools.domain.repository.StoreRepository
 import com.example.merchtools.domain.use_case.AddAuditItemUseCase
 import com.example.merchtools.domain.use_case.SearchSkuUseCase
+import com.example.merchtools.domain.util.BarcodeGenerator
+import com.example.merchtools.util.Resource
 import com.example.merchtools.util.toDisplayString
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -31,6 +34,7 @@ class AuditViewModel @Inject constructor(
     private val auditItemRepository: AuditItemRepository,
     private val searchSkuUseCase: SearchSkuUseCase,
     private val auditRepository: AuditRepository,
+    private val barcodeGenerator: BarcodeGenerator,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -41,7 +45,11 @@ class AuditViewModel @Inject constructor(
     private val _uiEffect = MutableSharedFlow<AuditUiEffect>()
     val uiEffect = _uiEffect.asSharedFlow()
 
+    val barcodeGen: BarcodeGenerator
+        get() = barcodeGenerator
+
     private var auditJob: Job? = null
+    private var storeJob: Job? = null
 
     init {
         getAuditStream(auditId)
@@ -111,11 +119,14 @@ class AuditViewModel @Inject constructor(
                 )
 
                 state = state.copy(audit = updatedAudit, isLoading = true)
+                delay(2000L)
 
                 auditRepository.updateAudit(updatedAudit)
 
                 state = state.copy(isLoading = false)
                 _uiEffect.emit(AuditUiEffect.ShowMessage("Audit saved at: ${now.toDisplayString()}"))
+                delay(2000L)
+                _uiEffect.emit(AuditUiEffect.NavigateToHistoryScreen)
             } catch (e: Exception) {
                 state = state.copy(isLoading = false)
                 _uiEffect.emit(AuditUiEffect.ShowMessage(e.message ?: "Unknown error"))
@@ -214,6 +225,7 @@ class AuditViewModel @Inject constructor(
             }
         }
     }
+
 
     private fun getAuditStream(auditId: Long) {
         auditJob?.cancel()

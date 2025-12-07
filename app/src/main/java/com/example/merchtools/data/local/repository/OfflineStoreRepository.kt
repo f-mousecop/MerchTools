@@ -80,10 +80,10 @@ class OfflineStoreRepository @Inject constructor(
         }
     }
 
-    override suspend fun insertStore(store: Store) {
+    override suspend fun insertStore(store: Store): Long {
         // We must map the domain model back to an entity before giving it to the
         // DAO
-        storeDao.insert(store.toStoreEntity())
+        return storeDao.insert(store.toStoreEntity())
     }
 
     override suspend fun deleteStore(store: Store) {

@@ -5,13 +5,18 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.merchtools.domain.model.Audit
 import com.example.merchtools.domain.repository.AuditRepository
+import com.example.merchtools.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -21,34 +26,90 @@ class HistoryViewModel @Inject constructor(
     var state by mutableStateOf(HistoryState())
         private set
 
+    private val _uiEffect = MutableSharedFlow<HistoryUiEffect>()
+    val uiEffect = _uiEffect.asSharedFlow()
+
+
     private var historyJob: Job? = null
 
     init {
-//        getAllAuditsStream()
+        getAllAuditsStream()
     }
 
-    /*private fun getAllAuditsStream() {
-        historyJob?.cancel()
-        historyJob = auditRepository
-            .getAllAuditsStream()
-            .onStart {
-                state = state.copy(isLoading = true, error = null)
-            }.onEach { audits ->
-                audits?.let {
-                    state = state.copy(
-                        history = state.copy(
-                            history = state.copy(
-                                history = audits,
-                                isLoading = false
-                            )
-                        )
-                    )
-                }
-            }.catch { e ->
+    fun onEvent(event: HistoryEvent) {
+        when (event) {
+            is HistoryEvent.OpenAuditClicked -> {
+                openAudit(event.auditId)
+            }
+            is HistoryEvent.DeleteAudit -> {
+                deleteAudit(event.audit)
+            }
+            is HistoryEvent.ExportPdfClicked -> {
+                exportPdf(event.auditId)
+            }
+        }
+    }
+
+    private fun deleteAudit(audit: Audit) {
+        val currentItems = state.audits.toMutableList()
+        viewModelScope.launch {
+            try {
                 state = state.copy(
-                    error = e.message ?: "Unknown error",
-                    isLoading = false
+                    audits = currentItems
                 )
-            }.launchIn(viewModelScope)
-    }*/
+
+                auditRepository.deleteAudit(audit)
+                _uiEffect.emit(HistoryUiEffect.ShowMessage(
+                    "Audit ${audit.store?.name} created by ${audit.createdBy} deleted")
+                )
+            } catch (e: Exception) {
+                _uiEffect.emit(HistoryUiEffect.ShowMessage(e.message ?: "Unknown error"))
+            }
+        }
+    }
+
+    private fun exportPdf(auditId: Long) {
+        viewModelScope.launch {
+            try {
+                _uiEffect.emit(HistoryUiEffect.NavigateToReportScreen(auditId))
+            } catch (e: Exception) {
+                _uiEffect.emit(HistoryUiEffect.ShowMessage(e.message ?: "Unknown error"))
+            }
+        }
+    }
+
+    private fun openAudit(auditId: Long) {
+        viewModelScope.launch {
+            try {
+                _uiEffect.emit(HistoryUiEffect.NavigateToAudit(auditId))
+            } catch (e: Exception) {
+                _uiEffect.emit(HistoryUiEffect.ShowMessage(e.message ?: "Unknown error"))
+            }
+        }
+    }
+
+    private fun getAllAuditsStream() {
+        historyJob?.cancel()
+        historyJob = viewModelScope.launch {
+            auditRepository
+                .getAllAuditsStream()
+                .collect { result ->
+                    when (result) {
+                        is Resource.Success -> {
+                            result.data?.let {
+                                state = state.copy(
+                                    audits = it
+                                )
+                            }
+                        }
+                        is Resource.Error -> {
+                            state = state.copy(error = result.message)
+                        }
+                        is Resource.Loading -> {
+                            state = state.copy(isLoading = result.isLoading)
+                        }
+                    }
+                }
+        }
+    }
 }

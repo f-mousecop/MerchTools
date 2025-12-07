@@ -25,4 +25,7 @@
     <string name="audit_history">Audit History</string>
     <string name="save_action">Save Changes</string>
     <string name="discard_changes">Discard Changes</string>
+    <string name="history_blank">No Recent Audits Completed</string>
+    <string name="store_catalog">Store Catalog</string>
+    <string name="store_catalog_blank">No Stores Added</string>
 </resources>

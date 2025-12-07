@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.merchtools.domain.repository.AuditRepository
 import com.example.merchtools.domain.repository.StoreRepository
+import com.example.merchtools.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -34,16 +35,34 @@ class HomeViewModel @Inject constructor(
     val uiEffect = _uiEffect.asSharedFlow()
 
     private var auditJob: Job? = null
+    private var storeJob: Job? = null
 
+    init {
+        getAllStoresStream()
+    }
 
     fun onEvent(event: HomeEvent) {
         when (event) {
             is HomeEvent.StartAuditClicked -> {
-                startAudit(event.userName)
+                startAudit(state.userName, state.storeId)
             }
-
+            is HomeEvent.OnUserNameChanged -> {
+                state = state.copy(userName = event.userName)
+            }
+            is HomeEvent.OnStoreNameChanged -> {
+                state = state.copy(
+                    storeName = event.storeName,
+                    storeId = event.storeId
+                )
+            }
             is HomeEvent.OpenAuditClicked -> {
                 openAudit()
+            }
+            is HomeEvent.ExpandStoreMenu -> {
+                state = state.copy(isExpanded = true)
+            }
+            is HomeEvent.CloseStoreMenu -> {
+                state = state.copy(isExpanded = false)
             }
         }
     }
@@ -60,11 +79,11 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun startAudit(userName: String) {
+    private fun startAudit(userName: String, storeId: Long) {
         auditJob?.cancel()
         auditJob = viewModelScope.launch {
             try {
-                val storeId = storeRepository.ensureDefaultStore()
+//                val storeId = storeRepository.ensureDefaultStore()
                 val newId = auditRepository.startNewAudit(
                     storeId = storeId,
                     createdBy = userName
@@ -74,6 +93,35 @@ class HomeViewModel @Inject constructor(
                 _uiEffect.emit(HomeUiEffect.ShowMessage(e.message ?: "Unknown error"))
             }
 
+        }
+    }
+
+    private fun getAllStoresStream() {
+        storeJob?.cancel()
+        storeJob = viewModelScope.launch {
+            storeRepository
+                .getAllStoresStream()
+                .collect { result ->
+                    when (result) {
+                        is Resource.Success -> {
+                            result.data?.let {
+                                state = state.copy(
+                                    stores = it,
+                                    isLoading = false
+                                )
+                            }
+                        }
+                        is Resource.Error -> {
+                            state = state.copy(
+                                error = result.message,
+                                isLoading = false
+                            )
+                        }
+                        is Resource.Loading -> {
+                            state = state.copy(isLoading = result.isLoading)
+                        }
+                    }
+                }
         }
     }
 }

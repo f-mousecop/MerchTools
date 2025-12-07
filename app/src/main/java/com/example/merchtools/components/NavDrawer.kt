@@ -15,6 +15,7 @@ import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Store
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -44,6 +45,7 @@ import com.example.merchtools.ui.theme.MerchToolsTheme
 import com.ramcosta.composedestinations.generated.destinations.HistoryScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.HomeScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.SearchScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.StoreCatalogScreenDestination
 import kotlinx.coroutines.launch
 
 sealed class DrawerScreens(
@@ -59,6 +61,10 @@ sealed class DrawerScreens(
         SearchScreenDestination.route,
         Icons.Default.Search
     )
+    object Stores: DrawerScreens("Store Catalog",
+        StoreCatalogScreenDestination.route,
+        Icons.Default.Store
+    )
     object History: DrawerScreens("Audit History",
         HistoryScreenDestination.route,
         Icons.Default.History
@@ -68,6 +74,7 @@ sealed class DrawerScreens(
 private val screens = listOf(
     DrawerScreens.Home,
     DrawerScreens.Search,
+    DrawerScreens.Stores,
     DrawerScreens.History
 )
 

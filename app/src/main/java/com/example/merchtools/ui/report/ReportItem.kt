@@ -1,18 +1,14 @@
-package com.example.merchtools.ui.audit
+package com.example.merchtools.ui.report
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -22,39 +18,24 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.max
 import com.example.merchtools.R
 import com.example.merchtools.components.BarcodeImage
-import com.example.merchtools.components.QuantityStepper
 import com.example.merchtools.domain.model.AuditItem
-import com.example.merchtools.domain.model.Sku
 import com.example.merchtools.domain.util.BarcodeGenerator
 
 @Composable
-fun InventoryItem(
+fun ReportItem(
     item: AuditItem,
     modifier: Modifier = Modifier,
     barcodeGenerator: BarcodeGenerator,
-    onClick: () -> Unit
 ) {
     Card(
         modifier = modifier.height(180.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         shape = RoundedCornerShape(4.dp),
-        enabled = true,
-        onClick = onClick,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.onSecondaryContainer,
-            contentColor = MaterialTheme.colorScheme.onSecondary
-        )
     ) {
         Row(
             modifier = Modifier
@@ -111,9 +92,6 @@ fun InventoryItem(
                     elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                     shape = RoundedCornerShape(4.dp),
                     border = BorderStroke(1.dp, MaterialTheme.colorScheme.secondary),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surface
-                    )
                 ) {
                     BarcodeImage(
                         upc = item.sku?.upc ?: "",
@@ -125,24 +103,3 @@ fun InventoryItem(
         }
     }
 }
-
-/*
-@Preview(showBackground = true)
-@Composable
-fun InventoryItemPreview() {
-    InventoryItem(
-        item = AuditItem(
-            auditId = 2,
-            count = 3,
-            note = "",
-            sku = Sku(
-                skuId = 1,
-                upc = "1245511",
-                name = "test",
-                casePack = null,
-                brand = "Pepsi"
-            ),
-        ),
-        onClick = {},
-    )
-}*/

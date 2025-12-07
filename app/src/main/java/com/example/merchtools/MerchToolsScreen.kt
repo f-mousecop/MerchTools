@@ -55,7 +55,7 @@ fun MerchToolsApp() {
                         saveState = true
                     }
                     launchSingleTop = true
-                    restoreState = true
+                    restoreState = false
                 }
             }
         }

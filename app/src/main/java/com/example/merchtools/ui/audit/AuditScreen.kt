@@ -45,12 +45,14 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.merchtools.R
 import com.example.merchtools.components.ProgressButton
+import com.example.merchtools.domain.util.BarcodeGenerator
 import com.example.merchtools.ui.components.SwipeToDeleteContainer
 import com.example.merchtools.ui.theme.MerchToolsTheme
 import com.example.merchtools.util.toDisplayString
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.EditAuditItemScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.HistoryScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.launch
 
@@ -72,6 +74,9 @@ fun AuditScreen(
                 is AuditUiEffect.NavigateToEditAuditItem -> {
                     navigator.navigate(EditAuditItemScreenDestination(effect.auditItemId))
                 }
+                is AuditUiEffect.NavigateToHistoryScreen -> {
+                    navigator.navigate(HistoryScreenDestination)
+                }
                 is AuditUiEffect.ShowMessage -> {
                     scope.launch {
                         snackbarHostState.showSnackbar(
@@ -91,10 +96,11 @@ fun AuditScreen(
         AuditScreenContent(
             state = state,
             onEvent = viewModel::onEvent,
+            barcodeGenerator = viewModel.barcodeGen,
             modifier = Modifier.padding(innerPadding)
         )
-        println("DEBUG: Audit screen loaded: $viewModel" +
-                "\n${uiEffect}")
+        println("DEBUG: Audit screen loaded: ${state.audit.auditId}\n" +
+                "Store: ${state.audit.storeId}")
     }
 }
 
@@ -102,6 +108,7 @@ fun AuditScreen(
 fun AuditScreenContent(
     state: AuditState,
     onEvent: (AuditEvent) -> Unit,
+    barcodeGenerator: BarcodeGenerator,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -112,6 +119,7 @@ fun AuditScreenContent(
         AuditScreenBody(
             state = state,
             onEvent = onEvent,
+            barcodeGenerator = barcodeGenerator,
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
@@ -135,6 +143,7 @@ fun AuditScreenContent(
 fun AuditScreenBody(
     state: AuditState,
     onEvent: (AuditEvent) -> Unit,
+    barcodeGenerator: BarcodeGenerator,
     modifier: Modifier = Modifier
 ) {
     var newAuditItem by rememberSaveable { mutableStateOf("") }
@@ -145,6 +154,12 @@ fun AuditScreenBody(
         Row(
             modifier = Modifier.fillMaxWidth()
         ) {
+            // This works fine
+            val storeName = state.audit.store?.name
+            Text(
+                text = storeName ?: "-",
+                style = MaterialTheme.typography.titleMedium
+            )
             Spacer(Modifier.weight(1f))
 
             val startedAtText = state.audit.startedAt
@@ -256,14 +271,16 @@ fun AuditScreenBody(
                         item.auditItemId
                     }
                 ) { item ->
-                    // Navigate to edit audit item screen passing the auditItemId
+                    // Enables swipe left to give the option to delete AuditItem
                     SwipeToDeleteContainer(
                         item = item,
                         onDelete = { onEvent(AuditEvent.RemoveItem(item)) }
                     ) {
+                        // Navigate to edit audit item screen passing the auditItemId
                         InventoryItem(
                             item = item,
                             onClick = { onEvent(AuditEvent.EditAuditItem(item.auditItemId)) },
+                            barcodeGenerator = barcodeGenerator,
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
@@ -278,9 +295,10 @@ fun AuditScreenBody(
 @Composable
 fun AuditScreenPreview() {
     MerchToolsTheme {
-        AuditScreenContent(
+        /*AuditScreenContent(
             state = AuditState(),
-            onEvent = {}
-        )
+            onEvent = {},
+
+        )*/
     }
 }

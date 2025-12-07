@@ -30,6 +30,7 @@ uiGraphics = "1.9.5"
 foundation = "1.9.5"
 animation = "1.9.5"
 roomKtx = "2.8.4"
+pdfViewer = "1.0.0-alpha12"
 
 [libraries]
 androidx-activity-compose-v1120 = { module = "androidx.activity:activity-compose", version.ref = "activityComposeVersion" }
@@ -78,6 +79,7 @@ androidx-compose-ui-graphics = { group = "androidx.compose.ui", name = "ui-graph
 androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundation" }
 androidx-compose-animation = { group = "androidx.compose.animation", name = "animation", version.ref = "animation" }
 room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomKtx" }
+androidx-pdf-viewer = { group = "androidx.pdf", name = "pdf-viewer", version.ref = "pdfViewer" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

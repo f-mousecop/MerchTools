@@ -74,12 +74,9 @@ class OfflineAuditRepository @Inject constructor(
     ): Long {
         val now = Instant.now(clock)
         val newAudit = Audit(
-            auditId = 0L,
             storeId = storeId,
             startedAt = now,
-            completedAt = null,
             createdBy = createdBy,
-            items = emptyList()
         )
         return auditDao.insert(newAudit.toAuditEntity())
     }

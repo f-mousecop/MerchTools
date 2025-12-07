@@ -1,7 +1,7 @@
 package com.example.merchtools.ui.audit
 
 import com.example.merchtools.domain.model.Audit
-import com.example.merchtools.domain.model.AuditItem
+import com.example.merchtools.domain.model.Store
 
 data class AuditState(
     val audit: Audit = Audit(),

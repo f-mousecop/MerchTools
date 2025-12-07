@@ -6,6 +6,7 @@ import com.example.merchtools.data.local.entity.AuditEntity
 import com.example.merchtools.data.local.entity.AuditItemEntity
 import com.example.merchtools.data.local.entity.PhotoEntity
 import com.example.merchtools.data.local.entity.SkuEntity
+import com.example.merchtools.data.local.entity.StoreEntity
 
 /**
  * Data class to hold audit item and relevant fields.
@@ -33,6 +34,7 @@ data class AuditItemWithSkuAndPhoto(
  * Data class to hold [AuditEntity] and associated Audit Items
  * @property audit
  * @property items
+ * @property store
  * @constructor AuditWithItems
  * @see AuditItemWithSkuAndPhoto
  */
@@ -43,5 +45,11 @@ data class AuditWithItems(
         parentColumn = "auditId",
         entityColumn = "auditId"
     )
-    val items: List<AuditItemWithSkuAndPhoto>
+    val items: List<AuditItemWithSkuAndPhoto>,
+
+    @Relation(
+        parentColumn = "storeId",
+        entityColumn = "storeId"
+    )
+    val store: StoreEntity
 )

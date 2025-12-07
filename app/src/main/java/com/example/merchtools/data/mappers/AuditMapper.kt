@@ -2,6 +2,7 @@ package com.example.merchtools.data.mappers
 
 import com.example.merchtools.data.local.entity.AuditEntity
 import com.example.merchtools.data.local.relations.AuditWithItems
+import com.example.merchtools.data.local.relations.AuditWithStore
 import com.example.merchtools.domain.model.Audit
 
 fun AuditEntity.toAudit(): Audit {
@@ -10,7 +11,7 @@ fun AuditEntity.toAudit(): Audit {
         storeId = storeId,
         startedAt = startedAt,
         completedAt = completedAt,
-        createdBy = createdBy
+        createdBy = createdBy,
     )
 }
 
@@ -26,6 +27,7 @@ fun Audit.toAuditEntity(): AuditEntity {
 
 fun AuditWithItems.toDomain(): Audit {
     return audit.toAudit().copy(
-        items = this.items.map { it.toAuditItem() }
+        items = this.items.map { it.toAuditItem() },
+        store = this.store.toStore()
     )
 }
