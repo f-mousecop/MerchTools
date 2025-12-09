@@ -12,6 +12,7 @@ import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.generated.NavGraphs
 import com.ramcosta.composedestinations.generated.destinations.AuditScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.EditAuditItemScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.GenerateReportScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.HistoryScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.HomeScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.SearchScreenDestination
@@ -33,6 +34,7 @@ fun MerchToolsApp() {
         AuditScreenDestination.route -> "Audit"
         EditAuditItemScreenDestination.route -> "Edit Audit Item"
         HistoryScreenDestination.route -> "Audit History"
+        GenerateReportScreenDestination.route -> "Audit Report"
         else -> "Merch Tools"
     }
 
@@ -46,16 +48,11 @@ fun MerchToolsApp() {
                 if (route == HomeScreenDestination.route) {
                     popUpTo(startDestination) {
                         inclusive = true
-                        saveState = false
                     }
                     launchSingleTop = true
-                    restoreState = false
                 } else {
-                    popUpTo(navController.graph.startDestinationId) {
-                        saveState = true
-                    }
+                    popUpTo(navController.graph.startDestinationId)
                     launchSingleTop = true
-                    restoreState = false
                 }
             }
         }

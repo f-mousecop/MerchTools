@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.merchtools.R
+import com.example.merchtools.ui.components.SkuItemCard
 import com.example.merchtools.ui.components.SwipeToDeleteContainer
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
@@ -147,14 +148,21 @@ fun SearchScreen(
                             item = item,
                             onDelete = { viewModel.onEvent(SearchSkuEvent.RemoveSku(item)) }
                         ) {
-                            SkuItem(
+                            SkuItemCard(
+                                sku = item,
+                                onClick = {
+                                    viewModel.onEvent(SearchSkuEvent.EditSku(item.skuId))
+                                },
+                                clickable = true,
+                            )
+                            /*SkuItem(
                                 sku = item,
                                 onClick = {
                                     viewModel.onEvent(SearchSkuEvent.EditSku(item.skuId))
                                 },
                                 modifier = Modifier
                                     .fillMaxWidth()
-                            )
+                            )*/
                         }
                     }
                 }

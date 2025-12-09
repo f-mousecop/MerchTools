@@ -49,7 +49,6 @@ class AuditViewModel @Inject constructor(
         get() = barcodeGenerator
 
     private var auditJob: Job? = null
-    private var storeJob: Job? = null
 
     init {
         getAuditStream(auditId)
@@ -66,7 +65,6 @@ class AuditViewModel @Inject constructor(
             is AuditEvent.EditAuditItem -> {
                 editAuditItem(event.auditItemId)
             }
-            // Do I need to copy the upc from the UI state?
             is AuditEvent.BarcodeScanned -> {
                 scanBarcode()
             }
@@ -75,12 +73,6 @@ class AuditViewModel @Inject constructor(
             }
             is AuditEvent.RemoveItem -> {
                 removeItem(event.item)
-            }
-            is AuditEvent.AddPhotoToItem -> {
-                addPhotoToItem(event.itemIndex)
-            }
-            is AuditEvent.RemovePhotoFromItem -> {
-                removePhotoFromItem(event.itemIndex, event.photoUri)
             }
             is AuditEvent.SaveAudit -> {
                 saveAudit()
@@ -98,15 +90,6 @@ class AuditViewModel @Inject constructor(
             )
             return@launch
         }
-    }
-
-
-    private fun addPhotoToItem(itemIndex: Int) {
-        TODO("Not yet implemented")
-    }
-
-    private fun removePhotoFromItem(itemIndex: Int, photoUri: String) {
-        TODO("Not yet implemented")
     }
 
     private fun saveAudit() {

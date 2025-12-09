@@ -49,6 +49,7 @@ import com.example.merchtools.R
 import com.example.merchtools.components.ProgressButton
 import com.example.merchtools.components.QuantityStepper
 import com.example.merchtools.domain.util.BarcodeGenerator
+import com.example.merchtools.ui.components.SkuItemCard
 import com.example.merchtools.ui.theme.MerchToolsTheme
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
@@ -93,7 +94,6 @@ fun EditAuditItemScreen(
         EditAuditItemScreenContent(
             state = state,
             onEvent = viewModel::onEvent,
-            barcodeGenerator = viewModel.barcodeGen,
             modifier = Modifier
                 .padding(
                     start = innerPadding.calculateStartPadding(LocalLayoutDirection.current),
@@ -110,10 +110,8 @@ fun EditAuditItemScreen(
 fun EditAuditItemScreenContent(
     state: AuditItemState,
     onEvent: (AuditItemEvent) -> Unit,
-    barcodeGenerator: BarcodeGenerator,
     modifier: Modifier = Modifier
 ) {
-    val scope = rememberCoroutineScope()
     Column(
         modifier = modifier
             .padding(dimensionResource(R.dimen.padding_medium)),
@@ -122,7 +120,6 @@ fun EditAuditItemScreenContent(
         AuditItemInputForm(
             state = state,
             onValueChange = onEvent,
-            barcodeGenerator = barcodeGenerator,
             modifier = Modifier.fillMaxWidth()
         )
         ProgressButton(
@@ -139,13 +136,8 @@ fun EditAuditItemScreenContent(
 fun AuditItemInputForm(
     state: AuditItemState,
     onValueChange: (AuditItemEvent) -> Unit = {},
-    barcodeGenerator: BarcodeGenerator,
     modifier: Modifier = Modifier,
-    enabled: Boolean = true
 ) {
-    val sku = state.auditItem.sku
-    val upc = sku?.upc.orEmpty()
-
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_medium))
@@ -170,82 +162,11 @@ fun AuditItemInputForm(
             thickness = 2.dp
         )
 
-        SkuItem(
-            upc = upc,
-            name = state.auditItem.sku?.name ?: "",
-            casePack = state.auditItem.sku?.casePack ?: "",
-            brand = state.auditItem.sku?.brand ?: "",
-            barcodeGenerator = barcodeGenerator
+        SkuItemCard(
+            sku = state.auditItem.sku,
+            clickable = false,
         )
 
-        /*OutlinedTextField(
-            value = upc,
-            enabled = isUpcEditable,
-            readOnly = !isUpcEditable,
-            label = { Text(stringResource(R.string.upc)) },
-            onValueChange = { newValue ->
-                if (isUpcEditable) {
-                    onValueChange(AuditItemEvent.OnItemFieldChanged(newValue))
-                }
-            },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Next
-            ),
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            colors = OutlinedTextFieldDefaults.colors(
-                unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                disabledTextColor = MaterialTheme.colorScheme.secondary,
-                disabledLabelColor = MaterialTheme.colorScheme.secondary
-            )
-        )
-
-        OutlinedTextField(
-            value = state.auditItem.sku?.name ?: "",
-            enabled = true,
-            label = { Text(stringResource(R.string.item_name)) },
-            onValueChange = { newText ->
-                onValueChange(AuditItemEvent.OnNameChanged(newText))
-            },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            colors = OutlinedTextFieldDefaults.colors(
-                unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            )
-        )
-
-        OutlinedTextField(
-            value = state.auditItem.sku?.casePack.orEmpty(),
-            enabled = true,
-            label = { Text(stringResource(R.string.case_pack)) },
-            onValueChange = { newText ->
-                onValueChange(AuditItemEvent.OnCasePackChanged(newText))
-            },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            colors = OutlinedTextFieldDefaults.colors(
-                unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            )
-        )
-
-        OutlinedTextField(
-            value = state.auditItem.sku?.brand ?: "",
-            enabled = true,
-            label = { Text(stringResource(R.string.brand)) },
-            onValueChange = { newText ->
-                onValueChange(AuditItemEvent.OnBrandChanged(newText))
-            },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            colors = OutlinedTextFieldDefaults.colors(
-                unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            )
-        )*/
         HorizontalDivider()
 
         Text(
@@ -278,6 +199,12 @@ fun AuditItemInputForm(
             )
         )
 
+        /**
+         * Currently a postponed feature
+         * TODO: Add photo picker
+         * As of right now, this is just a placeholder, and the AuditItem will contain
+         * a generated barcode of the UPC
+         */
         Row(
             modifier = Modifier,
             horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small)),
@@ -315,7 +242,7 @@ fun AuditItemInputForm(
         ) {
             Image(
                 modifier = Modifier
-                    .size(300.dp),
+                    .size(200.dp),
                 painter = painterResource(R.drawable.pepsi_12pk),
                 contentDescription = null,
                 contentScale = ContentScale.Crop
@@ -324,6 +251,10 @@ fun AuditItemInputForm(
     }
 }
 
+/**
+ * TODO: Add photo picker
+ * To be attached to an AuditItem
+ */
 @Composable
 fun ImagePicker(
     pickMedia: () -> Unit

@@ -48,6 +48,14 @@ import com.ramcosta.composedestinations.generated.destinations.SearchScreenDesti
 import com.ramcosta.composedestinations.generated.destinations.StoreCatalogScreenDestination
 import kotlinx.coroutines.launch
 
+/**
+ * Class representing a navigation drawer screen.
+ *
+ * @property DrawerScreens.title The title of the screen.
+ * @property DrawerScreens.route The route associated with the screen.
+ * @property DrawerScreens.icon The icon associated with the screen.
+ * @constructor Creates a [DrawerScreens] instance.
+ */
 sealed class DrawerScreens(
     val title: String,
     val route: String,
@@ -71,6 +79,8 @@ sealed class DrawerScreens(
     )
 }
 
+// Create a list of screens to iterate over, determining their routes and icons
+// and if selected = true
 private val screens = listOf(
     DrawerScreens.Home,
     DrawerScreens.Search,
@@ -89,7 +99,6 @@ fun DetailedNavDrawer(
     ) {
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    val selectedScreen = remember { mutableStateOf(screens[0]) }
 
     ModalNavigationDrawer(
         drawerState = drawerState,

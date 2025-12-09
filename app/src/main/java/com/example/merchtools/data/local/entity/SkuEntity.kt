@@ -11,5 +11,6 @@ data class SkuEntity(
     val upc: String,
     val name: String,
     val casePack: String?,
-    val brand: String
+    val brand: String,
+    val imageUri: String?
 )

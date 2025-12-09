@@ -1,14 +1,12 @@
 package com.example.merchtools.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -22,22 +20,27 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.min
 import com.example.merchtools.R
 
+/**
+ * A Composable that allows users to increment, decrement, or manually input a quantity.
+ * It consists of two buttons for incrementing and decrementing, and a text field
+ * for direct input. The value is constrained by a minimum and maximum value.
+ *
+ * @param value The current quantity to be displayed.
+ * @param modifier The modifier to be applied to the stepper row.
+ * @param minValue The minimum allowed quantity. Defaults to 0.
+ * @param maxValue The maximum allowed quantity. Defaults to 200.
+ * @param onValueChange A callback that is invoked when the quantity changes, providing the new value.
+ */
 @Composable
 fun QuantityStepper(
     value: Int,
@@ -84,7 +87,6 @@ fun QuantityStepper(
                         color = MaterialTheme.colorScheme.surface,
                         shape = shape
                     ),
-//                    .widthIn(min = 16.dp),
                 contentAlignment = Alignment.Center
             ) {
                 OutlinedTextField(
@@ -125,6 +127,15 @@ fun QuantityStepper(
     }
 }
 
+/**
+ * A private composable function that creates a styled button for a stepper control.
+ * It's typically used for incrementing or decrementing a value.
+ *
+ * @param icon The [ImageVector] to be displayed on the button.
+ * @param contentDescription A text description for accessibility services.
+ * @param enabled A boolean to control if the button is enabled and clickable.
+ * @param onClick The lambda function to be executed when the button is clicked.
+ */
 @Composable
 private fun StepperButton(
     icon: ImageVector,

@@ -9,7 +9,8 @@ fun SkuEntity.toSku(): Sku {
         upc = upc,
         name = name,
         casePack = casePack,
-        brand = brand
+        brand = brand,
+        imageUri = imageUri
     )
 }
 
@@ -19,6 +20,7 @@ fun Sku.toSkuEntity(): SkuEntity {
         upc = upc,
         name = name,
         casePack = casePack,
-        brand = brand
+        brand = brand,
+        imageUri = imageUri
     )
 }

@@ -45,6 +45,10 @@ class HomeViewModel @Inject constructor(
         when (event) {
             is HomeEvent.StartAuditClicked -> {
                 startAudit(state.userName, state.storeId)
+                state = state.copy(
+                    userName = "",
+                    storeName = ""
+                )
             }
             is HomeEvent.OnUserNameChanged -> {
                 state = state.copy(userName = event.userName)

@@ -21,12 +21,6 @@ sealed class AuditEvent {
     // Event to remove a specific audit item
     data class RemoveItem(val item: AuditItem) : AuditEvent()
 
-    // Event to add a photo to a specific audit item
-    data class AddPhotoToItem(val itemIndex: Int) : AuditEvent()
-
-    // Event to remove a photo from audit item
-    data class RemovePhotoFromItem(val photoUri: String, val itemIndex: Int) : AuditEvent()
-
     // Event to save or submit an audit
     data object SaveAudit : AuditEvent()
 

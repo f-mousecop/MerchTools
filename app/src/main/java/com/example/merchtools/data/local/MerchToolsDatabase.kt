@@ -31,7 +31,7 @@ import com.example.merchtools.data.util.InstantConverter
         AuditItemEntity::class,
         PhotoEntity::class
     ],
-    version = 4,
+    version = 5,
     exportSchema = false
 )
 @TypeConverters(InstantConverter::class)

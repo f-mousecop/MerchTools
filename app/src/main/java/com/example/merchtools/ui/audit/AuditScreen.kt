@@ -46,6 +46,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.merchtools.R
 import com.example.merchtools.components.ProgressButton
 import com.example.merchtools.domain.util.BarcodeGenerator
+import com.example.merchtools.ui.components.AuditInventoryItem
 import com.example.merchtools.ui.components.SwipeToDeleteContainer
 import com.example.merchtools.ui.theme.MerchToolsTheme
 import com.example.merchtools.util.toDisplayString
@@ -99,8 +100,6 @@ fun AuditScreen(
             barcodeGenerator = viewModel.barcodeGen,
             modifier = Modifier.padding(innerPadding)
         )
-        println("DEBUG: Audit screen loaded: ${state.audit.auditId}\n" +
-                "Store: ${state.audit.storeId}")
     }
 }
 
@@ -277,14 +276,15 @@ fun AuditScreenBody(
                         onDelete = { onEvent(AuditEvent.RemoveItem(item)) }
                     ) {
                         // Navigate to edit audit item screen passing the auditItemId
-                        InventoryItem(
+                        AuditInventoryItem(
                             item = item,
                             onClick = { onEvent(AuditEvent.EditAuditItem(item.auditItemId)) },
                             barcodeGenerator = barcodeGenerator,
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
+                            clickable = true,
+                            height = 220.dp
                         )
                     }
-
                 }
             }
         }

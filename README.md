@@ -29,7 +29,7 @@ UPC text field - fills in SKU details if match is found)
 - [ ] Started working on EditAuditItemScreen (user clicks AuditItem card in Audit list, nav -> EditAuditItem)
   - [x] Implemented the screen UI
   - [x] All fields required (pre-filled UPC, SKU details, editable note and count stepper)
-  - [ ] Need to implement proper add photo
+  - [x] Need to implement proper add photo
 - [x] Configured type converter to display correct started at time and store object in the database
 - [x] Fixed theming issue on physical device (dynamicColor = false)
 

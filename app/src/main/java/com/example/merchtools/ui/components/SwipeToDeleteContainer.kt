@@ -45,6 +45,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 
 
+/**
+ * A composable that wraps another composable to provide swipe-to-delete functionality.
+ * When an item is swiped from end to start, a confirmation background is shown with "Delete" and "Cancel" options.
+ * The deletion is animated with a vertical shrink and fade out.
+ *
+ * This composable uses the experimental `SwipeToDismissBox` from Material 3.
+ *
+ * @param T The type of the item being displayed.
+ * @param item The data item that the container represents. This item will be passed to the `onDelete` callback.
+ * @param onDelete A lambda function that is called when the delete action is confirmed. It receives the `item` to be deleted.
+ * @param animationDuration The duration for the exit animation when an item is deleted. Defaults to 500 milliseconds.
+ * @param content The composable content to be displayed inside the container. It receives the `item` to render.
+ */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
 @Composable
 fun <T> SwipeToDeleteContainer(
@@ -111,6 +124,16 @@ fun <T> SwipeToDeleteContainer(
     }
 }
 
+/**
+ * A composable that serves as the background content for a `SwipeToDismissBox`.
+ * It becomes visible when the user swipes an item from end to start.
+ * The background animates to red and displays a "Delete?" prompt with two icons:
+ * one to cancel the swipe action and another to confirm the deletion.
+ *
+ * @param swipeDismissState The state of the `SwipeToDismissBox` which controls the background's visibility and color.
+ * @param onDelete A lambda function to be invoked when the user confirms the delete action by clicking the delete icon.
+ * @param onCancel A lambda function to be invoked when the user cancels the swipe action by clicking the clear icon.
+ */
 @Composable
 fun DeleteBackground(
     swipeDismissState: SwipeToDismissBoxState,

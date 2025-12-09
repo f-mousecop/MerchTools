@@ -1,5 +1,6 @@
 package com.example.merchtools.ui.searchsku.edit_sku
 
+import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -9,6 +10,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.merchtools.domain.model.Sku
 import com.example.merchtools.domain.repository.SkuRepository
+import com.example.merchtools.ui.searchsku.SearchSkuEvent
 import com.example.merchtools.ui.searchsku.SearchSkuUiEffect
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -47,7 +49,6 @@ class EditSkuViewModel @Inject constructor(
                     sku = updated,
                     isUpcValid = validateUpc(updated)
                 )
-                println("DEBUG: isEntryValid: ${state.isEntryValid}")
             }
             is EditSkuEvent.OnNameChanged -> {
                 val updated = state.sku.copy(name = event.userInput)
@@ -73,7 +74,40 @@ class EditSkuViewModel @Inject constructor(
             is EditSkuEvent.SaveSku -> {
                 saveSku()
             }
+            is EditSkuEvent.OnImageUriChanged -> {
+                state = state.copy(
+                    sku = state.sku.copy(
+                        imageUri = event.uri.toString()
+                    )
+                )
+//                addProductImage(event.uri)
+            }
+            is EditSkuEvent.DiscardImageUri -> {
+                state = state.copy(
+                    sku = state.sku.copy(
+                        imageUri = null
+                    )
+                )
+            }
         }
+    }
+
+    private fun addProductImage(uri: Uri) {
+            /*state = state.copy(isLoading = true)
+            try {
+                state = state.copy(
+                    sku = state.sku.copy(
+                        imageUri = uri.toString()
+                    )
+                )
+                state = state.copy(isLoading = false)
+                _uiEffect.emit(SearchSkuUiEffect.ShowMessage("Image added"))
+            } catch (e: Exception) {
+                _uiEffect.emit(SearchSkuUiEffect.ShowMessage(e.message ?: "Unknown error"))
+            } finally {
+                state = state.copy(isLoading = false)
+            }*/
+
     }
 
     private fun validateUpc(sku: Sku): Boolean {
@@ -113,7 +147,6 @@ class EditSkuViewModel @Inject constructor(
                 state = state.copy(isLoading = true, error = null)
             }
             .onEach { sku ->
-                println("DEBUG: stream emitted sku = ${sku?.skuId}")
                 sku?.let {
                     state = state.copy(
                         sku = it,

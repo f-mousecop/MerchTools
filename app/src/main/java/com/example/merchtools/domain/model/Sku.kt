@@ -5,5 +5,6 @@ data class Sku(
     val upc: String = "",
     val name: String = "",
     val casePack: String? = null,
-    val brand: String = ""
+    val brand: String = "",
+    val imageUri: String? = null
 )

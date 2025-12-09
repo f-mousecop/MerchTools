@@ -1,11 +1,18 @@
 package com.example.merchtools.ui.searchsku.edit_sku
 
+import android.content.Intent
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -13,6 +20,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Error
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -26,16 +36,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 import com.example.merchtools.R
 import com.example.merchtools.components.ProgressButton
 import com.example.merchtools.ui.searchsku.SearchSkuUiEffect
@@ -124,6 +141,23 @@ fun EditSkuInputForm(
     onValueChange: (EditSkuEvent) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+    val flag = Intent.FLAG_GRANT_READ_URI_PERMISSION
+
+    val launcher = rememberLauncherForActivityResult(
+        ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+        if (uri != null) {
+            try {
+                context.contentResolver.takePersistableUriPermission(uri, flag)
+            } catch (e: SecurityException) {
+                e.printStackTrace()
+            }
+            onValueChange(EditSkuEvent.OnImageUriChanged(uri))
+        }
+    }
+
+
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_medium))
@@ -247,5 +281,61 @@ fun EditSkuInputForm(
                 focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
             )
         )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_medium))
+        ) {
+            Button(
+                onClick = {
+                    launcher.launch(
+                        PickVisualMediaRequest(
+                            ActivityResultContracts.PickVisualMedia.ImageOnly
+                        )
+                    )
+                },
+                shape = MaterialTheme.shapes.small,
+                modifier = Modifier.weight(0.5f)
+            ) {
+                Text("Add Product Image")
+            }
+
+            Button(
+                onClick = {
+                    onValueChange(EditSkuEvent.DiscardImageUri)
+                },
+                shape = MaterialTheme.shapes.small,
+                modifier = Modifier.weight(0.5f)
+            ) {
+                Text("Cancel")
+            }
+        }
+
+        Card(
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .size(240.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+            shape = RoundedCornerShape(4.dp),
+
+        ) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(state.sku.imageUri)
+                        .crossfade(true)
+                        .build(),
+                    placeholder = painterResource(R.drawable.photo_240dp_placeholder),
+                    error = painterResource(R.drawable.photo_240dp_placeholder),
+                    contentDescription = "Produce image for ${state.sku.upc}",
+                    contentScale = ContentScale.Fit,
+                    alignment = Alignment.Center,
+                    modifier = Modifier
+                )
+            }
+        }
     }
 }

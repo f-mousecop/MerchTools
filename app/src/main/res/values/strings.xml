@@ -28,4 +28,7 @@
     <string name="history_blank">No Recent Audits Completed</string>
     <string name="store_catalog">Store Catalog</string>
     <string name="store_catalog_blank">No Stores Added</string>
+    <string name="generate_report">Generate Report</string>
+    <string name="export_pdf">Export PDF</string>
+    <string name="share_report">Share</string>
 </resources>

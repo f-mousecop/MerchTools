@@ -60,10 +60,20 @@ class GenerateReportViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Generates an HTML string representation of the audit report.
+     *
+     * This function initiates the process of creating the report. It sets the UI state to loading,
+     * then invokes the [AuditReportHtmlBuilder] to construct the HTML content using the current audit
+     * data and barcode generator.
+     *
+     * Upon successful generation, the UI state is updated with the generated HTML and a success
+     * message is emitted as a [GenerateReportUiEffect]. If an exception occurs during the process,
+     * the UI state is updated with the error message, and a corresponding error message is emitted.
+     */
     private fun generatePdf() {
         viewModelScope.launch {
-            _uiEffect.emit(GenerateReportUiEffect.ShowMessage("Generating PDF..."))
-            /*try {
+            try {
                 state = state.copy(isLoading = true, error = null)
 
                 val html = auditReportHtmlBuilder.buildReportHtml(
@@ -71,17 +81,27 @@ class GenerateReportViewModel @Inject constructor(
                     barcodeGenerator = barcodeGenerator
                 )
 
-                _uiEffect.emit(GenerateReportUiEffect.GeneratePdf(html))
-            } catch (e: Exception) {
-                state = state.copy(error = e.message)
+                state = state.copy(
+                    html = html,
+                    isLoading = false
+                )
+
                 _uiEffect.emit(
                     GenerateReportUiEffect.ShowMessage(
-                        e.message ?: "Failed to generate report"
+                        "Preview generated below. Ready for export."
                     )
                 )
-            } finally {
-                state = state.copy(isLoading = false)
-            }*/
+            } catch (e: Exception) {
+                state = state.copy(
+                    isLoading = false,
+                    error = e.message
+                )
+                _uiEffect.emit(
+                    GenerateReportUiEffect.ShowMessage(
+                        e.message ?: "Unknown error"
+                    )
+                )
+            }
         }
     }
 

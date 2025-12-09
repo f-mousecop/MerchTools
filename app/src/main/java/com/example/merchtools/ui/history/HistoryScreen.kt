@@ -94,8 +94,6 @@ fun HistoryScreen(
             modifier = Modifier.padding(innerPadding)
         )
     }
-
-
 }
 
 @Composable
@@ -152,6 +150,7 @@ fun HistoryScreenBody(
             thickness = 2.dp
         )
 
+        // We need to check if the list of Audits is empty
         if (state.audits.isEmpty()) {
             historyText = stringResource(R.string.history_blank)
             Text(
@@ -163,10 +162,13 @@ fun HistoryScreenBody(
                 style = MaterialTheme.typography.bodyMedium
             )
         } else {
+            // If not empty, we need to partition the list into completed and open audits
             val (completedAudits, openAudits) = remember(state.audits) {
                 state.audits.partition { it.completedAt != null }
             }
 
+            // Now we can display the completed and open audits separately inside the
+            // LazyColumn
             LazyColumn(
                 modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(
@@ -321,7 +323,7 @@ fun AuditCard(
                     onClick = { onEvent(HistoryEvent.ExportPdfClicked(audit.auditId)) },
                     shape = MaterialTheme.shapes.small
                 ) {
-                    Text("Export PDF")
+                    Text(stringResource(R.string.generate_report))
                 }
             }
         }

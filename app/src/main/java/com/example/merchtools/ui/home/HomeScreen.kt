@@ -151,6 +151,8 @@ fun HomeScreenContent(
                                     onEvent(HomeEvent.StartAuditClicked)
                                     showDialog = false
                                 },
+                                enabled = state.userName.isNotBlank() && state.storeName.isNotBlank(),
+
                             ) {
                                 Text("OK")
                             }
