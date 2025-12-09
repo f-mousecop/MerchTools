@@ -1,8 +1,13 @@
 package com.example.merchtools.util
 
 import android.content.Context
+import android.os.Bundle
+import android.os.CancellationSignal
 import android.print.PrintAttributes
+import android.print.PrintDocumentAdapter
+import android.print.PrintDocumentAdapter.*
 import android.print.PrintManager
+import android.print.pdf.PrintedPdfDocument
 import android.webkit.WebView
 import com.example.merchtools.domain.model.Audit
 import java.io.File
