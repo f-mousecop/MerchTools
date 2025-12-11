@@ -1,6 +1,7 @@
 package com.example.merchtools.ui.report
 
 import com.example.merchtools.domain.model.Audit
+import com.example.merchtools.domain.model.Report
 
 /**
  * Represents the state for the report generation screen.
@@ -15,6 +16,7 @@ import com.example.merchtools.domain.model.Audit
  */
 data class GenerateReportState(
     val audit: Audit = Audit(),
+    val report: Report = Report(),
     val html: String? = null,
     val isLoading: Boolean = false,
     val error: String? = null

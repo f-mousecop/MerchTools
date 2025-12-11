@@ -1,6 +1,8 @@
 package com.example.merchtools.ui.report
 
+import android.content.Context
 import android.content.Intent
+import android.print.PrintManager
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
@@ -70,6 +72,7 @@ fun GenerateReportScreen(
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     val state = viewModel.state
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         uiEffect.collect { effect ->
@@ -78,7 +81,21 @@ fun GenerateReportScreen(
                     navigator.navigateUp()
                 }
                 is GenerateReportUiEffect.GeneratePdf -> {
-                    /*TODO: Generate PDF*/
+                    val printManager =
+                        context.getSystemService(Context.PRINT_SERVICE) as PrintManager
+
+                    val jobName = "${context.packageName}_audit_${state.audit.auditId}"
+
+                    val adapter = viewModel.buildPrintAdapter(context) { result ->
+                        result.onSuccess { uri ->
+                            sharePdfReport(context, uri, state.audit)
+                        }.onFailure { error ->
+                            Toast.makeText(context, error.message.toString(), Toast.LENGTH_LONG)
+                                .show()
+                        }
+                    }
+
+                    printManager.print(jobName, adapter, null)
                 }
                 is GenerateReportUiEffect.ShowMessage -> {
                     scope.launch {

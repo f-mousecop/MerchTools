@@ -31,6 +31,7 @@ foundation = "1.9.5"
 animation = "1.9.5"
 roomKtx = "2.8.4"
 pdfViewer = "1.0.0-alpha12"
+firebaseCrashlyticsBuildtools = "3.0.6"
 
 [libraries]
 androidx-activity-compose-v1120 = { module = "androidx.activity:activity-compose", version.ref = "activityComposeVersion" }
@@ -80,6 +81,7 @@ androidx-compose-foundation = { group = "androidx.compose.foundation", name = "f
 androidx-compose-animation = { group = "androidx.compose.animation", name = "animation", version.ref = "animation" }
 room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomKtx" }
 androidx-pdf-viewer = { group = "androidx.pdf", name = "pdf-viewer", version.ref = "pdfViewer" }
+firebase-crashlytics-buildtools = { group = "com.google.firebase", name = "firebase-crashlytics-buildtools", version.ref = "firebaseCrashlyticsBuildtools" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
