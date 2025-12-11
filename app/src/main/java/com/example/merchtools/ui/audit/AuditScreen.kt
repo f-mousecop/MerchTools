@@ -48,13 +48,17 @@ import com.example.merchtools.components.ProgressButton
 import com.example.merchtools.domain.util.BarcodeGenerator
 import com.example.merchtools.ui.components.AuditInventoryItem
 import com.example.merchtools.ui.components.SwipeToDeleteContainer
+import com.example.merchtools.ui.feature_scanner.BarcodeScanResult
 import com.example.merchtools.ui.theme.MerchToolsTheme
 import com.example.merchtools.util.toDisplayString
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.EditAuditItemScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.HistoryScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.ScanBarCodeScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.result.NavResult
+import com.ramcosta.composedestinations.result.ResultRecipient
 import kotlinx.coroutines.launch
 
 @Destination<RootGraph>
@@ -62,12 +66,25 @@ import kotlinx.coroutines.launch
 fun AuditScreen(
     auditId: Long,
     navigator: DestinationsNavigator,
+    resultRecipient: ResultRecipient<ScanBarCodeScreenDestination, BarcodeScanResult>,
     viewModel: AuditViewModel = hiltViewModel()
 ) {
     val uiEffect = viewModel.uiEffect
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     val state = viewModel.state
+
+    resultRecipient.onNavResult { navResult ->
+        when (navResult) {
+            is NavResult.Value -> {
+                val result = navResult.value
+                viewModel.onEvent(AuditEvent.AddItemBySearch(result.upc))
+            }
+            NavResult.Canceled -> {
+
+            }
+        }
+    }
 
     LaunchedEffect(Unit) {
         uiEffect.collect { effect ->
@@ -77,6 +94,9 @@ fun AuditScreen(
                 }
                 is AuditUiEffect.NavigateToHistoryScreen -> {
                     navigator.navigate(HistoryScreenDestination)
+                }
+                is AuditUiEffect.NavigateToScanBarcode -> {
+                    navigator.navigate(ScanBarCodeScreenDestination)
                 }
                 is AuditUiEffect.ShowMessage -> {
                     scope.launch {
@@ -89,6 +109,7 @@ fun AuditScreen(
             }
         }
     }
+
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },

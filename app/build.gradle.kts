@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
+    kotlin("plugin.serialization") version "2.2.0"
 }
 
 kotlin {
@@ -73,6 +74,7 @@ dependencies {
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.compose.animation)
     implementation(libs.room.ktx)
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
 //    implementation(libs.androidx.pdf.viewer)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -84,6 +86,7 @@ dependencies {
 
     // ML kit barcode scanning
     implementation(libs.barcode.scanning)
+    implementation(libs.androidx.camera.mlkit.vision)
     implementation("com.google.zxing:core:3.5.4")
 
     // Room

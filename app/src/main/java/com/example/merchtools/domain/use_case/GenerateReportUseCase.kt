@@ -8,8 +8,14 @@ import com.example.merchtools.util.toDisplayString
 import jakarta.inject.Inject
 
 /**
- * Need to modify this use case so that it invokes an AuditReportPrintAdapter
- * @return [PrintDocumentAdapter]
+ * A use case responsible for generating a [Report] from an [Audit] object.
+ *
+ * This class transforms the raw audit data into a more presentable format, suitable for display
+ * or for sharing via an intent/share sheet. It processes each item in the audit, formats its
+ * details like SKU, brand, and case pack, and constructs a [Report] object containing
+ * summarized information and a list of [ReportItemRow]s.
+ *
+ * @constructor Injected constructor for dependency injection.
  */
 class GenerateReportUseCase @Inject constructor() {
 

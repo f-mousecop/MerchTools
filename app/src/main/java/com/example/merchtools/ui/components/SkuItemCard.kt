@@ -88,7 +88,7 @@ fun SkuItemCard(
                         )
                     } else {
                         Image(
-                            painter = painterResource(R.drawable.error_placeholder),
+                            painter = painterResource(R.drawable.photo_64dp_placeholder),
                             contentDescription = null,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier.clip(RoundedCornerShape(4.dp))
@@ -105,7 +105,7 @@ fun SkuItemCard(
                     verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))
                 ) {
                     Text(
-                        text = "Product: ${sku?.brand} ${sku?.casePack}",
+                        text = "Product: ${sku?.brand ?: ""} ${sku?.casePack ?: ""}",
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Text(

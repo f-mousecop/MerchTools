@@ -85,10 +85,7 @@ class AuditViewModel @Inject constructor(
 
     private fun scanBarcode() {
         viewModelScope.launch {
-            _uiEffect.emit(
-                AuditUiEffect.ShowMessage("Barcode scanner not yet implemented")
-            )
-            return@launch
+            _uiEffect.emit(AuditUiEffect.NavigateToScanBarcode)
         }
     }
 

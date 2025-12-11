@@ -19,10 +19,12 @@ import javax.inject.Inject
 class AddSkuUseCase @Inject constructor(
     private val skuRepository: SkuRepository
 ){
-    suspend operator fun invoke(): Sku {
+    suspend operator fun invoke(
+        upc: String? = null
+    ): Sku {
         val newSku = Sku(
             skuId = 0,
-            upc = "",
+            upc = upc ?: "",
             name = "",
             casePack = null,
             brand = ""
@@ -31,6 +33,7 @@ class AddSkuUseCase @Inject constructor(
         // Make sure to return the new sku id after inserting it
         // for navigation to edit sku screen
         val id = skuRepository.insert(newSku)
-        return newSku.copy(skuId = id)
+        val upc = newSku.upc
+        return newSku.copy(skuId = id, upc = upc)
     }
 }

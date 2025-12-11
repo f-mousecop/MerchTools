@@ -49,8 +49,13 @@ class SearchViewModel @Inject constructor(
                     seedMockSkus()
                 }
             }
+            is SearchSkuEvent.BarcodeScanned -> {
+                viewModelScope.launch {
+                    _uiEffect.emit(SearchSkuUiEffect.NavigateToScanBarcode)
+                }
+            }
             is SearchSkuEvent.AddNewSku -> {
-                addNewSku()
+                addNewSku(event.upc)
             }
             is SearchSkuEvent.EditSku -> {
                 editSku(event.skuId)
@@ -90,11 +95,11 @@ class SearchViewModel @Inject constructor(
         }
     }
 
-    private fun addNewSku() {
+    private fun addNewSku(upc: String?) {
         searchJob?.cancel()
         searchJob = viewModelScope.launch {
             try {
-                val newSku = addSkuUseCase()
+                val newSku = addSkuUseCase(upc)
                 val newSkuId = newSku.skuId
 
                 _uiEffect.emit(

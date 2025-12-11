@@ -29,12 +29,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.merchtools.R
+import com.example.merchtools.ui.audit.AuditEvent
 import com.example.merchtools.ui.components.SkuItemCard
 import com.example.merchtools.ui.components.SwipeToDeleteContainer
+import com.example.merchtools.ui.feature_scanner.BarcodeScanResult
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.EditSkuScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.ScanBarCodeScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.result.NavResult
+import com.ramcosta.composedestinations.result.ResultRecipient
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -42,11 +47,24 @@ import kotlinx.coroutines.launch
 @Composable
 fun SearchScreen(
     navigator: DestinationsNavigator,
+    resultRecipient: ResultRecipient<ScanBarCodeScreenDestination, BarcodeScanResult>,
     viewModel: SearchViewModel = hiltViewModel()
 ) {
     val uiEffect = viewModel.uiEffect
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
+
+    resultRecipient.onNavResult { navResult ->
+        when (navResult) {
+            is NavResult.Value -> {
+                val result = navResult.value
+                viewModel.onEvent(SearchSkuEvent.AddNewSku(result.upc))
+            }
+            NavResult.Canceled -> {
+
+            }
+        }
+    }
 
     LaunchedEffect(Unit) {
         uiEffect.collect { effect ->
@@ -55,6 +73,9 @@ fun SearchScreen(
                     navigator.navigate(
                         EditSkuScreenDestination(effect.skuId)
                     )
+                }
+                is SearchSkuUiEffect.NavigateToScanBarcode -> {
+                    navigator.navigate(ScanBarCodeScreenDestination)
                 }
                 is SearchSkuUiEffect.ShowMessage -> {
                     scope.launch {
@@ -85,21 +106,36 @@ fun SearchScreen(
         ) {
             Row(
                 modifier = Modifier
-//                    .padding(horizontal = dimensionResource(R.dimen.padding_medium))
                     .align(Alignment.CenterHorizontally)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))
             ) {
                 Button(
                     shape = MaterialTheme.shapes.small,
                     onClick = {
-                        viewModel.onEvent(SearchSkuEvent.AddNewSku)
+                        viewModel.onEvent(SearchSkuEvent.AddNewSku(upc = null))
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.onSecondaryContainer,
                         contentColor = MaterialTheme.colorScheme.onSecondary
                     ),
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.weight(0.5f)
                 ) {
                     Text(text = "Add New SKU")
+                }
+
+                Button(
+                    shape = MaterialTheme.shapes.small,
+                    onClick = {
+                        viewModel.onEvent(SearchSkuEvent.BarcodeScanned)
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onSecondary
+                    ),
+                    modifier = Modifier.weight(0.5f)
+                ) {
+                    Text(text = "Scan Barcode")
                 }
             }
 
@@ -155,14 +191,6 @@ fun SearchScreen(
                                 },
                                 clickable = true,
                             )
-                            /*SkuItem(
-                                sku = item,
-                                onClick = {
-                                    viewModel.onEvent(SearchSkuEvent.EditSku(item.skuId))
-                                },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                            )*/
                         }
                     }
                 }

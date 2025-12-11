@@ -32,6 +32,13 @@ UPC text field - fills in SKU details if match is found)
   - [x] Need to implement proper add photo
 - [x] Configured type converter to display correct started at time and store object in the database
 - [x] Fixed theming issue on physical device (dynamicColor = false)
+- [x] Scan UPC/barcode 
+  - [x] Auto fills audit item fields 
+  - [x] Enter shelf/inventory count 
+  - [x] Add photo 
+  - [x] Add note
+- [x] Generate a PDF report
+- [x] Share/send email to store leadership to rectify inventory issues
 
 ---
 
@@ -39,9 +46,9 @@ UPC text field - fills in SKU details if match is found)
 
 ---
 
-- [ ] Implement barcodescanner
+- [x] Implement barcodescanner
 - [x] Implement proper SKU catalog and ability to add SKU via manual entry or scan
-  - [ ] Need to implement barcode scanner
+  - [x] Need to implement barcode scanner
 
 # IMPORTANT
 
