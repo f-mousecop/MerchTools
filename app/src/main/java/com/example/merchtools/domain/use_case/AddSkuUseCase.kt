@@ -14,6 +14,7 @@ import javax.inject.Inject
  * by the user.
  *
  * @param skuRepository The repository for handling SKU data operations.
+ * @return a new [Sku] object with default values.
  */
 class AddSkuUseCase @Inject constructor(
     private val skuRepository: SkuRepository

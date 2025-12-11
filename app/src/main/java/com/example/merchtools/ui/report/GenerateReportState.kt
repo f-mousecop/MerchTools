@@ -3,21 +3,21 @@ package com.example.merchtools.ui.report
 import com.example.merchtools.domain.model.Audit
 import com.example.merchtools.domain.model.Report
 
+
 /**
- * Represents the state for the report generation screen.
+ * Represents the state of the generate report screen.
  *
  * This data class holds all the necessary information to render the UI for generating a report,
- * including the audit data, the generated HTML content, loading status, and any potential errors.
+ * including the current audit details, the generated report, loading status, and any potential errors.
  *
- * @property audit The [Audit] object containing the data to be included in the report. Defaults to an empty audit.
- * @property html The generated report content as an HTML string. This is null until the report is successfully generated.
- * @property isLoading A boolean flag indicating whether a report generation process is currently in progress.
- * @property error A string containing an error message if the report generation fails. This is null if there is no error.
+ * @property audit The current [Audit] object being used to generate the report. Defaults to an empty Audit.
+ * @property report The generated [Report] object. Null if no report has been generated yet.
+ * @property isLoading A boolean flag indicating if a report generation is currently in progress.
+ * @property error A string containing an error message if the report generation failed, otherwise null.
  */
 data class GenerateReportState(
     val audit: Audit = Audit(),
-    val report: Report = Report(),
-    val html: String? = null,
+    val report: Report? = null,
     val isLoading: Boolean = false,
     val error: String? = null
 )

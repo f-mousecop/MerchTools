@@ -11,9 +11,9 @@ data class ReportItemRow(
 
 data class Report(
     val auditId: Long = 0L,
-    val storeName: String = "",
-    val createdBy: String = "",
-    val startedAt: String = "",
-    val completedAt: String = "",
+    val storeName: String? = null,
+    val createdBy: String? = null,
+    val startedAt: String? = null,
+    val completedAt: String? = null,
     val items: List<ReportItemRow> = emptyList()
 )
