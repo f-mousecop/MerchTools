@@ -31,7 +31,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.merchtools.R
-import com.example.merchtools.components.ProgressButton
+import com.example.merchtools.ui.components.ProgressButton
 import com.example.merchtools.domain.util.BarcodeGenerator
 import com.example.merchtools.ui.components.AuditInventoryItem
 import com.example.merchtools.util.sharePdfReport
@@ -117,11 +117,7 @@ fun ReportScreenContent(
             Button(
                 modifier = Modifier.weight(1f),
                 shape = MaterialTheme.shapes.small,
-                onClick = { onEvent(GenerateReportEvent.NavigateBack) },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onSecondary
-                )
+                onClick = { onEvent(GenerateReportEvent.NavigateBack) }
             ) {
                 Text("Back")
             }

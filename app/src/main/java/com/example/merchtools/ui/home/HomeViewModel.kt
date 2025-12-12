@@ -46,8 +46,10 @@ class HomeViewModel @Inject constructor(
             is HomeEvent.StartAuditClicked -> {
                 startAudit(state.userName, state.storeId)
                 state = state.copy(
+                    showDialog = false,
                     userName = "",
-                    storeName = ""
+                    storeName = "",
+                    storeId = 0L
                 )
             }
             is HomeEvent.OnUserNameChanged -> {
@@ -61,6 +63,17 @@ class HomeViewModel @Inject constructor(
             }
             is HomeEvent.OpenAuditClicked -> {
                 openAudit()
+            }
+            is HomeEvent.ShowDialogClicked -> {
+                state = state.copy(showDialog = true)
+            }
+            is HomeEvent.DismissDialog -> {
+                state = state.copy(
+                    showDialog = false,
+                    userName = "",
+                    storeName = "",
+                    storeId = 0L
+                )
             }
             is HomeEvent.ExpandStoreMenu -> {
                 state = state.copy(isExpanded = true)
@@ -87,7 +100,6 @@ class HomeViewModel @Inject constructor(
         auditJob?.cancel()
         auditJob = viewModelScope.launch {
             try {
-//                val storeId = storeRepository.ensureDefaultStore()
                 val newId = auditRepository.startNewAudit(
                     storeId = storeId,
                     createdBy = userName

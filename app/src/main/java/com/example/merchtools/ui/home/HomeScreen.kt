@@ -27,6 +27,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -78,16 +79,18 @@ fun HomeScreen(
     LaunchedEffect(Unit) {
         uiEffect.collect { effect ->
             when (effect) {
-            is HomeUiEffect.NavigateToAudit -> {
-                navigator.navigate(AuditScreenDestination(effect.auditId))
-            }
-            is HomeUiEffect.ShowMessage -> {
-                scope.launch {
-                    snackbarHostState.showSnackbar(
-                        message = effect.message
-                    )
+                is HomeUiEffect.NavigateToAudit -> {
+                    navigator.navigate(AuditScreenDestination(effect.auditId))
                 }
-            }
+
+                is HomeUiEffect.ShowMessage -> {
+                    scope.launch {
+                        snackbarHostState.showSnackbar(
+                            message = effect.message,
+                            duration = SnackbarDuration.Long
+                        )
+                    }
+                }
             }
         }
     }
@@ -137,8 +140,6 @@ fun HomeScreenContent(
     onNavigateToAuditHistory: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var showDialog by remember { mutableStateOf(false) }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -158,14 +159,14 @@ fun HomeScreenContent(
                         .fillMaxWidth()
                         .testTag("start_audit_button"),
                     shape = MaterialTheme.shapes.small,
-                    onClick = { showDialog = true }
+                    onClick = { onEvent(HomeEvent.ShowDialogClicked) }
                 ) {
                     Text(stringResource(R.string.start_audit))
                 }
 
-                if (showDialog) {
+                if (state.showDialog) {
                     AlertDialog(
-                        onDismissRequest = { showDialog = false },
+                        onDismissRequest = { onEvent(HomeEvent.DismissDialog) },
                         title = { Text(stringResource(R.string.start_audit)) },
                         text = {
 
@@ -184,7 +185,6 @@ fun HomeScreenContent(
                             TextButton(
                                 onClick = {
                                     onEvent(HomeEvent.StartAuditClicked)
-                                    showDialog = false
                                 },
                                 enabled = state.userName.isNotBlank() && state.storeName.isNotBlank(),
                                 modifier = Modifier.testTag("start_audit_ok_button")
@@ -195,7 +195,7 @@ fun HomeScreenContent(
                         },
                         dismissButton = {
                             TextButton(
-                                onClick = { showDialog = false },
+                                onClick = { onEvent(HomeEvent.DismissDialog) },
                                 modifier = Modifier.testTag("start_audit_cancel_button")
                             ) {
                                 Text("Cancel")

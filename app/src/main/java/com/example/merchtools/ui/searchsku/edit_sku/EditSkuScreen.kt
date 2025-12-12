@@ -54,7 +54,7 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.example.merchtools.R
-import com.example.merchtools.components.ProgressButton
+import com.example.merchtools.ui.components.ProgressButton
 import com.example.merchtools.ui.searchsku.SearchSkuUiEffect
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
@@ -272,7 +272,7 @@ fun EditSkuInputForm(
                 onValueChange(EditSkuEvent.OnCasePackChanged(newText))
             },
             keyboardOptions = KeyboardOptions(
-                imeAction = ImeAction.Next
+                imeAction = ImeAction.Done
             ),
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,

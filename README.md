@@ -64,17 +64,29 @@ UPC text field - fills in SKU details if match is found)
 
 ---
 
-<img src="docs/screenshots/Screenshot_20251129_084006.png" alt="text" height="400"/> <img src="docs/screenshots/Screenshot_20251129_084104.png" alt="text" height="400"/>
-<img src="docs/screenshots/Screenshot_20251129_084118.png" alt="text" height="400"/> <img src="docs/screenshots/Screenshot_20251129_084129.png" alt="text" height="400"/>
+
+
+
+---
+<img src="docs/screenshots/Screenshot_20251212_063505.png" alt="text" height="400"/> <img src="docs/screenshots/Screenshot_20251212_063610.png" alt="text" height="400"/>
+<img src="docs/screenshots/Screenshot_20251212_063709.png" alt="text" height="400"/> 
 
 ---
 
-<img src="docs/screenshots/Screenshot_20251129_085636.png" alt="text" height="400"/> <img src="docs/screenshots/Screenshot_20251129_085654.png" alt="text" height="400"/>
-<img src="docs/screenshots/Screenshot_20251129_085703.png" alt="text" height="400"/> <img src="docs/screenshots/Screenshot_20251129_085709.png" alt="text" height="400"/>
+<img src="docs/screenshots/Screenshot_20251212_063740.png" alt="text" height="400"/> <img src="docs/screenshots/Screenshot_20251212_063505.png" alt="text" height="400"/> 
+<img src="docs/screenshots/Screenshot_20251212_063610.png" alt="text" height="400"/>
+
+---
 
 
+<img src="docs/screenshots/Screenshot_20251212_063610.png" alt="text" height="400"/> <img src="docs/screenshots/Screenshot_20251212_063505.png" alt="text" height="400"/>
+<img src="docs/screenshots/Screenshot_20251212_063942.png" alt="text" height="400"/>
+
+---
 
 ## Screen captures
 
 ---
+
+![img](docs/screenshots/gifs/merchtools_demo.gif)
 

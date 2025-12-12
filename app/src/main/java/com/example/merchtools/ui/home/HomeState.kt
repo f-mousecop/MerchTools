@@ -10,6 +10,7 @@ data class HomeState(
     val storeName: String = "",
     val storeId: Long = 0L,
     val isExpanded: Boolean = false,
+    val showDialog: Boolean = false,
     val isLoading: Boolean = false,
     val error: String? = null
 )

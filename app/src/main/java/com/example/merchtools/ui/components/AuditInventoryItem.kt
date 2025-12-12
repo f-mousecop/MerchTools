@@ -22,7 +22,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.merchtools.R
-import com.example.merchtools.components.BarcodeImage
 import com.example.merchtools.domain.model.AuditItem
 import com.example.merchtools.domain.util.BarcodeGenerator
 

@@ -74,26 +74,17 @@ fun SkuItemCard(
                 ) {
                     val model = sku?.imageUri
 
-                    if (model != null) {
-                        AsyncImage(
-                            model = ImageRequest.Builder(LocalContext.current)
-                                .data(model.toUri())
-                                .crossfade(true)
-                                .build(),
-                            placeholder = painterResource(R.drawable.photo_64dp_placeholder),
-                            error = painterResource(R.drawable.photo_64dp_placeholder),
-                            contentDescription = null,
-                            contentScale = ContentScale.Fit,
-                            modifier = Modifier.clip(RoundedCornerShape(4.dp))
-                        )
-                    } else {
-                        Image(
-                            painter = painterResource(R.drawable.photo_64dp_placeholder),
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier.clip(RoundedCornerShape(4.dp))
-                        )
-                    }
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(model?.toUri())
+                            .crossfade(true)
+                            .build(),
+                        placeholder = painterResource(R.drawable.photo_120dp_placeholder),
+                        error = painterResource(R.drawable.photo_120dp_placeholder),
+                        contentDescription = null,
+                        contentScale = if (model == null) ContentScale.None else ContentScale.Fit,
+                        modifier = Modifier.clip(RoundedCornerShape(4.dp))
+                    )
                 }
 
                 Spacer(modifier.width(dimensionResource(R.dimen.padding_small)))

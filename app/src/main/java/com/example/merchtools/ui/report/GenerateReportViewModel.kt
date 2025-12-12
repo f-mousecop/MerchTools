@@ -15,6 +15,7 @@ import com.example.merchtools.util.AuditReportPdfGenerator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
@@ -86,6 +87,9 @@ class GenerateReportViewModel @Inject constructor(
                     }
                     return@launch
                 }
+                delay(2000)
+                _uiEffect.emit(GenerateReportUiEffect.ShowMessage("Generating report..."))
+                delay(2000)
 
                 val result = AuditReportPdfGenerator(
                     context,
