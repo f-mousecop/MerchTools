@@ -34,6 +34,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -53,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.merchtools.R
 import com.example.merchtools.domain.model.Store
+import com.example.merchtools.ui.components.UiElementRichToolTip
 import com.example.merchtools.ui.theme.MerchToolsTheme
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
@@ -60,6 +62,7 @@ import com.ramcosta.composedestinations.generated.destinations.HomeScreenDestina
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Destination<RootGraph>
 @Composable
 fun StoreCatalogScreen(
@@ -92,11 +95,17 @@ fun StoreCatalogScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         containerColor = MaterialTheme.colorScheme.surfaceVariant,
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = { viewModel.onEvent(StoreCatalogEvent.ShowAddStoreDialog) },
-                shape = RoundedCornerShape(4.dp)
+            UiElementRichToolTip(
+                richTooltipSubheadText = stringResource(R.string.store_tooltip_sub),
+                richTooltipText = stringResource(R.string.store_tooltip_text),
+                tooltipState = rememberTooltipState(isPersistent = true)
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Add")
+                FloatingActionButton(
+                    onClick = { viewModel.onEvent(StoreCatalogEvent.ShowAddStoreDialog) },
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = "Add")
+                }
             }
         }
     ) { innerPadding ->
@@ -130,8 +139,6 @@ fun StoreCatalogScreenContent(
             state = state,
             onEvent = onEvent,
             modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
         )
     }
 }
@@ -173,7 +180,7 @@ fun StoreCatalogScreenBody(
             storeText = stringResource(R.string.store_catalog_blank)
             Text(
                 text = storeText,
-                modifier = modifier
+                modifier = Modifier
                     .padding(dimensionResource(R.dimen.padding_medium))
                     .fillMaxWidth(),
                 textAlign = TextAlign.Center,
@@ -181,8 +188,8 @@ fun StoreCatalogScreenBody(
             )
         } else {
             LazyColumn(
-                modifier = modifier
-                    .fillMaxSize(),
+                modifier = Modifier
+                    .weight(1f),
                 verticalArrangement = Arrangement.spacedBy(
                     dimensionResource(R.dimen.padding_small)
                 ),
@@ -220,11 +227,11 @@ fun StoreCard(
         shape = RoundedCornerShape(4.dp),
     ) {
         Column(
-            modifier = modifier
+            modifier = Modifier
                 .padding(dimensionResource(R.dimen.padding_medium)),
         ) {
             Row(
-                modifier = modifier
+                modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.CenterHorizontally),
                 verticalAlignment = Alignment.CenterVertically

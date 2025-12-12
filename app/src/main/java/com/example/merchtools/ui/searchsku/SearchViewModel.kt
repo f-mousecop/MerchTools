@@ -1,6 +1,5 @@
 package com.example.merchtools.ui.searchsku
 
-import android.database.sqlite.SQLiteConstraintException
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue

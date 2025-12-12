@@ -13,15 +13,12 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="MainActivity">
+      <SelectionState runConfigName="HomeScreenTest">
         <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
-      <SelectionState runConfigName="HomeScreenPreview">
-        <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-11-29T21:58:10.743236300Z">
+        <DropdownSelection timestamp="2025-12-12T01:33:53.912540400Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="PhysicalDevice" identifier="serial=49301JEBF12173" />
+              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\Charles\.android\avd\Medium_Phone.avd" />
             </handle>
           </Target>
         </DropdownSelection>

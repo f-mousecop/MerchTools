@@ -121,10 +121,6 @@ class EditAuditItemViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Might want to see if I can implement insert new SKU and check if user entered
-     * a valid UPC (between 12 and 13 digits)
-     */
     private fun updateSku(transform: (Sku) -> Sku): AuditItem {
         val currentItem = state.auditItem
         val currentSku = currentItem.sku
@@ -157,15 +153,6 @@ class EditAuditItemViewModel @Inject constructor(
         TODO("Not yet implemented")
     }
 
-    /*private fun updateItemField(userInput: String) {
-        state = state.copy(
-            auditItem = state.auditItem.copy(
-                note = userInput,
-                count = userInput.toIntOrNull() ?: 0,
-                photos = List<>
-            )
-        )
-    }*/
 
     private fun saveAuditItem() {
          viewModelScope.launch {

@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
+    id("kotlin-kapt")
     kotlin("plugin.serialization") version "2.2.0"
 }
 
@@ -68,26 +69,36 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.runtime.ktx)
-//    implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.compose.material.icons.extended.android)
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.compose.animation)
     implementation(libs.room.ktx)
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
-//    implementation(libs.androidx.pdf.viewer)
+    implementation(libs.kotlinx.serialization.json)
     testImplementation(libs.junit)
+    testImplementation(libs.junit.jupiter)
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
+    testImplementation("org.mockito:mockito-core:5.21.0")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:6.1.0")
+    testImplementation("com.google.dagger:hilt-android-testing:2.57.1")
+    kaptTest("com.google.dagger:hilt-android-compiler:2.57.1")
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
+    androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.57.1")
+    kaptAndroidTest("com.google.dagger:hilt-android-compiler:2.57.1")
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    // Permissions
+    implementation("com.google.accompanist:accompanist-permissions:0.37.3")
 
     // ML kit barcode scanning
     implementation(libs.barcode.scanning)
     implementation(libs.androidx.camera.mlkit.vision)
-    implementation("com.google.zxing:core:3.5.4")
+    implementation(libs.zxing.core)
 
     // Room
     implementation(libs.androidx.room.runtime)

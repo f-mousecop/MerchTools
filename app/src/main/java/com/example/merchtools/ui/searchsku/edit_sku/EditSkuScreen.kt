@@ -186,7 +186,7 @@ fun EditSkuInputForm(
             value = state.sku.upc,
             enabled = true,
             label = { Text(stringResource(R.string.upc)) },
-            placeholder = { Text("12 digit UPC number")},
+            placeholder = { Text("12 or 13 digit UPC number")},
             supportingText = { Text(stringResource(R.string.invalid_upc)) },
             onValueChange = { newValue ->
                 onValueChange(EditSkuEvent.OnUpcChanged(newValue))

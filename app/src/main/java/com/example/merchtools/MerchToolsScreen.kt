@@ -15,6 +15,7 @@ import com.ramcosta.composedestinations.generated.destinations.EditAuditItemScre
 import com.ramcosta.composedestinations.generated.destinations.GenerateReportScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.HistoryScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.HomeScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.ScanBarCodeScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.SearchScreenDestination
 import com.ramcosta.composedestinations.utils.currentDestinationAsState
 
@@ -35,6 +36,7 @@ fun MerchToolsApp() {
         EditAuditItemScreenDestination.route -> "Edit Audit Item"
         HistoryScreenDestination.route -> "Audit History"
         GenerateReportScreenDestination.route -> "Audit Report"
+        ScanBarCodeScreenDestination.route -> "Scan Barcode"
         else -> "Merch Tools"
     }
 

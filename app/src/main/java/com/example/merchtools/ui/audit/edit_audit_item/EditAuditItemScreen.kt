@@ -170,7 +170,7 @@ fun AuditItemInputForm(
         HorizontalDivider()
 
         Text(
-            text = "Edit Details",
+            text = "Edit Count & Note",
             style = MaterialTheme.typography.headlineSmall,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth()
@@ -198,89 +198,17 @@ fun AuditItemInputForm(
                 focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
             )
         )
-
-        /**
-         * Currently a postponed feature
-         * TODO: Add photo picker
-         * As of right now, this is just a placeholder, and the AuditItem will contain
-         * a generated barcode of the UPC
-         */
-        Row(
-            modifier = Modifier,
-            horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small)),
-        ) {
-            Button(
-                onClick = { onValueChange(AuditItemEvent.AddPhotoToItem) },
-                enabled = true,
-                shape = MaterialTheme.shapes.small,
-                modifier = Modifier.weight(1f),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onSecondary
-                )
-            ) {
-                Text(stringResource(R.string.add_photo))
-            }
-
-            Button(
-                onClick = { onValueChange(AuditItemEvent.RemovePhotoFromItem) },
-                enabled = true,
-                shape = MaterialTheme.shapes.small,
-                modifier = Modifier.weight(1f),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onSecondary
-                )
-            ) {
-                Text(stringResource(R.string.remove_photo))
-            }
-        }
-
-        Card(
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-        ) {
-            Image(
-                modifier = Modifier
-                    .size(200.dp),
-                painter = painterResource(R.drawable.pepsi_12pk),
-                contentDescription = null,
-                contentScale = ContentScale.Crop
-            )
-        }
     }
 }
 
-/**
- * TODO: Add photo picker
- * To be attached to an AuditItem
- */
-@Composable
-fun ImagePicker(
-    pickMedia: () -> Unit
-)
-{
-    val pickMedia = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
-        if (uri != null) {
-            Log.d("PhotoPicker", "Selected URI: $uri")
-        } else {
-            Log.d("PhotoPicker", "No media selected")
-        }
-    }
-
-    pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-    val mimeType = "image/jpeg"
-    pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.SingleMimeType(mimeType)))
-}
 
 @Preview(showBackground = true)
 @Composable
 fun EditAuditItemScreenPreview() {
     MerchToolsTheme {
-        /*EditAuditItemScreenContent(
+        EditAuditItemScreenContent(
             state = AuditItemState(),
             onEvent = {},
-            barcodeGenerator = BarcodeGenerator
-        )*/
+        )
     }
 }

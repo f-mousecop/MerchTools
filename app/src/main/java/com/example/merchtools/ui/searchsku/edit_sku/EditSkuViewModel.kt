@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.merchtools.domain.model.Sku
 import com.example.merchtools.domain.repository.SkuRepository
+import com.example.merchtools.domain.validation.UpcValidator
 import com.example.merchtools.ui.searchsku.SearchSkuEvent
 import com.example.merchtools.ui.searchsku.SearchSkuUiEffect
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -80,7 +81,6 @@ class EditSkuViewModel @Inject constructor(
                         imageUri = event.uri.toString()
                     )
                 )
-//                addProductImage(event.uri)
             }
             is EditSkuEvent.DiscardImageUri -> {
                 state = state.copy(
@@ -92,26 +92,9 @@ class EditSkuViewModel @Inject constructor(
         }
     }
 
-    private fun addProductImage(uri: Uri) {
-            /*state = state.copy(isLoading = true)
-            try {
-                state = state.copy(
-                    sku = state.sku.copy(
-                        imageUri = uri.toString()
-                    )
-                )
-                state = state.copy(isLoading = false)
-                _uiEffect.emit(SearchSkuUiEffect.ShowMessage("Image added"))
-            } catch (e: Exception) {
-                _uiEffect.emit(SearchSkuUiEffect.ShowMessage(e.message ?: "Unknown error"))
-            } finally {
-                state = state.copy(isLoading = false)
-            }*/
-
-    }
-
     private fun validateUpc(sku: Sku): Boolean {
-        return (sku.upc.length in 12..<13 && sku.upc.isDigitsOnly())
+        val isValid = UpcValidator.isValid(sku.upc)
+        return isValid
     }
 
     private fun validateOtherFields(sku: Sku): Boolean {
@@ -127,7 +110,7 @@ class EditSkuViewModel @Inject constructor(
 
                 skuRepository.update(state.sku)
 
-                _uiEffect.emit(SearchSkuUiEffect.ShowMessage("Audit item saved"))
+                _uiEffect.emit(SearchSkuUiEffect.ShowMessage("SKU saved"))
                 delay(2000L)
                 _uiEffect.emit(SearchSkuUiEffect.NavigateUp)
 

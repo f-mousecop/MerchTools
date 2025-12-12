@@ -1,9 +1,6 @@
 package com.example.merchtools.ui.feature_scanner
 
 import android.Manifest
-import android.content.pm.PackageManager
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
@@ -21,7 +19,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,8 +28,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
 import com.example.merchtools.ui.components.ScanCode
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.permissions.shouldShowRationale
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -40,7 +40,7 @@ import com.ramcosta.composedestinations.result.ResultBackNavigator
 
 @kotlinx.serialization.Serializable
 data class BarcodeScanResult(val upc: String)
-
+@OptIn(ExperimentalPermissionsApi::class)
 @Destination<RootGraph>
 @Composable
 fun ScanBarCodeScreen(
@@ -49,32 +49,20 @@ fun ScanBarCodeScreen(
 ) {
     val context = LocalContext.current
 
-    var hasCameraPermission by remember {
-        mutableStateOf(
-            ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.CAMERA
-            ) == PackageManager.PERMISSION_GRANTED
-        )
+    val permissionState = rememberPermissionState(
+        Manifest.permission.CAMERA // Permission being requested
+    )
+
+    var onCancel by remember(permissionState.status.shouldShowRationale) {
+        mutableStateOf(permissionState.status.shouldShowRationale)
     }
 
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { granted ->
-        hasCameraPermission = granted
-    }
-
-    LaunchedEffect(Unit) {
-        if (!hasCameraPermission) {
-            permissionLauncher.launch(Manifest.permission.CAMERA)
-        }
-    }
 
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
         when {
-            hasCameraPermission -> {
+            permissionState.status.isGranted -> {
                 // We have permission → show scanner
                 ScanCode(
                     onBarcodeDetected = { upc ->
@@ -93,8 +81,14 @@ fun ScanBarCodeScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
+                    val textToShow = if (onCancel) {
+                        "The camera is important for this app. Please grant the permission."
+                    } else {
+                        "Camera permission required for this feature to be available. " +
+                                "Please grant the permission"
+                    }
                     Text(
-                        text = "Camera permission is required to scan barcodes.",
+                        text = textToShow,
                         style = MaterialTheme.typography.titleMedium,
                         textAlign = TextAlign.Center
                     )
@@ -103,7 +97,7 @@ fun ScanBarCodeScreen(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Button(onClick = {
-                            permissionLauncher.launch(Manifest.permission.CAMERA)
+                            permissionState.launchPermissionRequest()
                         }) {
                             Text("Try again")
                         }
@@ -121,8 +115,13 @@ fun ScanBarCodeScreen(
             modifier = Modifier
                 .align(Alignment.TopStart)
                 .padding(16.dp)
+                .size(48.dp)
         ) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+            Icon(
+                Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = "Back",
+                modifier = Modifier.size(48.dp)
+            )
         }
     }
 }
