@@ -4,24 +4,25 @@
 ---
 
 ---
-<div style="text-align: center;">
-
-## 📹 App demo
 
 
-![app flow demo](docs/screenshots/gifs/merchtools_demo_400.gif "Merch Tools demo gif")
+## 📹 App demo    Scan Barcode Demo
 
----
-## Barcode scanning demo
+<details open>
+    <summary><h3>Merch Tools</h3></summary>
 
+|                                            App demo                                             |                                     Scan Barcode Demo                                      |
+|:-----------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------:|
+| ![App demo](docs/screenshots/gifs/merchtools_scan_demo.gif "Merch Tools barcode scanning demo") | ![Scan Barcode Demo](docs/screenshots/gifs/merchtools_demo_400.gif "Merch Tools demo gif") |
 
-![scan demo gif](docs/screenshots/gifs/merchtools_scan_demo.gif "Merch Tools barcode scanning demo")
-
-</div>
+</details>
 
 ---
 
-### More [screenshots](#screenshots) below
+*  More [screenshots](#-screenshots) below
+*  See [contributing](#contributing)
+*  See [features](#-features) and [finished implementations](#-finished-implementations)
+*  Contact me [here](#-contact)
 
 ## 💾 Technologies Used
 
@@ -110,17 +111,6 @@ Throughout planning and implementation, I learned more about separation of conce
 
 ## 🪛 Contributing Guidelines
 
----
-
-### License and Authors
-
-* This project is licensed under the MIT License - see the [MIT License](LICENSE.md) for details
-* **Credit to the following developers**: 
-  * [DUMA042]("https://github.com/DUMA042/BarsandQ") (CameraX/ML Kit integration)
-  * [realityexpander]("https://github.com/realityexpander/ComposeSwipeToDelete") (Swipe to delete compose container)
-
----
-
 ###  Contributing
 
 Feel free to contribute to the repository by suggesting improvements, fixing bugs, improving documentation, adding features, etc. To contribute:
@@ -131,9 +121,16 @@ Feel free to contribute to the repository by suggesting improvements, fixing bug
 
 ---
 
-# 📩 Contact
+### License and Authors
+
+* This project is licensed under the MIT License - see the [MIT License](LICENSE.md) for details
+* **Credit to the following developers**:
+    * [DUMA042](https://github.com/DUMA042/BarsandQ) (CameraX/ML Kit integration)
+    * [realityexpander](https://github.com/realityexpander/ComposeSwipeToDelete) (Swipe to delete compose container)
 
 ---
+
+# 📩 Contact
 
 Reach out to me via [email](mailto:charles.fmousecop@protonmail.com) for any questions 😁
 
