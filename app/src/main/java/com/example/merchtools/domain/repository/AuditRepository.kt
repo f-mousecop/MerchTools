@@ -5,7 +5,7 @@ import com.example.merchtools.domain.model.Photo
 import com.example.merchtools.domain.model.Audit
 import com.example.merchtools.data.local.entity.AuditEntity
 import com.example.merchtools.data.local.relations.AuditWithItems
-import com.example.merchtools.util.Resource
+import com.example.merchtools.core.Resource
 import kotlinx.coroutines.flow.Flow
 
 /**

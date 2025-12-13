@@ -23,6 +23,19 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 
+/**
+ * A composable that displays a barcode image generated from a given UPC string.
+ *
+ * This function takes a UPC code and a [BarcodeGenerator] instance to create and display a barcode.
+ * It handles the asynchronous generation of the barcode image, showing a loading indicator
+ * while the image is being prepared. If the provided UPC is blank, it displays a "No UPC"
+ * placeholder text. Once the barcode is generated, it's displayed as an [Image].
+ *
+ * @param upc The Universal Product Code (UPC) string to be encoded into a barcode.
+ *            If this is blank, a placeholder is shown.
+ * @param barcodeGenerator An instance of [BarcodeGenerator] used to create the barcode bitmap.
+ * @param modifier The [Modifier] to be applied to the composable.
+ */
 @Composable
 fun BarcodeImage(
     upc: String,

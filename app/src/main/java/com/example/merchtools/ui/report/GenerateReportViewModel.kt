@@ -11,7 +11,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.merchtools.domain.repository.AuditRepository
 import com.example.merchtools.domain.use_case.GenerateReportUseCase
 import com.example.merchtools.domain.util.BarcodeGenerator
-import com.example.merchtools.util.AuditReportPdfGenerator
+import com.example.merchtools.core.AuditReportPdfGenerator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

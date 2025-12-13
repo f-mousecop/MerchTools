@@ -9,7 +9,7 @@ import com.example.merchtools.data.mappers.toStoreEntity
 import com.example.merchtools.domain.model.Store
 import com.example.merchtools.domain.model.Section
 import com.example.merchtools.data.local.relations.StoreWithSections
-import com.example.merchtools.util.Resource
+import com.example.merchtools.core.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map

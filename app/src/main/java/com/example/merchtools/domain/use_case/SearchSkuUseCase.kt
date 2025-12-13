@@ -2,7 +2,7 @@ package com.example.merchtools.domain.use_case
 
 import com.example.merchtools.domain.model.Sku
 import com.example.merchtools.domain.repository.SkuRepository
-import com.example.merchtools.util.Resource
+import com.example.merchtools.core.Resource
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 

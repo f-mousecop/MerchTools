@@ -101,7 +101,7 @@ fun ScanCode(
         val upc = lastBarcode
         if (upc != null && upc.isNotBlank()) {
             triggerVibration(context)
-            delay(200)
+            delay(1000)
             onBarcodeDetected(upc)
         }
     }
@@ -125,13 +125,9 @@ fun DrawBarcodeRectOverlay(rect: Rect?) {
     }
 }
 
+@Suppress("DEPRECATION")
 fun triggerVibration(context: Context) {
     val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE))
-    } else {
-        @Suppress("DEPRECATION")
-        vibrator.vibrate(200)
-    }
+    vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE))
 }
 

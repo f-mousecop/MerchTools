@@ -47,7 +47,7 @@ import com.example.merchtools.ui.components.AuditInventoryItem
 import com.example.merchtools.ui.components.SwipeToDeleteContainer
 import com.example.merchtools.ui.feature_scanner.BarcodeScanResult
 import com.example.merchtools.ui.theme.MerchToolsTheme
-import com.example.merchtools.util.toDisplayString
+import com.example.merchtools.core.toDisplayString
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.EditAuditItemScreenDestination

@@ -16,7 +16,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -45,7 +44,7 @@ import com.example.merchtools.domain.model.Audit
 import com.example.merchtools.domain.model.Store
 import com.example.merchtools.ui.components.SwipeToDeleteContainer
 import com.example.merchtools.ui.theme.MerchToolsTheme
-import com.example.merchtools.util.toDisplayString
+import com.example.merchtools.core.toDisplayString
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.AuditScreenDestination

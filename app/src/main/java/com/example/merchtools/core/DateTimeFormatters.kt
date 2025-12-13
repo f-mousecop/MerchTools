@@ -1,4 +1,4 @@
-package com.example.merchtools.util
+package com.example.merchtools.core
 
 import java.time.Instant
 import java.time.ZoneId

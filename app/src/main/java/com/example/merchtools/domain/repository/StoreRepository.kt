@@ -1,7 +1,7 @@
 package com.example.merchtools.domain.repository
 import com.example.merchtools.data.local.repository.OfflineStoreRepository
 import com.example.merchtools.domain.model.Store
-import com.example.merchtools.util.Resource
+import com.example.merchtools.core.Resource
 import com.example.merchtools.data.local.relations.StoreWithSections
 import kotlinx.coroutines.flow.Flow
 

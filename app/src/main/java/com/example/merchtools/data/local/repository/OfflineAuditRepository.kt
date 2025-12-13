@@ -6,7 +6,7 @@ import com.example.merchtools.data.mappers.toAuditEntity
 import com.example.merchtools.data.mappers.toDomain
 import com.example.merchtools.domain.model.Audit
 import com.example.merchtools.domain.repository.AuditRepository
-import com.example.merchtools.util.Resource
+import com.example.merchtools.core.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map

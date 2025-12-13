@@ -1,10 +1,9 @@
 package com.example.merchtools.domain.use_case
 
-import android.print.PrintDocumentAdapter
 import com.example.merchtools.domain.model.Audit
 import com.example.merchtools.domain.model.Report
 import com.example.merchtools.domain.model.ReportItemRow
-import com.example.merchtools.util.toDisplayString
+import com.example.merchtools.core.toDisplayString
 import jakarta.inject.Inject
 
 /**

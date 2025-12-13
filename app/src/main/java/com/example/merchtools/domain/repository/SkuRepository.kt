@@ -2,7 +2,7 @@ package com.example.merchtools.domain.repository
 
 import com.example.merchtools.domain.model.Sku
 import com.example.merchtools.data.local.entity.SkuEntity
-import com.example.merchtools.util.Resource
+import com.example.merchtools.core.Resource
 import kotlinx.coroutines.flow.Flow
 
 interface SkuRepository {

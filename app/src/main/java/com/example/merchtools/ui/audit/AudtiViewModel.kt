@@ -9,12 +9,10 @@ import androidx.lifecycle.viewModelScope
 import com.example.merchtools.domain.model.AuditItem
 import com.example.merchtools.domain.repository.AuditItemRepository
 import com.example.merchtools.domain.repository.AuditRepository
-import com.example.merchtools.domain.repository.StoreRepository
 import com.example.merchtools.domain.use_case.AddAuditItemUseCase
 import com.example.merchtools.domain.use_case.SearchSkuUseCase
 import com.example.merchtools.domain.util.BarcodeGenerator
-import com.example.merchtools.util.Resource
-import com.example.merchtools.util.toDisplayString
+import com.example.merchtools.core.toDisplayString
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay

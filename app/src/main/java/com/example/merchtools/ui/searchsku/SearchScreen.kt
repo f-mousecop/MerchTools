@@ -97,7 +97,6 @@ fun SearchScreen(
         containerColor = MaterialTheme.colorScheme.surfaceVariant
     ) { innerPadding ->
 
-        val swipeRefreshState = rememberPullToRefreshState()
         val state = viewModel.state
         Column(
             modifier = Modifier
@@ -156,23 +155,16 @@ fun SearchScreen(
                 singleLine = true
             )
 
-            PullToRefreshBox(
-                state = swipeRefreshState,
-                isRefreshing = viewModel.state.isRefreshing,
-                onRefresh = {
-                    viewModel.onEvent(SearchSkuEvent.Refresh)
-                }
-            ) {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(
-                        dimensionResource(R.dimen.padding_small)
-                    ),
-                    contentPadding = PaddingValues(
-                        top = dimensionResource(R.dimen.padding_medium),
-                        bottom = dimensionResource(R.dimen.padding_medium)
-                    )
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(
+                    dimensionResource(R.dimen.padding_small)
+                ),
+                contentPadding = PaddingValues(
+                    top = dimensionResource(R.dimen.padding_medium),
+                    bottom = dimensionResource(R.dimen.padding_medium)
+                )
                 ) {
                     items(
                         items = state.skus,
@@ -187,14 +179,11 @@ fun SearchScreen(
                             SkuItemCard(
                                 sku = item,
                                 onClick = {
-                                    viewModel.onEvent(SearchSkuEvent.EditSku(item.skuId))
-                                },
-                                clickable = true,
-                            )
+                                    viewModel.onEvent(SearchSkuEvent.EditSku(item.skuId)) },
+                                clickable = true,)
                         }
                     }
                 }
-            }
         }
     }
 }

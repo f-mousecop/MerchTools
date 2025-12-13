@@ -5,7 +5,7 @@ import com.example.merchtools.domain.repository.SkuRepository
 import com.example.merchtools.data.mappers.toSku
 import com.example.merchtools.data.mappers.toSkuEntity
 import com.example.merchtools.domain.model.Sku
-import com.example.merchtools.util.Resource
+import com.example.merchtools.core.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
