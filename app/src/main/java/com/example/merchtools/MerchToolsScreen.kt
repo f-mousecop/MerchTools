@@ -21,6 +21,22 @@ import com.ramcosta.composedestinations.generated.destinations.StoreCatalogScree
 import com.ramcosta.composedestinations.utils.currentDestinationAsState
 
 
+/**
+ * The main entry point and root composable for the Merch Tools application.
+ *
+ * This function sets up the core UI structure, including navigation. It uses a `rememberNavController`
+ * to manage the navigation state and determines the current screen's title based on the route.
+ *
+ * The UI is built around a `DetailedNavDrawer`, which provides the main navigation drawer and top app bar.
+ * The content area of the scaffold is populated by `DestinationsNavHost`, which handles the routing
+ * and displays the appropriate screen composable based on the current navigation destination.
+ *
+ * Navigation logic within the drawer ensures a clean back stack, popping up to the start
+ * destination and using `launchSingleTop` to avoid creating multiple instances of the same screen.
+ *
+ * @see DetailedNavDrawer
+ * @see DestinationsNavHost
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MerchToolsApp() {
@@ -30,6 +46,7 @@ fun MerchToolsApp() {
     val currentRoute = currentDestination?.route
 
 
+    // Determine the title based on the current destination
     val title = when (currentDestination?.route) {
         HomeScreenDestination.route -> "Home"
         SearchScreenDestination.route -> "Search SKU"
