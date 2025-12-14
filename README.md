@@ -61,8 +61,11 @@ To get a local copy up and running follow these simple example steps.
 ---
 
 ## 📄 Tests
-* **UI Tests**: [UI Test Summary](tests/ui_home_test.html)
-* **Unit Tests**: [Unit Test Summary](tests/unit_tests.html)
+* **UI Tests**: [UI Test Summary](tests/img.png)
+* **Unit Tests**: 
+  * [Unit Test Summary](tests/unit_test.png)
+  * [Unit Test UPC](tests/unit_test_upc.png)
+  * [Unit Test SKU VM](tests/unit_test_sku_1.png)
 
 ---
 
