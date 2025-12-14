@@ -6,7 +6,7 @@
 ---
 
 
-## 📹 App demo    Scan Barcode Demo
+## 📹 App demo
 
 <details open>
     <summary><h3>Merch Tools</h3></summary>
@@ -20,6 +20,7 @@
 ---
 
 *  More [screenshots](#-screenshots) below
+* See [tests](#-tests)
 *  See [contributing](#contributing)
 *  See [features](#-features) and [finished implementations](#-finished-implementations)
 *  Contact me [here](#-contact)
@@ -56,6 +57,12 @@ To get a local copy up and running follow these simple example steps.
     - Navigate to the project folder and open the `build.gradle` file to sync the project with the necessary dependencies.
 3. **Run the app**:
     - Select your preferred emulator or physical device and run the app.
+
+---
+
+## 📄 Tests
+* **UI Tests**: [UI Test Summary](tests/ui_home_test.html)
+* **Unit Tests**: [Unit Test Summary](tests/unit_tests.html)
 
 ---
 
