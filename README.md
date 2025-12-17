@@ -1,5 +1,5 @@
 # ⚒️ Merch Tools
-## A inventory & shelf audit assistant for field merchandisers and vendors - Android app
+## An inventory & shelf audit assistant for field merchandisers and vendors - Android app
 
 ---
 
@@ -11,15 +11,16 @@
 <details open>
     <summary><h3>Merch Tools</h3></summary>
 
-|                                            App demo                                             |                                     Scan Barcode Demo                                      |
-|:-----------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------:|
-| ![App demo](docs/screenshots/gifs/merchtools_scan_demo.gif "Merch Tools barcode scanning demo") | ![Scan Barcode Demo](docs/screenshots/gifs/merchtools_demo_400.gif "Merch Tools demo gif") |
+|                                            App demo                                            |                                      Scan Barcode Demo                                      |
+|:----------------------------------------------------------------------------------------------:|:-------------------------------------------------------------------------------------------:|
+| ![App demo](docs/screenshots/gifs/merchtools_demo_400.gif "Merch Tools barcode scanning demo") | ![Scan Barcode Demo](docs/screenshots/gifs/merchtools_scan_demo.gif "Merch Tools demo gif") |
 
 </details>
 
 ---
 
 *  More [screenshots](#-screenshots) below
+* See [TODO](docs/TODO.md)
 * See [tests](#-tests)
 *  See [contributing](#contributing)
 *  See [features](#-features) and [finished implementations](#-finished-implementations)
@@ -142,7 +143,7 @@ Feel free to contribute to the repository by suggesting improvements, fixing bug
 
 # 📩 Contact
 
-Reach out to me via [email](mailto:charles.fmousecop@protonmail.com) for any questions 😁
+Reach out to me via [email](mailto:charles.fmousecop@protonmail.com) for any questions
 
 ---
 ## ✅ Finished Implementations

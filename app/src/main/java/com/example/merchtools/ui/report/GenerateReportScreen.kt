@@ -165,6 +165,7 @@ fun ReportScreenBody(
                 ?: "—"
             Text(
                 text = "Completed at: $completedAtText",
+                textAlign = TextAlign.Right,
                 style = MaterialTheme.typography.bodyMedium,
                 fontStyle = FontStyle.Italic
             )

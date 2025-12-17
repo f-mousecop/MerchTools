@@ -169,7 +169,8 @@ fun AuditScreenBody(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))
         ) {
             // This works fine
             val storeName = state.audit.store?.name
@@ -185,7 +186,8 @@ fun AuditScreenBody(
             Text(
                 text = "Started at: $startedAtText",
                 style = MaterialTheme.typography.bodyMedium,
-                fontStyle = FontStyle.Italic
+                fontStyle = FontStyle.Italic,
+                textAlign = TextAlign.Right
             )
 
         }

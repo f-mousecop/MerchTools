@@ -74,6 +74,7 @@ class GenerateReportViewModel @Inject constructor(
         context: Context,
         onResult: (Result<Uri>) -> Unit
     ) {
+        // Offload PDF report generation to separate thread
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 state = state.copy(isLoading = true, error = null)

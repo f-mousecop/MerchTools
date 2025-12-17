@@ -274,7 +274,8 @@ fun AddStoreDialog(
                 onValueChange = { newName -> onEvent(StoreCatalogEvent.OnStoreNameChanged(newName)) },
                 label = { Text("Store name") },
                 singleLine = true,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
             )
         },
         confirmButton = {
