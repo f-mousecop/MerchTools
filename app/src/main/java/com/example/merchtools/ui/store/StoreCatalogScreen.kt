@@ -67,7 +67,6 @@ fun StoreCatalogScreen(
     viewModel: StoreViewModel = hiltViewModel()
 ) {
     val uiEffect = viewModel.uiEffect
-    val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     val state = viewModel.state
 
@@ -78,7 +77,7 @@ fun StoreCatalogScreen(
                     navigator.navigate(HomeScreenDestination)
                 }
                 is StoreCatalogUiEffect.ShowMessage -> {
-                    scope.launch {
+                    launch {
                         snackbarHostState.showSnackbar(
                             message = effect.message
                         )
@@ -273,6 +272,7 @@ fun AddStoreDialog(
                 value = state.newStoreName,
                 onValueChange = { newName -> onEvent(StoreCatalogEvent.OnStoreNameChanged(newName)) },
                 label = { Text("Store name") },
+                supportingText = { Text("${state.newStoreName.length}/50") },
                 singleLine = true,
                 modifier = Modifier
                     .fillMaxWidth()

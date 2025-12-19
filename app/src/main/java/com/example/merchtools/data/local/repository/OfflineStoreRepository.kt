@@ -24,18 +24,6 @@ class OfflineStoreRepository @Inject constructor(
         return flow {
             emit(Resource.Loading(true))
 
-            /*val storeListing = storeDao.searchStores(query)
-            emit(Resource.Success(
-                data = storeListing.map { it.toStore() }
-            ))
-
-            val isDbEmpty = storeListing.isEmpty() && query.isBlank()
-            val loadFromCache = !isDbEmpty
-            if (loadFromCache) {
-                emit(Resource.Loading(false))
-                return@flow
-            }*/
-
             try {
                 // Start listening to the DAOs flow
                 storeDao.getAllStores().map { entityList ->

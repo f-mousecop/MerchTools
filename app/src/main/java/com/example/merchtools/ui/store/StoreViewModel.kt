@@ -5,9 +5,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.merchtools.core.Resource
 import com.example.merchtools.domain.model.Store
 import com.example.merchtools.domain.repository.StoreRepository
-import com.example.merchtools.core.Resource
+import com.example.merchtools.domain.validation.TextInputFieldValidator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -40,7 +41,9 @@ class StoreViewModel @Inject constructor(
                 state = state.copy(isAddStoreDialogOpen = false)
             }
             is StoreCatalogEvent.OnStoreNameChanged -> {
-                state = state.copy(newStoreName = event.name)
+                state = state.copy(
+                    newStoreName = TextInputFieldValidator.capInputLength(event.name)
+                )
             }
             is StoreCatalogEvent.AddNewStore -> {
                 addNewStore(state.newStoreName)
@@ -85,17 +88,20 @@ class StoreViewModel @Inject constructor(
     }
 
     private fun addNewStore(name: String) {
+        // Trim trailing spaces before inserting into the database
+        val storeName = TextInputFieldValidator.trimTrailingSpaces(name)
+
         storeAddJob?.cancel()
         storeAddJob = viewModelScope.launch {
             try {
                 storeRepository.insertStore(
                     Store(
-                        name = name
+                        name = storeName
                     )
                 )
                 _uiEffect.emit(
                     StoreCatalogUiEffect.ShowMessage(
-                        "Store $name added successfully"
+                        "Store $storeName added successfully"
                     )
                 )
             } catch (e: Exception) {

@@ -1,24 +1,18 @@
 package com.example.merchtools.ui.home
 
-import androidx.compose.foundation.BasicTooltipDefaults
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Assessment
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
@@ -26,7 +20,6 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -38,12 +31,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
@@ -87,7 +76,7 @@ fun HomeScreen(
                 }
 
                 is HomeUiEffect.ShowMessage -> {
-                    scope.launch {
+                    launch {
                         snackbarHostState.showSnackbar(
                             message = effect.message,
                             duration = SnackbarDuration.Long
@@ -131,9 +120,6 @@ fun HomeScreen(
             modifier = Modifier.padding(innerPadding)
         )
     }
-
-
-
 }
 
 @Composable
@@ -255,10 +241,10 @@ fun DropDownMenuContent(
         OutlinedTextField(
             value = state.userName,
             onValueChange = { newName ->
-                onEvent(HomeEvent.OnUserNameChanged(newName)
-                )
+                onEvent(HomeEvent.OnUserNameChanged(newName))
             },
             label = { Text("Created by") },
+            supportingText = { Text("${state.userName.length}/50")},
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
