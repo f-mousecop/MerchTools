@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.merchtools.domain.model.Sku
 import com.example.merchtools.domain.repository.SkuRepository
+import com.example.merchtools.domain.use_case.AddSkuUseCase
 import com.example.merchtools.domain.validation.UpcValidator
 import com.example.merchtools.ui.searchsku.SearchSkuEvent
 import com.example.merchtools.ui.searchsku.SearchSkuUiEffect
@@ -28,6 +29,7 @@ import javax.inject.Inject
 @HiltViewModel
 class EditSkuViewModel @Inject constructor(
     private val skuRepository: SkuRepository,
+    private val addSkuUseCase: AddSkuUseCase,
     savedStateHandle: SavedStateHandle
 ): ViewModel() {
     private val skuId: Long = checkNotNull(savedStateHandle["skuId"])
@@ -106,12 +108,12 @@ class EditSkuViewModel @Inject constructor(
         viewModelScope.launch {
             state = state.copy(isLoading = true)
             try {
-                delay(2000L)
+                delay(1000L)
 
                 skuRepository.update(state.sku)
 
                 _uiEffect.emit(SearchSkuUiEffect.ShowMessage("SKU saved"))
-                delay(2000L)
+                delay(1000L)
                 _uiEffect.emit(SearchSkuUiEffect.NavigateUp)
 
             } catch (e: Exception) {

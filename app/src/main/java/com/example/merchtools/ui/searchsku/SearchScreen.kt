@@ -8,7 +8,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -98,6 +100,10 @@ fun SearchScreen(
     ) { innerPadding ->
 
         val state = viewModel.state
+
+        // We need to remember lazyListState for scroll animation
+        val listState = rememberLazyListState()
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -112,7 +118,7 @@ fun SearchScreen(
                 Button(
                     shape = MaterialTheme.shapes.small,
                     onClick = {
-                        viewModel.onEvent(SearchSkuEvent.AddNewSku(upc = null))
+                        viewModel.onEvent(SearchSkuEvent.AddNewSku(upc = ""))
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.onSecondaryContainer,
@@ -138,6 +144,14 @@ fun SearchScreen(
                 }
             }
 
+            // After search query or deletion, smoothly scroll to top
+            // of the LazyColumn
+            LaunchedEffect(state.searchQuery) {
+                scope.launch {
+                    listState.animateScrollToItem(0)
+                }
+            }
+
             OutlinedTextField(
                 value = state.searchQuery,
                 onValueChange = {
@@ -149,7 +163,7 @@ fun SearchScreen(
                     .padding(vertical = dimensionResource(R.dimen.padding_small))
                     .fillMaxWidth(),
                 placeholder = {
-                    Text(text = "Search")
+                    Text(text = "Search by UPC, name, or brand...")
                 },
                 maxLines = 1,
                 singleLine = true
@@ -158,6 +172,7 @@ fun SearchScreen(
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize(),
+                state = listState,
                 verticalArrangement = Arrangement.spacedBy(
                     dimensionResource(R.dimen.padding_small)
                 ),

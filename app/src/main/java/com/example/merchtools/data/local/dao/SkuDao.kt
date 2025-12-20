@@ -26,14 +26,15 @@ interface SkuDao {
     @Query("SELECT * FROM skus WHERE upc = :upc LIMIT 1")
     fun getSkuByUpc(upc: String): Flow<SkuEntity?>
 
-    @Query("SELECT * FROM skus ORDER BY brand, name")
+    @Query("SELECT * FROM skus ORDER BY brand")
     fun getAllSkus(): Flow<List<SkuEntity>>
 
     @Query("""
         SELECT * FROM skus
         WHERE lower(name) LIKE '%' || LOWER(:query) || '%'
         OR lower(brand) LIKE '%' || LOWER(:query) || '%'
-        ORDER BY brand, name
+        OR lower(upc) LIKE '%' || LOWER(:query) || '%'
+        ORDER BY brand
     """)
     fun searchSkus(query: String): Flow<List<SkuEntity>>
 }

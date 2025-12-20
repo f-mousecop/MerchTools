@@ -1,5 +1,6 @@
 package com.example.merchtools.ui.searchsku
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -63,12 +64,13 @@ class SearchViewModel @Inject constructor(
                 removeSku(event.sku)
             }
             is SearchSkuEvent.OnSearchQueryChange -> {
-                state = state.copy(searchQuery = event.query)
+                searchAllSkus(event.query)
+                /*state = state.copy(searchQuery = event.query)
                 searchJob?.cancel()
                 searchJob = viewModelScope.launch {
                     delay(500L)
                     searchAllSkus()
-                }
+                }*/
             }
         }
     }
@@ -94,16 +96,30 @@ class SearchViewModel @Inject constructor(
         }
     }
 
-    private fun addNewSku(upc: String?) {
+    private fun addNewSku(upc: String) {
         searchJob?.cancel()
         searchJob = viewModelScope.launch {
             try {
+                /**
+                 * We check to see if SKU exists in database by fetching by UPC
+                 * that was returned from the barcode scan result
+                 *
+                 * If the UPC is not null, then perform a search query on the SKU catalog
+                 */
+                val existingSku = skuRepository.getSkuByUpc(upc)
+                if (existingSku != null) {
+                    searchAllSkus(existingSku.upc)
+                    return@launch
+                }
+
+                // Otherwise insert a new SKU into the database via UPC result
                 val newSku = addSkuUseCase(upc)
                 val newSkuId = newSku.skuId
 
-                _uiEffect.emit(
-                    SearchSkuUiEffect.NavigateToSkuDetails(newSkuId)
-                )
+                // Next navigate to the edit SKU screen
+                SearchSkuUiEffect.ShowMessage("SKU not found, adding new UPC $upc to database")
+                delay(1000L)
+                _uiEffect.emit(SearchSkuUiEffect.NavigateToSkuDetails(newSkuId))
 
             } catch (e: Exception) {
                 _uiEffect.emit(
@@ -117,7 +133,10 @@ class SearchViewModel @Inject constructor(
         query: String = state.searchQuery.lowercase(),
         fetchFromRemote: Boolean = false
     ) {
-        viewModelScope.launch {
+        state = state.copy(searchQuery = query)
+
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch {
             searchSkuUseCase
                 .catalog(query)
                 .collect { result ->
