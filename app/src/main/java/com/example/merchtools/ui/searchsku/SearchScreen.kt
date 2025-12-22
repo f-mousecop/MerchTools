@@ -144,12 +144,16 @@ fun SearchScreen(
                 }
             }
 
+            /**
+             * TODO: Fix scroll animation issue where LaunchedEffect is called on re-entry
+             * of the composable causing scroll animation to jump to top of list
+             * e.g., user scrolls down, clicks SKU item -> nav to edit SKU
+             * user navs back -> scroll animation jumps to top of list, losing current index
+             */
             // After search query or deletion, smoothly scroll to top
             // of the LazyColumn
-            LaunchedEffect(state.searchQuery) {
-                scope.launch {
-                    listState.animateScrollToItem(0)
-                }
+            LaunchedEffect(state.searchQuery, state.skus.size) {
+                listState. animateScrollToItem(0)
             }
 
             OutlinedTextField(
@@ -158,6 +162,9 @@ fun SearchScreen(
                     viewModel.onEvent(
                         SearchSkuEvent.OnSearchQueryChange(it)
                     )
+                    /*scope.launch {
+                        listState.animateScrollToItem(0)
+                    }*/
                 },
                 modifier = Modifier
                     .padding(vertical = dimensionResource(R.dimen.padding_small))

@@ -97,8 +97,7 @@ class SearchViewModel @Inject constructor(
     }
 
     private fun addNewSku(upc: String) {
-        searchJob?.cancel()
-        searchJob = viewModelScope.launch {
+        viewModelScope.launch {
             try {
                 /**
                  * We check to see if SKU exists in database by fetching by UPC
@@ -108,7 +107,7 @@ class SearchViewModel @Inject constructor(
                  */
                 val existingSku = skuRepository.getSkuByUpc(upc)
                 if (existingSku != null) {
-                    searchAllSkus(existingSku.upc)
+                    searchAllSkus(upc)
                     return@launch
                 }
 
@@ -117,8 +116,10 @@ class SearchViewModel @Inject constructor(
                 val newSkuId = newSku.skuId
 
                 // Next navigate to the edit SKU screen
-                SearchSkuUiEffect.ShowMessage("SKU not found, adding new UPC $upc to database")
-                delay(1000L)
+                if (upc.isNotBlank()) {
+                    _uiEffect.emit(SearchSkuUiEffect.ShowMessage("SKU not found, adding new UPC $upc to database"))
+                    delay(1000L)
+                }
                 _uiEffect.emit(SearchSkuUiEffect.NavigateToSkuDetails(newSkuId))
 
             } catch (e: Exception) {
