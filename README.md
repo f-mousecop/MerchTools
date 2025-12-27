@@ -19,14 +19,14 @@
 
 ---
 
-*  More [screenshots](#-screenshots) below
+*  More [screenshots](#screenshots) below
 * See [TODO](docs/TODO.md)
-* See [tests](#-tests)
+* See [tests](#tests)
 *  See [contributing](#contributing)
 *  See [features](#-features) and [finished implementations](#-finished-implementations)
 *  Contact me [here](#-contact)
 
-## 💾 Technologies Used
+## Technologies Used
 
 - **Key Technologies**:
   - **UI**: Jetpack Compose
@@ -61,7 +61,7 @@ To get a local copy up and running follow these simple example steps.
 
 ---
 
-## 📄 Tests
+## Tests
 * **UI Tests**: [UI Test Summary](tests/img.png)
 * **Unit Tests**: 
   * [Unit Test Summary](tests/unit_test.png)
@@ -70,40 +70,52 @@ To get a local copy up and running follow these simple example steps.
 
 ---
 
-## 🗃️ Project Structure
+## Project Structure
 
-This project is built upon the principles of **Clean Architecture** and **MVVM**.
+This project is built upon the principles of **Clean Architecture** and **MVVM/MVI**.
 Throughout planning and implementation, I learned more about separation of concerns using these principles
 
 ###  Modular Structure
 
-* **/app**: Main application module
-  * **/core**: Shared utilities
-  * **/data**: Data layer 
-    * **/local**: Local data sources
-      * **/dao**
-      * **/entity**
-      * **/relations**
-      * **/repository**
-    * **/remote**: Remote data sources
-    * **/mappers**: Data mappers
-    * **/util**: Utility classes
-  * **/di**: Dependency injection modules (Hilt)
-  * **/domain**: Domain layer
-    * **/model**
-    * **/repository**: Repository interfaces
-    * **/use_case**:
-    * **/util**
-    * **/validation**: Logic validation files
-  * **/ui**: UI layer-related code for each screen/ViewModel/components
-    * **/audit**
-    * **/components**
-    * **/feature_scanner**
-    * **/history**
-    * **/report**
-    * **/searchsku**
-    * **/store**
-    * **/theme**
+```terminaloutput
++---java
+|   \---com
+|       \---example
+|           \---merchtools
+|               +---core - Shared utilities
+|               +---data - Data layer
+|               |   +---csv
+|               |   +---local - Local data sources
+|               |   |   +---dao
+|               |   |   +---entity
+|               |   |   +---mock
+|               |   |   +---relations
+|               |   |   \---repository
+|               |   +---mappers - Data mappers
+|               |   +---pdf
+|               |   +---remote - Remote data sources
+|               |   |   \---dto
+|               |   \---util - Utility classes
+|               +---di - Dependency injection modules (Hilt)
+|               +---domain - Domain layer
+|               |   +---model
+|               |   +---repository - Repository interfaces
+|               |   +---use_case
+|               |   +---util
+|               |   \---validation - Logic validation files
+|               \---ui - UI layer-related code for each screen/ViewModel/components
+|                   +---audit
+|                   |   \---edit_audit_item
+|                   +---components
+|                   +---feature_scanner
+|                   +---history
+|                   +---home
+|                   +---report
+|                   +---searchsku
+|                   |   \---edit_sku
+|                   +---store
+|                   \---theme
+```
 
 ---
 
@@ -120,7 +132,7 @@ Throughout planning and implementation, I learned more about separation of conce
 
 ---
 
-## 🪛 Contributing Guidelines
+## Contributing Guidelines
 
 ###  Contributing
 
@@ -141,7 +153,7 @@ Feel free to contribute to the repository by suggesting improvements, fixing bug
 
 ---
 
-# 📩 Contact
+## 📩 Contact
 
 Reach out to me via [email](mailto:charles.fmousecop@protonmail.com) for any questions
 
@@ -169,7 +181,7 @@ UPC text field - fills in SKU details if match is found)
 
 ---
 
-## 📷 Screenshots
+## Screenshots
 
 <img src="docs/screenshots/Screenshot_20251212_063505.png" alt="text" height="400"/> <img src="docs/screenshots/Screenshot_20251212_063740.png" alt="text" height="400"/>
 <img src="docs/screenshots/Screenshot_20251212_063756.png" alt="text" height="400"/> <img src="docs/screenshots/Screenshot_20251212_063709.png" alt="text" height="400"/>
