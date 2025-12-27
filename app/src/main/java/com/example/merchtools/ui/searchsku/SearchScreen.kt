@@ -1,5 +1,6 @@
 package com.example.merchtools.ui.searchsku
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -24,8 +25,13 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -42,9 +48,17 @@ import com.ramcosta.composedestinations.generated.destinations.ScanBarCodeScreen
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultRecipient
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, FlowPreview::class)
 @Destination<RootGraph>
 @Composable
 fun SearchScreen(
@@ -144,16 +158,35 @@ fun SearchScreen(
                 }
             }
 
-            /**
-             * TODO: Fix scroll animation issue where LaunchedEffect is called on re-entry
-             * of the composable causing scroll animation to jump to top of list
-             * e.g., user scrolls down, clicks SKU item -> nav to edit SKU
-             * user navs back -> scroll animation jumps to top of list, losing current index
-             */
+
             // After search query or deletion, smoothly scroll to top
             // of the LazyColumn
-            LaunchedEffect(state.searchQuery, state.skus.size) {
-                listState. animateScrollToItem(0)
+            LaunchedEffect(Unit) {
+                snapshotFlow { viewModel.state.searchQuery }
+                    .distinctUntilChanged()
+                    .drop(1)
+                    .debounce(150)  // Debounce for fast typing for scrolling
+                    .collectLatest { query ->
+
+                        // We need to wait until LazyColumn has something to scroll
+                        // and avoid hanging if the catalog is empty
+                        withTimeoutOrNull(500) {
+                            snapshotFlow { listState.layoutInfo.totalItemsCount }
+                                .first { it > 0 }
+                        }
+
+                        val alreadyAtTop = listState.firstVisibleItemIndex == 0 &&
+                                listState.firstVisibleItemScrollOffset == 0
+
+                        // We need to ensure that the animation will not fire if we are already
+                        // at the top of the list
+                        if (!alreadyAtTop) {
+                            Log.d("SearchScreen", "Query = '$query' -> scrolling to top")
+                            listState.animateScrollToItem(0)
+                        } else {
+                            Log.d("SearchScreen", "Query = '$query' -> already at top")
+                        }
+                    }
             }
 
             OutlinedTextField(

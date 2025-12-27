@@ -146,7 +146,7 @@ class EditSkuViewModel @Inject constructor(
                     error = e.message ?: "Unknown error",
                     isLoading = false
                 )
-                _uiEffect.emit(SearchSkuUiEffect.ShowMessage(e.message ?: "Unknown error"))
+                _uiEffect.emit(SearchSkuUiEffect.ShowMessage(state.error.toString()))
             }
             .launchIn(viewModelScope)
     }

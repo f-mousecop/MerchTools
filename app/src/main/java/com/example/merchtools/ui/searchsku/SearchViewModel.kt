@@ -7,12 +7,12 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.merchtools.core.Resource
 import com.example.merchtools.data.local.mock.MockSkus
 import com.example.merchtools.domain.model.Sku
 import com.example.merchtools.domain.repository.SkuRepository
 import com.example.merchtools.domain.use_case.AddSkuUseCase
 import com.example.merchtools.domain.use_case.SearchSkuUseCase
-import com.example.merchtools.core.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -64,7 +64,16 @@ class SearchViewModel @Inject constructor(
                 removeSku(event.sku)
             }
             is SearchSkuEvent.OnSearchQueryChange -> {
-                searchAllSkus(event.query)
+                val query = event.query
+                state = state.copy(searchQuery = query)
+
+                if (query.isBlank()) {
+                    searchJob?.cancel()
+                    getAllSkusStream()
+                } else {
+                    skuListJob?.cancel()
+                    searchAllSkus(query)
+                }
             }
         }
     }
@@ -79,7 +88,8 @@ class SearchViewModel @Inject constructor(
 
                 skuRepository.delete(sku)
             } catch (e: Exception) {
-                _uiEffect.emit(SearchSkuUiEffect.ShowMessage(e.message ?: "Unknown error"))
+                _uiEffect.emit(SearchSkuUiEffect.ShowMessage("An unexpected error occurred: ${e.message}"))
+                Log.e("SearchViewModel", "Error in removeSku: ${e.message}")
             }
         }
     }
@@ -101,6 +111,8 @@ class SearchViewModel @Inject constructor(
                  */
                 val existingSku = skuRepository.getSkuByUpc(upc)
                 if (existingSku != null) {
+                    state = state.copy(searchQuery = upc)
+                    skuListJob?.cancel()
                     searchAllSkus(upc)
                     return@launch
                 }
@@ -128,8 +140,6 @@ class SearchViewModel @Inject constructor(
         query: String = state.searchQuery.lowercase(),
         fetchFromRemote: Boolean = false
     ) {
-        state = state.copy(searchQuery = query)
-
         searchJob?.cancel()
         searchJob = viewModelScope.launch {
             searchSkuUseCase
@@ -145,6 +155,9 @@ class SearchViewModel @Inject constructor(
                         }
                         is Resource.Error -> {
                             state = state.copy(error = result.message)
+                            _uiEffect.emit(
+                                SearchSkuUiEffect.ShowMessage(result.message.toString())
+                            )
                         }
                         is Resource.Loading -> {
                             state = state.copy(isLoading = result.isLoading)
@@ -171,12 +184,16 @@ class SearchViewModel @Inject constructor(
                         is Resource.Success -> {
                             result.data?.let { skus ->
                                 state = state.copy(
-                                    skus = skus
+                                    skus = skus,
+                                    isLoading = false
                                 )
                             }
                         }
                         is Resource.Error -> {
-                            state = state.copy(error = result.message)
+                            state = state.copy(
+                                error = result.message,
+                                isLoading = false
+                            )
                         }
                         is Resource.Loading -> {
                             state = state.copy(isLoading = result.isLoading)
