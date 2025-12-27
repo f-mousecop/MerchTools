@@ -65,12 +65,6 @@ class SearchViewModel @Inject constructor(
             }
             is SearchSkuEvent.OnSearchQueryChange -> {
                 searchAllSkus(event.query)
-                /*state = state.copy(searchQuery = event.query)
-                searchJob?.cancel()
-                searchJob = viewModelScope.launch {
-                    delay(500L)
-                    searchAllSkus()
-                }*/
             }
         }
     }

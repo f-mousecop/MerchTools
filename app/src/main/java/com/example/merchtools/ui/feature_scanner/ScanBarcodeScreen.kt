@@ -58,7 +58,7 @@ fun ScanBarCodeScreen(
         mutableStateOf(permissionState.status.shouldShowRationale)
     }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(permissionState) {
         if (!permissionState.status.isGranted) {
             permissionState.launchPermissionRequest()
         }
@@ -69,7 +69,7 @@ fun ScanBarCodeScreen(
     ) {
         when {
             permissionState.status.isGranted -> {
-                // We have permission → show scanner
+                // We have permission -> show scanner
                 ScanCode(
                     onBarcodeDetected = { upc ->
                         resultBackNavigator.navigateBack(BarcodeScanResult(upc = upc))

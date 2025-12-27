@@ -162,9 +162,6 @@ fun SearchScreen(
                     viewModel.onEvent(
                         SearchSkuEvent.OnSearchQueryChange(it)
                     )
-                    /*scope.launch {
-                        listState.animateScrollToItem(0)
-                    }*/
                 },
                 modifier = Modifier
                     .padding(vertical = dimensionResource(R.dimen.padding_small))
