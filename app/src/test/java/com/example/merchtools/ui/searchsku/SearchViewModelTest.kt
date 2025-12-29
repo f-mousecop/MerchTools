@@ -46,7 +46,6 @@ class SearchViewModelTest {
 
         viewModel = SearchViewModel(
             addSkuUseCase = addSkuUseCase,
-            savedStateHandle = savedStateHandle,
             skuRepository = skuRepository,
             searchSkuUseCase = searchSkuUseCase
         )

@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.merchtools.core.Resource
@@ -24,7 +23,6 @@ import javax.inject.Inject
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     private val addSkuUseCase: AddSkuUseCase,
-    private val savedStateHandle: SavedStateHandle,
     private val skuRepository: SkuRepository,
     private val searchSkuUseCase: SearchSkuUseCase
 ): ViewModel() {
@@ -69,9 +67,11 @@ class SearchViewModel @Inject constructor(
 
                 if (query.isBlank()) {
                     searchJob?.cancel()
+                    Log.d("SearchViewModel", "Search query is blank, cancelling $searchJob")
                     getAllSkusStream()
                 } else {
                     skuListJob?.cancel()
+                    Log.d("SearchViewModel", "Search query is not blank, cancelling $skuListJob")
                     searchAllSkus(query)
                 }
             }
@@ -142,6 +142,7 @@ class SearchViewModel @Inject constructor(
     ) {
         searchJob?.cancel()
         searchJob = viewModelScope.launch {
+            Log.d("SearchViewModel", "Searching for '$query', $searchJob started")
             searchSkuUseCase
                 .catalog(query)
                 .collect { result ->
@@ -177,6 +178,7 @@ class SearchViewModel @Inject constructor(
     private fun getAllSkusStream() {
         skuListJob?.cancel()
         skuListJob = viewModelScope.launch {
+            Log.d("SearchViewModel", "Getting all SKUs, $skuListJob started")
             skuRepository
                 .getAllSkusStream()
                 .collect { result ->

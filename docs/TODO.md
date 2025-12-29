@@ -6,3 +6,5 @@
 * [x] Fix scroll animation effect in SearchScreen
 * [ ] Refactor code and change state from mutableStateOf to StateFlow, where necessary
 * [ ] Add better documentation/comments to files
+  * [x] Add documentation to UpcValidator and  TextInputFieldValidator
+---
