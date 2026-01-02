@@ -7,7 +7,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.merchtools.core.Resource
-import com.example.merchtools.data.local.mock.MockSkus
 import com.example.merchtools.domain.model.Sku
 import com.example.merchtools.domain.repository.SkuRepository
 import com.example.merchtools.domain.use_case.AddSkuUseCase
@@ -29,6 +28,16 @@ class SearchViewModel @Inject constructor(
     var state by mutableStateOf(SearchSkuState())
         private set
 
+    /**
+     * TODO: Begin working on using StateFlow for UI state
+     */
+    /*private val _skuCatalogUiState = MutableStateFlow(SearchSkuState())
+    val skuCatalogUiState: StateFlow<SearchSkuState> = _skuCatalogUiState.asStateFlow()*/
+
+    /*private val _uiEvent = MutableSharedFlow<SearchSkuEvent>()
+    val uiEvent = _uiEvent.asSharedFlow()*/
+
+
     private val _uiEffect = MutableSharedFlow<SearchSkuUiEffect>()
     val uiEffect = _uiEffect.asSharedFlow()
 
@@ -41,12 +50,6 @@ class SearchViewModel @Inject constructor(
 
     fun onEvent(event: SearchSkuEvent) {
         when (event) {
-            is SearchSkuEvent.Refresh -> {
-                getAllSkusStream()
-                viewModelScope.launch {
-                    seedMockSkus()
-                }
-            }
             is SearchSkuEvent.BarcodeScanned -> {
                 viewModelScope.launch {
                     _uiEffect.emit(SearchSkuUiEffect.NavigateToScanBarcode)
@@ -79,13 +82,8 @@ class SearchViewModel @Inject constructor(
     }
 
     private fun removeSku(sku: Sku) {
-        val currentSkus = state.skus.toMutableList()
         viewModelScope.launch {
             try {
-                state = state.copy(
-                    skus = currentSkus
-                )
-
                 skuRepository.delete(sku)
             } catch (e: Exception) {
                 _uiEffect.emit(SearchSkuUiEffect.ShowMessage("An unexpected error occurred: ${e.message}"))
@@ -150,7 +148,8 @@ class SearchViewModel @Inject constructor(
                         is Resource.Success -> {
                             result.data?.let { skus ->
                                 state = state.copy(
-                                    skus = skus
+                                    skus = skus,
+                                    isLoading = false
                                 )
                             }
                         }
@@ -167,12 +166,6 @@ class SearchViewModel @Inject constructor(
                 }
         }
 
-    }
-
-    private suspend fun seedMockSkus() {
-        MockSkus.skus.forEach { sku ->
-            skuRepository.insert(sku)
-        }
     }
 
     private fun getAllSkusStream() {

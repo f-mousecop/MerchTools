@@ -3,7 +3,6 @@ package com.example.merchtools.ui.searchsku
 import com.example.merchtools.domain.model.Sku
 
 sealed class SearchSkuEvent {
-    object Refresh: SearchSkuEvent()
     data object BarcodeScanned : SearchSkuEvent()
     data class AddNewSku(val upc: String) : SearchSkuEvent()
     data class EditSku(val skuId: Long) : SearchSkuEvent()

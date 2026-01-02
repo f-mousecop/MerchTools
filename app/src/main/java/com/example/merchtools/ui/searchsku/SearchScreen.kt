@@ -25,6 +25,7 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -69,6 +70,8 @@ fun SearchScreen(
     val uiEffect = viewModel.uiEffect
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
+//    val state by viewModel.skuCatalogUiState.collectAsState()
+
 
     resultRecipient.onNavResult { navResult ->
         when (navResult) {
@@ -77,7 +80,6 @@ fun SearchScreen(
                 viewModel.onEvent(SearchSkuEvent.AddNewSku(result.upc))
             }
             NavResult.Canceled -> {
-
             }
         }
     }
