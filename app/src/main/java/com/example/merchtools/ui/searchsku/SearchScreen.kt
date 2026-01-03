@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Button
@@ -21,24 +20,16 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.merchtools.R
-import com.example.merchtools.ui.audit.AuditEvent
 import com.example.merchtools.ui.components.SkuItemCard
 import com.example.merchtools.ui.components.SwipeToDeleteContainer
 import com.example.merchtools.ui.feature_scanner.BarcodeScanResult
@@ -54,10 +45,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeoutOrNull
 
 @OptIn(ExperimentalMaterial3Api::class, FlowPreview::class)
 @Destination<RootGraph>
@@ -68,9 +56,9 @@ fun SearchScreen(
     viewModel: SearchViewModel = hiltViewModel()
 ) {
     val uiEffect = viewModel.uiEffect
-    val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
-//    val state by viewModel.skuCatalogUiState.collectAsState()
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val query by viewModel.searchQuery.collectAsStateWithLifecycle()
 
 
     resultRecipient.onNavResult { navResult ->
@@ -84,7 +72,7 @@ fun SearchScreen(
         }
     }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(uiEffect) {
         uiEffect.collect { effect ->
             when (effect) {
                 is SearchSkuUiEffect.NavigateToSkuDetails -> {
@@ -96,7 +84,7 @@ fun SearchScreen(
                     navigator.navigate(ScanBarCodeScreenDestination)
                 }
                 is SearchSkuUiEffect.ShowMessage -> {
-                    scope.launch {
+                    launch {
                         snackbarHostState.showSnackbar(
                             message = effect.message
                         )
@@ -114,8 +102,6 @@ fun SearchScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         containerColor = MaterialTheme.colorScheme.surfaceVariant
     ) { innerPadding ->
-
-        val state = viewModel.state
 
         // We need to remember lazyListState for scroll animation
         val listState = rememberLazyListState()
@@ -163,19 +149,13 @@ fun SearchScreen(
 
             // After search query or deletion, smoothly scroll to top
             // of the LazyColumn
-            LaunchedEffect(Unit) {
-                snapshotFlow { viewModel.state.searchQuery }
-                    .distinctUntilChanged()
+            LaunchedEffect(listState) {
+                viewModel.searchQuery
                     .drop(1)
+                    .distinctUntilChanged()
                     .debounce(150)  // Debounce for fast typing for scrolling
                     .collectLatest { query ->
-
-                        // We need to wait until LazyColumn has something to scroll
-                        // and avoid hanging if the catalog is empty
-                        withTimeoutOrNull(500) {
-                            snapshotFlow { listState.layoutInfo.totalItemsCount }
-                                .first { it > 0 }
-                        }
+                        listState.animateScrollToItem(0)
 
                         val alreadyAtTop = listState.firstVisibleItemIndex == 0 &&
                                 listState.firstVisibleItemScrollOffset == 0
@@ -192,7 +172,7 @@ fun SearchScreen(
             }
 
             OutlinedTextField(
-                value = state.searchQuery,
+                value = query,
                 onValueChange = {
                     viewModel.onEvent(
                         SearchSkuEvent.OnSearchQueryChange(it)
@@ -234,7 +214,8 @@ fun SearchScreen(
                                 sku = item,
                                 onClick = {
                                     viewModel.onEvent(SearchSkuEvent.EditSku(item.skuId)) },
-                                clickable = true,)
+                                clickable = true
+                            )
                         }
                     }
                 }

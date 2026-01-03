@@ -7,7 +7,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Assessment
 import androidx.compose.material.icons.filled.Info
@@ -141,7 +143,7 @@ fun HomeScreenContent(
             Column(
                 modifier = Modifier
                     .padding(dimensionResource(id = R.dimen.padding_medium)),
-                verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium))
+                verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))
             ) {
                 Button(
                     modifier = Modifier
@@ -158,11 +160,10 @@ fun HomeScreenContent(
                         onDismissRequest = { onEvent(HomeEvent.DismissDialog) },
                         title = { Text(stringResource(R.string.start_audit)) },
                         text = {
-
                             Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(16.dp)
+                                    .padding(8.dp)
                             ) {
                                 DropDownMenuContent(
                                     state = state,
@@ -236,7 +237,7 @@ fun DropDownMenuContent(
     Column(
         modifier = Modifier
             .fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))
+        verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         OutlinedTextField(
             value = state.userName,
@@ -252,7 +253,9 @@ fun DropDownMenuContent(
         ExposedDropdownMenuBox(
             expanded = state.isExpanded,
             onExpandedChange = { onEvent(HomeEvent.ExpandStoreMenu) },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
         ) {
             OutlinedTextField(
                 value = state.storeName,
@@ -268,7 +271,7 @@ fun DropDownMenuContent(
             )
             ExposedDropdownMenu(
                 expanded = state.isExpanded,
-                onDismissRequest = { onEvent(HomeEvent.CloseStoreMenu) }
+                onDismissRequest = { onEvent(HomeEvent.CloseStoreMenu) },
             ) {
                 state.stores.forEach { store ->
                     DropdownMenuItem(

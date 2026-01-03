@@ -139,15 +139,8 @@ class AuditViewModel @Inject constructor(
     }
 
     private fun removeItem(item: AuditItem) {
-        val currentItems = state.audit.items.toMutableList()
         viewModelScope.launch {
             try {
-                state = state.copy(
-                    audit = state.audit.copy(
-                        items = currentItems
-                    )
-                )
-
                 auditItemRepository.deleteAuditItem(item)
                 _uiEffect.emit(AuditUiEffect.ShowMessage("Audit item removed"))
             } catch (e: Exception) {

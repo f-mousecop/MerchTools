@@ -94,7 +94,15 @@ class OfflineSkuRepository @Inject constructor(val skuDao: SkuDao) : SkuReposito
     }
 
     override suspend fun delete(sku: Sku) {
-        skuDao.delete(sku.toSkuEntity())
+        try {
+            skuDao.delete(sku.toSkuEntity())
+        } catch (e: IOException) {
+            "Network error, please check your connection: ${e.message}"
+        } catch (e: SQLiteException) {
+            throw SQLiteException("SKU deletion failed: ${e.message}")
+        } catch (e: Exception) {
+            "An unexpected error occurred: ${e.message}"
+        }
     }
 
     override suspend fun update(sku: Sku) {

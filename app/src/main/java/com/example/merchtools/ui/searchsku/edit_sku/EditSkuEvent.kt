@@ -8,6 +8,6 @@ sealed class EditSkuEvent {
     data class OnCasePackChanged(val userInput: String) : EditSkuEvent()
     data class OnBrandChanged(val userInput: String) : EditSkuEvent()
     data class OnImageUriChanged(val uri: Uri) : EditSkuEvent()
-    data object DiscardImageUri : EditSkuEvent()
-    data object SaveSku : EditSkuEvent()
+    object DiscardImageUri : EditSkuEvent()
+    object SaveSku : EditSkuEvent()
 }

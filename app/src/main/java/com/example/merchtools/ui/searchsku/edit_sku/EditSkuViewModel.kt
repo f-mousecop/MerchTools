@@ -111,8 +111,7 @@ class EditSkuViewModel @Inject constructor(
     }
 
     private fun validateUpc(sku: Sku): Boolean {
-        val isValid = UpcValidator.isValid(sku.upc)
-        return isValid
+        return UpcValidator.isValid(sku.upc)
     }
 
     private fun validateOtherFields(sku: Sku): Boolean {

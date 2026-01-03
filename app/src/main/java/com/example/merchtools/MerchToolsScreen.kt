@@ -28,6 +28,7 @@ import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.generated.NavGraphs
 import com.ramcosta.composedestinations.generated.destinations.AuditScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.EditAuditItemScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.EditSkuScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.GenerateReportScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.HistoryScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.HomeScreenDestination
@@ -66,6 +67,7 @@ fun MerchToolsApp() {
     val title = when (currentDestination?.route) {
         HomeScreenDestination.route -> "Home"
         SearchScreenDestination.route -> "Search SKU"
+        EditSkuScreenDestination.route -> "SKU Entry"
         AuditScreenDestination.route -> "Audit"
         EditAuditItemScreenDestination.route -> "Edit Audit Item"
         HistoryScreenDestination.route -> "Audit History"
