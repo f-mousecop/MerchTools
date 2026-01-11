@@ -146,7 +146,7 @@ Feel free to contribute to the repository by suggesting improvements, fixing bug
 
 ### License and Authors
 
-* This project is licensed under the MIT License - see the [MIT License](LICENSE.md) for details
+* This project is licensed under the Apache License 2.0 - see the [Apache License 2.0](LICENSE.md) for details
 * **Credit to the following developers**:
     * [DUMA042](https://github.com/DUMA042/BarsandQ) (CameraX/ML Kit integration)
     * [realityexpander](https://github.com/realityexpander/ComposeSwipeToDelete) (Swipe to delete compose container)
