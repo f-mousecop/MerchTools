@@ -17,6 +17,7 @@
 package com.example.merchtools.ui.searchsku
 
 import android.util.Log
+import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.merchtools.core.Resource
@@ -24,6 +25,7 @@ import com.example.merchtools.domain.repository.SkuRepository
 import com.example.merchtools.domain.use_case.AddSkuUseCase
 import com.example.merchtools.domain.use_case.SearchSkuUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
@@ -33,6 +35,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.runningFold
@@ -47,10 +50,6 @@ class SearchViewModel @Inject constructor(
     private val skuRepository: SkuRepository,
     private val searchSkuUseCase: SearchSkuUseCase
 ): ViewModel() {
-    /**
-     * TODO: Begin working on using StateFlow for UI state
-     */
-
     private val _uiEffect = MutableSharedFlow<SearchSkuUiEffect>()
     val uiEffect = _uiEffect.asSharedFlow()
 
@@ -59,9 +58,11 @@ class SearchViewModel @Inject constructor(
     val uiState: StateFlow<SearchSkuState> =
         _searchQuery
     /**
-     * Adding debounce to StateFlow searchQuery causes unpredictable behaviot
+     * Adding debounce to StateFlow searchQuery causes unpredictable behavior
      * in SearchScreen: OutlinedTextField does not update properly
      * user input "h", on next input the search query is reset
+     *
+     * TODO: Debounce works, however, scrolling to top is unreliable
      */
 //            .debounce(150)
             .flatMapLatest { query ->
@@ -128,6 +129,14 @@ class SearchViewModel @Inject constructor(
 
     private fun addNewSku(upc: String) {
         viewModelScope.launch {
+            /**
+             * TODO: Need to fix this so that the guard clause is at the top
+             * We need to prevent SKU with invalid UPCs from being added to the database
+             */
+            /*if (!upc.isDigitsOnly()) {
+                _uiEffect.emit(SearchSkuUiEffect.ShowMessage("Invalid UPC: $upc"))
+                return@launch
+            }*/
             try {
                 /**
                  * We check to see if SKU exists in database by fetching by UPC
@@ -135,22 +144,30 @@ class SearchViewModel @Inject constructor(
                  *
                  * If the UPC is not null, then perform a search query on the SKU catalog
                  */
-                val existingSku = if (upc.isNotBlank()) skuRepository.getSkuByUpc(upc) else null
+                val existingSku = skuRepository.getSkuByUpc(upc)
                 if (existingSku != null) {
                     _searchQuery.value = upc
                     return@launch
                 }
 
+                /**
+                 * Temporary fix
+                 */
+                if (!upc.isDigitsOnly()) {
+                    _uiEffect.emit(SearchSkuUiEffect.ShowMessage("Invalid UPC: $upc"))
+                    return@launch
+                }
+
+                _uiEffect.emit(SearchSkuUiEffect.ShowMessage("SKU not found, adding new UPC $upc to database"))
+
                 // Otherwise insert a new SKU into the database via UPC result
                 val newSku = addSkuUseCase(upc)
 
                 // Next navigate to the edit SKU screen
-                if (upc.isNotBlank()) {
-                    _uiEffect.emit(SearchSkuUiEffect.ShowMessage("SKU not found, adding new UPC $upc to database"))
-                    delay(1000L)
-                }
                 _uiEffect.emit(SearchSkuUiEffect.NavigateToSkuDetails(newSku.skuId))
 
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 _uiEffect.emit(
                     SearchSkuUiEffect.ShowMessage(e.message ?: "Unknown error")

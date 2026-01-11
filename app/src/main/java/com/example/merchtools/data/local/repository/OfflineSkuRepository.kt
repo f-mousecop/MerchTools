@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.onStart
 import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.coroutines.cancellation.CancellationException
 
 @Singleton
 class OfflineSkuRepository @Inject constructor(val skuDao: SkuDao) : SkuRepository {
@@ -32,10 +33,11 @@ class OfflineSkuRepository @Inject constructor(val skuDao: SkuDao) : SkuReposito
                 Log.e("SkuRepository", "Error in searchSkus: ${e.message}")
 
                 val errorMessage = when (e) {
-                    is IOException -> "Network error, please check your connection: ${e.localizedMessage}"
-                    is SQLiteException -> "A local database error occurred: ${e.localizedMessage}"
-                    else -> "An unexpected error occurred: ${e.localizedMessage}"
+                    is IOException -> "Network error, please check your connection: ${e.message}"
+                    is SQLiteException -> "A local database error occurred: ${e.message}"
+                    else -> "An unexpected error occurred: ${e.message}"
                 }
+                Log.e("SkuRepository", "Error in searchSkus: $errorMessage")
                 emit(Resource.Error(errorMessage))
             }
             .onCompletion {

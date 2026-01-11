@@ -128,7 +128,7 @@ fun ScanCode(
 
         triggerVibration(context)
 
-        delay(300)
+        delay(150)
         latestOnDetected.value(upc)
     }
 
