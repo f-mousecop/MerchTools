@@ -16,11 +16,9 @@
 
 package com.example.merchtools.ui.searchsku.edit_sku
 
-import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -28,7 +26,6 @@ import com.example.merchtools.domain.model.Sku
 import com.example.merchtools.domain.repository.SkuRepository
 import com.example.merchtools.domain.use_case.AddSkuUseCase
 import com.example.merchtools.domain.validation.UpcValidator
-import com.example.merchtools.ui.searchsku.SearchSkuEvent
 import com.example.merchtools.ui.searchsku.SearchSkuUiEffect
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
