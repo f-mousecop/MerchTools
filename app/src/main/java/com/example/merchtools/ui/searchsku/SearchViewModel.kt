@@ -55,8 +55,7 @@ class SearchViewModel @Inject constructor(
 
     private val _searchQuery = MutableStateFlow("")
     val searchQuery = _searchQuery.asStateFlow()
-    val uiState: StateFlow<SearchSkuState> =
-        _searchQuery
+    val uiState: StateFlow<SearchSkuState> = searchQuery
     /**
      * Adding debounce to StateFlow searchQuery causes unpredictable behavior
      * in SearchScreen: OutlinedTextField does not update properly
@@ -64,10 +63,13 @@ class SearchViewModel @Inject constructor(
      *
      * TODO: Debounce works, however, scrolling to top is unreliable
      */
-//            .debounce(150)
+//            .debounce(300)
             .flatMapLatest { query ->
-                val flow = if (query.isBlank()) skuRepository.getAllSkusStream()
-                            else searchSkuUseCase.catalog(query)
+                val flow = if (query.isBlank()) {
+                    skuRepository.getAllSkusStream()
+                } else {
+                    searchSkuUseCase.catalog(query)
+                }
 
                 flow.map { result -> result to query }
             }
@@ -99,14 +101,15 @@ class SearchViewModel @Inject constructor(
                 }
             }
             .stateIn(
-                viewModelScope,
-                SharingStarted.WhileSubscribed(5_000),
-                SearchSkuState()
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = SearchSkuState()
             )
 
     fun onEvent(event: SearchSkuEvent) {
         when (event) {
             is SearchSkuEvent.OnSearchQueryChange -> _searchQuery.value = event.query
+            is SearchSkuEvent.AddNewSku -> addNewSku(event.upc)
             is SearchSkuEvent.BarcodeScanned -> viewModelScope.launch {
                 _uiEffect.emit(SearchSkuUiEffect.NavigateToScanBarcode)
             }
@@ -123,7 +126,6 @@ class SearchViewModel @Inject constructor(
                         )
                     }
             }
-            is SearchSkuEvent.AddNewSku -> addNewSku(event.upc)
         }
     }
 

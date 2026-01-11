@@ -74,7 +74,7 @@ fun SearchScreen(
         }
     }
 
-    LaunchedEffect(uiEffect) {
+    LaunchedEffect(Unit) {
         uiEffect.collect { effect ->
             when (effect) {
                 is SearchSkuUiEffect.NavigateToSkuDetails -> {
@@ -147,7 +147,6 @@ fun SearchScreen(
                     Text(text = "Scan Barcode")
                 }
             }
-
 
             // After search query or deletion, smoothly scroll to top
             // of the LazyColumn
