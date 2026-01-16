@@ -9,8 +9,10 @@ import com.example.merchtools.domain.validation.TextInputFieldValidator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -22,7 +24,7 @@ class StoreViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _uiEffect = MutableSharedFlow<StoreCatalogUiEffect>()
-    val uiEffect = _uiEffect
+    val uiEffect: SharedFlow<StoreCatalogUiEffect> = _uiEffect.asSharedFlow()
 
     private val _isAddStoreDialogOpen = MutableStateFlow(false)
     private val _newStoreName = MutableStateFlow("")
@@ -42,7 +44,7 @@ class StoreViewModel @Inject constructor(
     ) { isDialogOpen, newStoreName, storesResource ->
         when (storesResource) {
             is Resource.Loading -> {
-                StoreState(isLoading = true)
+                StoreState(isLoading = storesResource.isLoading)
             }
             is Resource.Error -> {
                 StoreState(error = storesResource.message)
@@ -101,6 +103,9 @@ class StoreViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Probably will delete this as it is not used or needed
+     */
     private fun editStore(storeId: Long) {
         viewModelScope.launch {
             _uiEffect.emit(StoreCatalogUiEffect.NavigateToEditStore)
