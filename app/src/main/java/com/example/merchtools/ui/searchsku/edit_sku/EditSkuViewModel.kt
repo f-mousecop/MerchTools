@@ -46,7 +46,9 @@ class EditSkuViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
 ): ViewModel() {
     private val skuId: Long = checkNotNull(savedStateHandle["skuId"])
+
     var state by mutableStateOf(EditSkuState())
+        private set
 
     private val _uiEffect = MutableSharedFlow<SearchSkuUiEffect>()
     val uiEffect = _uiEffect.asSharedFlow()

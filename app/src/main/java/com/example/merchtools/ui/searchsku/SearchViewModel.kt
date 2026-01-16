@@ -34,6 +34,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.runningFold
@@ -51,6 +52,9 @@ class SearchViewModel @Inject constructor(
     private val _uiEffect = MutableSharedFlow<SearchSkuUiEffect>()
     val uiEffect = _uiEffect.asSharedFlow()
 
+    /*private val _uiEffect = Channel<SearchSkuUiEffect>(capacity = Channel.BUFFERED)
+    val uiEffect = _uiEffect.receiveAsFlow()*/
+
     private val _searchQuery = MutableStateFlow("")
     val searchQuery = _searchQuery.asStateFlow()
     val uiState: StateFlow<SearchSkuState> = searchQuery
@@ -61,7 +65,7 @@ class SearchViewModel @Inject constructor(
      *
      * TODO: Debounce works, however, scrolling to top is unreliable
      */
-//            .debounce(300)
+//            .debounce(150)
             .flatMapLatest { query ->
                 val flow = if (query.isBlank()) {
                     skuRepository.getAllSkusStream()
@@ -107,7 +111,9 @@ class SearchViewModel @Inject constructor(
     fun onEvent(event: SearchSkuEvent) {
         when (event) {
             is SearchSkuEvent.OnSearchQueryChange -> _searchQuery.value = event.query
+
             is SearchSkuEvent.AddNewSku -> addNewSku(event.upc)
+
             is SearchSkuEvent.BarcodeScanned -> viewModelScope.launch {
                 _uiEffect.emit(SearchSkuUiEffect.NavigateToScanBarcode)
             }
@@ -118,7 +124,9 @@ class SearchViewModel @Inject constructor(
                 runCatching { skuRepository.delete(event.sku) }
                     .onFailure { exception ->
                         uiState.value.copy(error = exception.message)
+
                         Log.e("SearchViewModel", "SKU deletion failed", exception)
+
                         _uiEffect.emit(SearchSkuUiEffect.ShowMessage(
                             exception.message ?: "An unexpected error occurred")
                         )

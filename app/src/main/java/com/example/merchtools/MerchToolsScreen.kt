@@ -65,7 +65,7 @@ fun MerchToolsApp() {
 
     // Determine the title based on the current destination
     val title = when (currentDestination?.route) {
-        HomeScreenDestination.route -> "Home"
+        HomeScreenDestination.route -> "Merch Tools"
         SearchScreenDestination.route -> "Search SKU"
         EditSkuScreenDestination.route -> "SKU Entry"
         AuditScreenDestination.route -> "Audit"
