@@ -60,10 +60,9 @@ class SearchViewModel @Inject constructor(
     val uiState: StateFlow<SearchSkuState> = searchQuery
     /**
      * Adding debounce to StateFlow searchQuery causes unpredictable behavior
-     * in SearchScreen: OutlinedTextField does not update properly
-     * user input "h", on next input the search query is reset
+     * in SearchScreen: scrolling to top is unreliable
      *
-     * TODO: Debounce works, however, scrolling to top is unreliable
+     * TODO: Debounce works, however, scrolling to top is unreliable; sometimes it scrolls on query change, other times it doesn't
      */
 //            .debounce(150)
             .flatMapLatest { query ->

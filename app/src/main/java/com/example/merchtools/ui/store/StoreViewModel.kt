@@ -1,24 +1,5 @@
-/**
- * Copyright (C) 2026 Charles Clark
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.example.merchtools.ui.store
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.merchtools.core.Resource
@@ -26,47 +7,75 @@ import com.example.merchtools.domain.model.Store
 import com.example.merchtools.domain.repository.StoreRepository
 import com.example.merchtools.domain.validation.TextInputFieldValidator
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class StoreViewModel @Inject constructor(
     private val storeRepository: StoreRepository
-) : ViewModel(){
-    var state by mutableStateOf(StoreState())
-        private set
+) : ViewModel() {
 
     private val _uiEffect = MutableSharedFlow<StoreCatalogUiEffect>()
     val uiEffect = _uiEffect
 
-    private var storeListJob: Job? = null
-    private var storeAddJob: Job? = null
+    private val _isAddStoreDialogOpen = MutableStateFlow(false)
+    private val _newStoreName = MutableStateFlow("")
 
-    init {
-        getAllStoresStream()
-    }
+    private val _stores = storeRepository
+        .getAllStoresStream()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = Resource.Loading(true)
+        )
+
+    val state: StateFlow<StoreState> = combine(
+        _isAddStoreDialogOpen,
+        _newStoreName,
+        _stores,
+    ) { isDialogOpen, newStoreName, storesResource ->
+        when (storesResource) {
+            is Resource.Loading -> {
+                StoreState(isLoading = true)
+            }
+            is Resource.Error -> {
+                StoreState(error = storesResource.message)
+            }
+            is Resource.Success -> {
+                StoreState(
+                    stores = storesResource.data ?: emptyList(),
+                    isAddStoreDialogOpen = isDialogOpen,
+                    newStoreName = newStoreName
+                )
+            }
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = StoreState(isLoading = true)
+    )
 
     fun onEvent(event: StoreCatalogEvent) {
         when (event) {
             is StoreCatalogEvent.ShowAddStoreDialog -> {
-                state = state.copy(isAddStoreDialogOpen = true)
+                _isAddStoreDialogOpen.value = true
             }
             is StoreCatalogEvent.HideAddStoreDialog -> {
-                state = state.copy(isAddStoreDialogOpen = false)
+                _isAddStoreDialogOpen.value = false
             }
             is StoreCatalogEvent.OnStoreNameChanged -> {
-                state = state.copy(
-                    newStoreName = TextInputFieldValidator.capInputLength(event.name)
-                )
+                _newStoreName.value = TextInputFieldValidator.capInputLength(event.name)
             }
             is StoreCatalogEvent.AddNewStore -> {
-                addNewStore(state.newStoreName)
-                state = state.copy(
-                    isAddStoreDialogOpen = false,
-                    newStoreName = ""
-                )
+                addNewStore(state.value.newStoreName)
+                _isAddStoreDialogOpen.value = false
+                _newStoreName.value = ""
             }
             is StoreCatalogEvent.RemoveStore -> {
                 removeStore(event.store)
@@ -78,13 +87,8 @@ class StoreViewModel @Inject constructor(
     }
 
     private fun removeStore(store: Store) {
-        val currentStores = state.stores.toMutableList()
         viewModelScope.launch {
             try {
-                state = state.copy(
-                    stores = currentStores
-                )
-
                 storeRepository.deleteStore(store)
                 _uiEffect.emit(
                     StoreCatalogUiEffect.ShowMessage(
@@ -107,8 +111,7 @@ class StoreViewModel @Inject constructor(
         // Trim trailing spaces before inserting into the database
         val storeName = TextInputFieldValidator.trimTrailingSpaces(name)
 
-        storeAddJob?.cancel()
-        storeAddJob = viewModelScope.launch {
+        viewModelScope.launch {
             try {
                 storeRepository.insertStore(
                     Store(
@@ -127,35 +130,6 @@ class StoreViewModel @Inject constructor(
                     )
                 )
             }
-        }
-    }
-
-    private fun getAllStoresStream() {
-        storeListJob?.cancel()
-        storeListJob = viewModelScope.launch {
-            storeRepository
-                .getAllStoresStream()
-                .collect { result ->
-                    when (result) {
-                        is Resource.Success -> {
-                            result.data?.let {
-                                state = state.copy(
-                                    stores = it,
-                                    isLoading = false
-                                )
-                            }
-                        }
-                        is Resource.Error -> {
-                            state = state.copy(
-                                error = result.message,
-                                isLoading = false
-                            )
-                        }
-                        is Resource.Loading -> {
-                            state = state.copy(isLoading = result.isLoading)
-                        }
-                    }
-                }
         }
     }
 }

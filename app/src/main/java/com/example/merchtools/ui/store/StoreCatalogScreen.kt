@@ -49,6 +49,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.merchtools.R
 import com.example.merchtools.domain.model.Store
 import com.example.merchtools.ui.components.UiElementRichToolTip
@@ -68,7 +69,8 @@ fun StoreCatalogScreen(
 ) {
     val uiEffect = viewModel.uiEffect
     val snackbarHostState = remember { SnackbarHostState() }
-    val state = viewModel.state
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
 
     LaunchedEffect(Unit) {
         uiEffect.collect { effect ->
