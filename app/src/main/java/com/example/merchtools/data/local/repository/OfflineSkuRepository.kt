@@ -2,24 +2,21 @@ package com.example.merchtools.data.local.repository
 
 import android.util.Log
 import androidx.sqlite.SQLiteException
+import com.example.merchtools.core.Resource
 import com.example.merchtools.data.local.dao.SkuDao
-import com.example.merchtools.domain.repository.SkuRepository
+import com.example.merchtools.data.local.entity.SkuEntity
 import com.example.merchtools.data.mappers.toSku
 import com.example.merchtools.data.mappers.toSkuEntity
 import com.example.merchtools.domain.model.Sku
-import com.example.merchtools.core.Resource
-import com.example.merchtools.data.local.entity.SkuEntity
+import com.example.merchtools.domain.repository.SkuRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
 import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.coroutines.cancellation.CancellationException
 
 @Singleton
 class OfflineSkuRepository @Inject constructor(val skuDao: SkuDao) : SkuRepository {
@@ -39,9 +36,6 @@ class OfflineSkuRepository @Inject constructor(val skuDao: SkuDao) : SkuReposito
                 }
                 Log.e("SkuRepository", "Error in searchSkus: $errorMessage")
                 emit(Resource.Error(errorMessage))
-            }
-            .onCompletion {
-                emit(Resource.Loading(false))
             }
     }
 
@@ -66,9 +60,6 @@ class OfflineSkuRepository @Inject constructor(val skuDao: SkuDao) : SkuReposito
                     else -> "An unexpected error occurred: ${e.localizedMessage}"
                 }
                 emit(Resource.Error(errorMessage))
-            }
-            .onCompletion {
-                emit(Resource.Loading(false))
             }
     }
 
@@ -129,9 +120,6 @@ class OfflineSkuRepository @Inject constructor(val skuDao: SkuDao) : SkuReposito
                     else -> "An unexpected error occurred: ${e.localizedMessage}"
                 }
                 emit(Resource.Error(errorMessage))
-            }
-            .onCompletion {
-                emit(Resource.Loading(false))
             }
     }
 }

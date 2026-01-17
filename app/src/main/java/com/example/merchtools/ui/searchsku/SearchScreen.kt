@@ -24,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -42,9 +43,7 @@ import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultRecipient
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, FlowPreview::class)
@@ -146,26 +145,36 @@ fun SearchScreen(
                 }
             }
 
-            // After search query or deletion, smoothly scroll to top
+            // After search query change, smoothly scroll to top
             // of the LazyColumn
             LaunchedEffect(listState) {
-                viewModel.searchQuery
-                    .drop(1)
-                    .distinctUntilChanged()
-                    .debounce(150)  // Debounce for fast typing for scrolling
+                // We need to check if it is the initial run to avoid triggering a scroll
+                var isInitialRun = true
+                snapshotFlow { state.searchQuery }
                     .collectLatest { query ->
-                        listState.animateScrollToItem(0)
+                        if (isInitialRun) {
+                            isInitialRun = false
+                            return@collectLatest    // do not scroll
+                        }
 
-                        val alreadyAtTop = listState.firstVisibleItemIndex == 0 &&
-                                listState.firstVisibleItemScrollOffset == 0
+                        // Otherwise we wait for the state to reflect the successful result of this query
+                        snapshotFlow { state }
+                            .first { !it.isLoading && it.searchQuery == query }
+
+                        // Next wait for the LazyColumn to update
+                        snapshotFlow { listState.layoutInfo.totalItemsCount }
+                            .first { it == state.skus.size }
 
                         // We need to ensure that the animation will not fire if we are already
                         // at the top of the list
+                        val alreadyAtTop = listState.firstVisibleItemIndex == 0 &&
+                                listState.firstVisibleItemScrollOffset == 0
+
                         if (!alreadyAtTop) {
-                            Log.d("SearchScreen", "Query = '$query' -> scrolling to top")
+                            Log.d("SearchScreen", "Query '$query' processed, scrolling to top.")
                             listState.animateScrollToItem(0)
                         } else {
-                            Log.d("SearchScreen", "Query = '$query' -> already at top")
+                            Log.d("SearchScreen", "Query '$query' processed, already at top.")
                         }
                     }
             }
@@ -211,8 +220,7 @@ fun SearchScreen(
                         ) {
                             SkuItemCard(
                                 sku = item,
-                                onClick = {
-                                    viewModel.onEvent(SearchSkuEvent.EditSku(item.skuId)) },
+                                onClick = { viewModel.onEvent(SearchSkuEvent.EditSku(item.skuId)) },
                                 clickable = true
                             )
                         }

@@ -1,12 +1,10 @@
-# ⚒️ Merch Tools
+# Merch Tools
 ## An inventory & shelf audit assistant for field merchandisers and vendors - Android app
 
 ---
 
----
 
-
-## 📹 App demo
+## App demo
 
 <details open>
     <summary><h3>Merch Tools</h3></summary>
@@ -23,7 +21,7 @@
 * See [TODO](docs/TODO.md)
 * See [tests](#tests)
 *  See [contributing](#contributing)
-*  See [features](#-features) and [finished implementations](#-finished-implementations)
+*  See [features](#features) and [finished implementations](#finished-implementations)
 *  Contact me [here](#-contact)
 
 ## Technologies Used
@@ -119,7 +117,7 @@ Throughout planning and implementation, I learned more about separation of conce
 
 ---
 
-## 💡 Features
+## Features
 
 * Search product/SKU
 * Scan UPC/barcode 
@@ -158,7 +156,7 @@ Feel free to contribute to the repository by suggesting improvements, fixing bug
 Reach out to me via [email](mailto:charles.fmousecop@protonmail.com) for any questions
 
 ---
-## ✅ Finished Implementations
+## Finished Implementations
 
 - [x] Data repositories, DAOs, entities, relations, domain mappers
 - [x] Home Screen (buttons to nav -> Start Audit, -> Open Audit, -> Audit History)
