@@ -70,9 +70,6 @@ class AuditViewModel @Inject constructor(
 
     fun onEvent(event: AuditEvent) {
         when (event) {
-            is AuditEvent.AddNewItem -> {
-                addNewItem()
-            }
             is AuditEvent.AddItemBySearch -> {
                 findSkuByUpc(event.upc)
             }
@@ -81,9 +78,6 @@ class AuditViewModel @Inject constructor(
             }
             is AuditEvent.BarcodeScanned -> {
                 scanBarcode()
-            }
-            is AuditEvent.OnItemChanged -> {
-                updateItem(event.itemIndex, event.item)
             }
             is AuditEvent.RemoveItem -> {
                 removeItem(event.item)
@@ -106,18 +100,18 @@ class AuditViewModel @Inject constructor(
     private fun saveAudit() {
         auditJob?.cancel()
         auditJob = viewModelScope.launch {
+            state = state.copy(isLoading = true)
             try {
                 val now = Instant.now()
-                val updatedAudit = state.audit.copy(
-                    completedAt = now
+                state = state.copy(
+                    audit = state.audit.copy(
+                        completedAt = now
+                    )
                 )
 
-                state = state.copy(audit = updatedAudit, isLoading = true)
-                delay(2000L)
-
-                auditRepository.updateAudit(updatedAudit)
-
+                auditRepository.updateAudit(state.audit)
                 state = state.copy(isLoading = false)
+
                 _uiEffect.emit(AuditUiEffect.ShowMessage("Audit saved at: ${now.toDisplayString()}"))
                 delay(2000L)
                 _uiEffect.emit(AuditUiEffect.NavigateToHistoryScreen)
@@ -139,15 +133,8 @@ class AuditViewModel @Inject constructor(
     }
 
     private fun removeItem(item: AuditItem) {
-        val currentItems = state.audit.items.toMutableList()
         viewModelScope.launch {
             try {
-                state = state.copy(
-                    audit = state.audit.copy(
-                        items = currentItems
-                    )
-                )
-
                 auditItemRepository.deleteAuditItem(item)
                 _uiEffect.emit(AuditUiEffect.ShowMessage("Audit item removed"))
             } catch (e: Exception) {
@@ -157,69 +144,30 @@ class AuditViewModel @Inject constructor(
 
     }
 
-    private fun updateItem(itemIndex: Int, item: AuditItem) {
-        val currentItems = state.audit.items.toMutableList()
-        try {
-            if (itemIndex in currentItems.indices) {
-                currentItems[itemIndex] = item
-                state = state.copy(
-                    audit = state.audit.copy(
-                        items = currentItems
-                    )
-                )
-            }
-        } catch (e: Exception) {
-            viewModelScope.launch {
-                _uiEffect.emit(AuditUiEffect.ShowMessage(e.message ?: "Unknown error"))
-            }
-        }
-
-    }
-
     private fun findSkuByUpc(upc: String) {
         viewModelScope.launch {
-            try {
-                val sku = searchSkuUseCase.byUpc(upc)
-
-                if (sku == null) {
-                    _uiEffect.emit(
-                        AuditUiEffect.ShowMessage("No SKU found for UPC: $upc"))
-                    return@launch
-                }
-
-                val newItem = addAuditItemUseCase(auditId, sku)
-
-                val currentItems = state.audit.items
-                state = state.copy(
-                    audit = state.audit.copy(
-                        items = currentItems + newItem
-                    )
-                )
-                _uiEffect.emit(
-                    AuditUiEffect.ShowMessage("New audit item added with UPC: $upc")
-                )
-            } catch (e: Exception) {
-                _uiEffect.emit(
-                    AuditUiEffect.ShowMessage(e.message ?: "Unknown error")
-                )
-            }
-        }
-    }
-
-    private fun addNewItem() {
-        viewModelScope.launch {
-            try {
+            if (upc.isBlank()) {
                 _uiEffect.emit(
                     AuditUiEffect.ShowMessage("Enter a valid UPC to add audit item")
                 )
-            } catch (e: Exception) {
-                _uiEffect.emit(
-                    AuditUiEffect.ShowMessage(e.message ?: "Unknown error")
-                )
+                return@launch
             }
+
+            val sku = searchSkuUseCase.byUpc(upc)
+
+            if (sku == null) {
+                _uiEffect.emit(
+                    AuditUiEffect.ShowMessage("No SKU found for UPC: $upc"))
+                return@launch
+            }
+
+            addAuditItemUseCase(auditId, sku)
+
+            _uiEffect.emit(
+                AuditUiEffect.ShowMessage("New audit item added with UPC: $upc")
+            )
         }
     }
-
 
     private fun getAuditStream(auditId: Long) {
         auditJob?.cancel()
@@ -241,6 +189,8 @@ class AuditViewModel @Inject constructor(
                     error = e.message ?: "Unknown error",
                     isLoading = false
                 )
+
+                _uiEffect.emit(AuditUiEffect.ShowMessage(state.error.toString()))
             }
             .launchIn(viewModelScope)
     }

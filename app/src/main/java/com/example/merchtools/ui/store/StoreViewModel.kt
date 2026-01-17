@@ -16,9 +16,7 @@
 
 package com.example.merchtools.ui.store
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import android.database.sqlite.SQLiteException
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.merchtools.core.Resource
@@ -26,80 +24,94 @@ import com.example.merchtools.domain.model.Store
 import com.example.merchtools.domain.repository.StoreRepository
 import com.example.merchtools.domain.validation.TextInputFieldValidator
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class StoreViewModel @Inject constructor(
     private val storeRepository: StoreRepository
-) : ViewModel(){
-    var state by mutableStateOf(StoreState())
-        private set
+) : ViewModel() {
 
-    private val _uiEffect = MutableSharedFlow<StoreCatalogUiEffect>()
-    val uiEffect = _uiEffect
+    /*private val _uiEffect = MutableSharedFlow<StoreCatalogUiEffect>()
+    val uiEffect: SharedFlow<StoreCatalogUiEffect> = _uiEffect.asSharedFlow()*/
 
-    private var storeListJob: Job? = null
-    private var storeAddJob: Job? = null
+    // Recommendation is to switch to Channel for one-time events, such as showing
+    // snackbar message from what I've read online
+    private val _uiEffect = Channel<StoreCatalogUiEffect>(capacity = Channel.BUFFERED)
+    val uiEffect = _uiEffect.receiveAsFlow()
 
-    init {
-        getAllStoresStream()
-    }
+
+    private val _isAddStoreDialogOpen = MutableStateFlow(false)
+    private val _newStoreName = MutableStateFlow("")
+
+    private val _stores = storeRepository
+        .getAllStoresStream()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = Resource.Loading(true)
+        )
+
+    val state: StateFlow<StoreState> = combine(
+        _isAddStoreDialogOpen,
+        _newStoreName,
+        _stores,
+    ) { isDialogOpen, newStoreName, storesResource ->
+
+        val stores = (storesResource as? Resource.Success)?.data.orEmpty()
+        val isLoading = (storesResource as? Resource.Loading)?.isLoading ?: false
+        val error = (storesResource as? Resource.Error)?.message
+
+        StoreState(
+            stores = stores,
+            isAddStoreDialogOpen = isDialogOpen,
+            newStoreName = newStoreName,
+            isLoading = isLoading,
+            error = error
+        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = StoreState(isLoading = true)
+    )
 
     fun onEvent(event: StoreCatalogEvent) {
         when (event) {
             is StoreCatalogEvent.ShowAddStoreDialog -> {
-                state = state.copy(isAddStoreDialogOpen = true)
+                _isAddStoreDialogOpen.value = true
             }
             is StoreCatalogEvent.HideAddStoreDialog -> {
-                state = state.copy(isAddStoreDialogOpen = false)
+                _isAddStoreDialogOpen.value = false
             }
             is StoreCatalogEvent.OnStoreNameChanged -> {
-                state = state.copy(
-                    newStoreName = TextInputFieldValidator.capInputLength(event.name)
-                )
+                _newStoreName.value = TextInputFieldValidator.capInputLength(event.name)
             }
             is StoreCatalogEvent.AddNewStore -> {
-                addNewStore(state.newStoreName)
-                state = state.copy(
-                    isAddStoreDialogOpen = false,
-                    newStoreName = ""
-                )
+                addNewStore(_newStoreName.value)
+                _isAddStoreDialogOpen.value = false
+                _newStoreName.value = ""
             }
             is StoreCatalogEvent.RemoveStore -> {
                 removeStore(event.store)
-            }
-            is StoreCatalogEvent.EditStore -> {
-                editStore(event.storeId)
             }
         }
     }
 
     private fun removeStore(store: Store) {
-        val currentStores = state.stores.toMutableList()
         viewModelScope.launch {
             try {
-                state = state.copy(
-                    stores = currentStores
-                )
-
                 storeRepository.deleteStore(store)
-                _uiEffect.emit(
-                    StoreCatalogUiEffect.ShowMessage(
-                        "Deleted store: ${store.name}"
-                    )
-                )
-            } catch (e: Exception) {
-                _uiEffect.emit(StoreCatalogUiEffect.ShowMessage(e.message ?: "Unknown error"))
+                _uiEffect.send(StoreCatalogUiEffect.ShowMessage("Deleted store: ${store.name}"))
+            } catch (e: SQLiteException) {
+                _uiEffect.send(StoreCatalogUiEffect.ShowMessage("Error deleting store: ${store.name}: ${e.message}"))
             }
-        }
-    }
-
-    private fun editStore(storeId: Long) {
-        viewModelScope.launch {
-            _uiEffect.emit(StoreCatalogUiEffect.NavigateToEditStore)
         }
     }
 
@@ -107,55 +119,9 @@ class StoreViewModel @Inject constructor(
         // Trim trailing spaces before inserting into the database
         val storeName = TextInputFieldValidator.trimTrailingSpaces(name)
 
-        storeAddJob?.cancel()
-        storeAddJob = viewModelScope.launch {
-            try {
-                storeRepository.insertStore(
-                    Store(
-                        name = storeName
-                    )
-                )
-                _uiEffect.emit(
-                    StoreCatalogUiEffect.ShowMessage(
-                        "Store $storeName added successfully"
-                    )
-                )
-            } catch (e: Exception) {
-                _uiEffect.emit(
-                    StoreCatalogUiEffect.ShowMessage(
-                        e.message ?: "Unknown error"
-                    )
-                )
-            }
-        }
-    }
-
-    private fun getAllStoresStream() {
-        storeListJob?.cancel()
-        storeListJob = viewModelScope.launch {
-            storeRepository
-                .getAllStoresStream()
-                .collect { result ->
-                    when (result) {
-                        is Resource.Success -> {
-                            result.data?.let {
-                                state = state.copy(
-                                    stores = it,
-                                    isLoading = false
-                                )
-                            }
-                        }
-                        is Resource.Error -> {
-                            state = state.copy(
-                                error = result.message,
-                                isLoading = false
-                            )
-                        }
-                        is Resource.Loading -> {
-                            state = state.copy(isLoading = result.isLoading)
-                        }
-                    }
-                }
+        viewModelScope.launch {
+            storeRepository.insertStore(Store(name = storeName))
+            _uiEffect.send(StoreCatalogUiEffect.ShowMessage("Store $storeName added successfully"))
         }
     }
 }

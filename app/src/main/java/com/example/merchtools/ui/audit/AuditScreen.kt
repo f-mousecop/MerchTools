@@ -17,15 +17,16 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -41,13 +42,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.merchtools.R
-import com.example.merchtools.ui.components.ProgressButton
+import com.example.merchtools.core.toDisplayString
 import com.example.merchtools.domain.util.BarcodeGenerator
 import com.example.merchtools.ui.components.AuditInventoryItem
+import com.example.merchtools.ui.components.ProgressButton
 import com.example.merchtools.ui.components.SwipeToDeleteContainer
 import com.example.merchtools.ui.feature_scanner.BarcodeScanResult
 import com.example.merchtools.ui.theme.MerchToolsTheme
-import com.example.merchtools.core.toDisplayString
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.EditAuditItemScreenDestination
@@ -56,6 +57,7 @@ import com.ramcosta.composedestinations.generated.destinations.ScanBarCodeScreen
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultRecipient
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @Destination<RootGraph>
@@ -67,7 +69,6 @@ fun AuditScreen(
     viewModel: AuditViewModel = hiltViewModel()
 ) {
     val uiEffect = viewModel.uiEffect
-    val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     val state = viewModel.state
 
@@ -96,12 +97,13 @@ fun AuditScreen(
                     navigator.navigate(ScanBarCodeScreenDestination)
                 }
                 is AuditUiEffect.ShowMessage -> {
-                    scope.launch {
+                    launch {
                         snackbarHostState.showSnackbar(
-                            message = effect.message
+                            message = effect.message,
+                            withDismissAction = true,
+                            duration = SnackbarDuration.Short
                         )
                     }
-
                 }
             }
         }
@@ -223,13 +225,8 @@ fun AuditScreenBody(
                 modifier = Modifier.weight(1f),
                 shape = MaterialTheme.shapes.small,
                 onClick = {
-                    if (newAuditItem.isNotBlank()) {
-                        onEvent(AuditEvent.AddItemBySearch(newAuditItem))
-                        newAuditItem = ""
-                    } else {
-                        onEvent(AuditEvent.AddNewItem)
-                        newAuditItem = ""
-                    }
+                    onEvent(AuditEvent.AddItemBySearch(newAuditItem))
+                    if (newAuditItem.isNotBlank()) newAuditItem = ""
                 }
             ) {
                 Text("Add Item")

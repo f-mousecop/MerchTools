@@ -33,10 +33,12 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.merchtools.ui.theme.MerchToolsTheme
@@ -92,7 +94,6 @@ fun DetailedNavDrawer(
     title: String,
     currentRoute: String?,
     onDestinationClicked: (route: String) -> Unit,
-    modifier: Modifier = Modifier,
     content: @Composable (PaddingValues) -> Unit
     ) {
     val scope = rememberCoroutineScope()
@@ -163,7 +164,8 @@ fun DetailedNavDrawer(
                     title = { Text(
                         title,
                         style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(start = 16.dp)
                     ) },
                     navigationIcon = {
                         IconButton(onClick = {
@@ -200,7 +202,7 @@ fun DetailedNavDrawer(
 @Preview(showBackground = true)
 @Composable
 fun DetailedNavDrawerPreview() {
-    MerchToolsTheme() {
+    MerchToolsTheme {
         DetailedNavDrawer(
             title = "Home",
             currentRoute = null,
