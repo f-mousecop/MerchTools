@@ -116,6 +116,11 @@ fun StoreCatalogScreen(
             modifier = Modifier.padding(innerPadding)
         )
 
+        /**
+         * TODO: Need to fix bug where when keyboard is open and user rotates device, the keyboard glitches instead of gracefully closing
+         * I believe this is the problem child, conditionally calling and displaying the dialog in
+         * in the scaffold. Maybe should be moved to StoreCatalogBody
+         */
         if (state.isAddStoreDialogOpen) {
             AddStoreDialog(
                 state = state,

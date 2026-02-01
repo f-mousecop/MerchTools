@@ -62,7 +62,7 @@ class SearchViewModel @Inject constructor(
     private val _uiEffect = Channel<SearchSkuUiEffect>(capacity = Channel.BUFFERED)
     val uiEffect = _uiEffect.receiveAsFlow()
 
-    private val _searchQuery = MutableStateFlow("")
+    private val _searchQuery = MutableStateFlow(SearchSkuState().searchQuery)
     val searchQuery = _searchQuery.asStateFlow()
     val uiState: StateFlow<SearchSkuState> = _searchQuery
         // Debounce the query to avoid necessary load on the database

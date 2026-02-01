@@ -28,6 +28,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -39,25 +40,17 @@ class StoreViewModel @Inject constructor(
     private val storeRepository: StoreRepository
 ) : ViewModel() {
 
-    /*private val _uiEffect = MutableSharedFlow<StoreCatalogUiEffect>()
-    val uiEffect: SharedFlow<StoreCatalogUiEffect> = _uiEffect.asSharedFlow()*/
-
     // Recommendation is to switch to Channel for one-time events, such as showing
     // snackbar message from what I've read online
     private val _uiEffect = Channel<StoreCatalogUiEffect>(capacity = Channel.BUFFERED)
     val uiEffect = _uiEffect.receiveAsFlow()
 
 
-    private val _isAddStoreDialogOpen = MutableStateFlow(false)
-    private val _newStoreName = MutableStateFlow("")
+    private val _isAddStoreDialogOpen = MutableStateFlow(StoreState().isAddStoreDialogOpen)
 
-    private val _stores = storeRepository
-        .getAllStoresStream()
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = Resource.Loading(true)
-        )
+    private val _newStoreName = MutableStateFlow(StoreState().newStoreName)
+
+    private val _stores = storeRepository.getAllStoresStream()
 
     val state: StateFlow<StoreState> = combine(
         _isAddStoreDialogOpen,
