@@ -1,8 +1,10 @@
 package com.example.merchtools.ui.components
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -15,6 +17,7 @@ import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Store
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,10 +40,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.merchtools.BuildConfig
+import com.example.merchtools.R
 import com.example.merchtools.ui.theme.MerchToolsTheme
 import com.ramcosta.composedestinations.generated.destinations.HistoryScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.HomeScreenDestination
@@ -98,6 +104,7 @@ fun DetailedNavDrawer(
     ) {
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val appVersion = BuildConfig.VERSION_NAME
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -112,6 +119,7 @@ fun DetailedNavDrawer(
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
                         .verticalScroll(rememberScrollState())
+                        .fillMaxHeight()
                 ) {
                     Spacer(Modifier.height(12.dp))
                     Text(
@@ -154,6 +162,16 @@ fun DetailedNavDrawer(
                         Spacer(Modifier.padding(vertical = 4.dp))
                     }
                 }
+
+                Spacer(Modifier.weight(1f))
+                Text(
+                    text = "v$appVersion 💚",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier
+                        .padding(dimensionResource(R.dimen.padding_medium))
+                        .align(Alignment.CenterHorizontally)
+                )
             }
         }
     ) {
@@ -181,6 +199,19 @@ fun DetailedNavDrawer(
                             Icon(
                                 Icons.Default.Menu,
                                 contentDescription = "Menu",
+                                modifier = Modifier.size(32.dp)
+                            )
+                        }
+                    },
+                    actions = {
+                        IconButton(onClick = {
+                            onDestinationClicked(DrawerScreens.Home.route)
+                        },
+                            modifier = Modifier.padding(end = dimensionResource(R.dimen.padding_medium))
+                        ) {
+                            Icon(
+                                Icons.Default.Settings,
+                                contentDescription = "Settings",
                                 modifier = Modifier.size(32.dp)
                             )
                         }
