@@ -28,7 +28,9 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -45,11 +47,12 @@ class StoreViewModel @Inject constructor(
     val uiEffect = _uiEffect.receiveAsFlow()
 
 
-    private val _isAddStoreDialogOpen = MutableStateFlow(StoreState().isAddStoreDialogOpen)
+    private val _isAddStoreDialogOpen = MutableStateFlow(false)
 
-    private val _newStoreName = MutableStateFlow(StoreState().newStoreName)
+    private val _newStoreName = MutableStateFlow("")
 
     private val _stores = storeRepository.getAllStoresStream()
+
 
     val state: StateFlow<StoreState> = combine(
         _isAddStoreDialogOpen,
@@ -70,7 +73,7 @@ class StoreViewModel @Inject constructor(
         )
     }.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000),
+        started = SharingStarted.WhileSubscribed(5_000L),
         initialValue = StoreState(isLoading = true)
     )
 
@@ -81,6 +84,7 @@ class StoreViewModel @Inject constructor(
             }
             is StoreCatalogEvent.HideAddStoreDialog -> {
                 _isAddStoreDialogOpen.value = false
+                _newStoreName.value = ""
             }
             is StoreCatalogEvent.OnStoreNameChanged -> {
                 _newStoreName.value = TextInputFieldValidator.capInputLength(event.name)
