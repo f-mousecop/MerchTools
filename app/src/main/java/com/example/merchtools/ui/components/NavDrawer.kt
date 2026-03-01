@@ -111,8 +111,7 @@ fun DetailedNavDrawer(
         gesturesEnabled = true,
         drawerContent = {
             ModalDrawerSheet(
-                drawerContainerColor = MaterialTheme.colorScheme.surfaceDim,
-                drawerContentColor = MaterialTheme.colorScheme.secondary,
+                drawerContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                 drawerShape = RectangleShape
             ) {
                 Column(
@@ -124,7 +123,9 @@ fun DetailedNavDrawer(
                     Spacer(Modifier.height(12.dp))
                     Text(
                         "Merch Tools Menu",
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier
+                            .padding(dimensionResource(R.dimen.padding_small))
+                            .align(Alignment.CenterHorizontally),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
@@ -152,9 +153,12 @@ fun DetailedNavDrawer(
                                 }
                             },
                             colors = NavigationDrawerItemDefaults.colors(
-                                unselectedContainerColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                                unselectedTextColor = MaterialTheme.colorScheme.onSecondary,
-                                unselectedIconColor = MaterialTheme.colorScheme.onSecondary,
+                                unselectedContainerColor = MaterialTheme.colorScheme.primary,
+                                unselectedTextColor = MaterialTheme.colorScheme.onPrimary,
+                                unselectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                                selectedContainerColor = MaterialTheme.colorScheme.secondary,
+                                selectedTextColor = MaterialTheme.colorScheme.onSecondary,
+                                selectedIconColor = MaterialTheme.colorScheme.onSecondary
                             ),
                             shape = RoundedCornerShape(4.dp)
                         )
@@ -166,7 +170,7 @@ fun DetailedNavDrawer(
                 Spacer(Modifier.weight(1f))
                 Text(
                     text = "v$appVersion 💚",
-                    style = MaterialTheme.typography.bodyLarge,
+                    style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier
                         .padding(dimensionResource(R.dimen.padding_medium))

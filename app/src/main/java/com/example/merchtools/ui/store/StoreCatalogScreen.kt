@@ -345,7 +345,7 @@ fun AddStoreDialog(
                         modifier = Modifier
                             .fillMaxWidth(),
                         label = { Text("Store Name") },
-                        supportingText = { Text("${state.newStoreName.length}/50") },
+                        supportingText = { Text("${state.newStoreName.length}/20") },
                         singleLine = true
                     )
 

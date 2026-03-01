@@ -7,8 +7,8 @@ package com.example.merchtools.domain.validation
  * user input, such as trimming trailing whitespace.
  */
 object TextInputFieldValidator {
-    // We need to limit the input length to 50 characters
-    private const val MAX_LEN = 50
+    // We need to limit the input length to 20 characters
+    private const val MAX_LEN = 20
 
     /**
      * Caps the length of a user input string to a predefined maximum length.
@@ -22,7 +22,7 @@ object TextInputFieldValidator {
      * @see MAX_LEN
      */
     fun capInputLength(userInput: String): String {
-        // Return the first 50 characters of a string
+        // Return the first 20 characters of a string
         return userInput.take(MAX_LEN)
     }
 

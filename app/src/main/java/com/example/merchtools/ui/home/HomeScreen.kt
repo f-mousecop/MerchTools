@@ -245,7 +245,7 @@ fun DropDownMenuContent(
                 onEvent(HomeEvent.OnUserNameChanged(newName))
             },
             label = { Text("Created by") },
-            supportingText = { Text("${state.userName.length}/50")},
+            supportingText = { Text("${state.userName.length}/20")},
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
