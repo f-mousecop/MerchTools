@@ -1,7 +1,10 @@
 package com.example.merchtools.ui.audit
 
 import android.annotation.SuppressLint
+import android.widget.Space
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -20,13 +23,17 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -44,6 +51,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.isTraversalGroup
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -66,6 +76,7 @@ import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.EditAuditItemScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.HistoryScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.ScanBarCodeScreenDestination
+import com.ramcosta.composedestinations.generated.navtype.barcodeScanResultNavType
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultRecipient
@@ -83,6 +94,7 @@ fun AuditScreen(
     val uiEffect = viewModel.uiEffect
     val snackbarHostState = remember { SnackbarHostState() }
     val state = viewModel.state
+    val textFieldState = TextFieldState()
 
     resultRecipient.onNavResult { navResult ->
         when (navResult) {
@@ -148,7 +160,7 @@ fun AuditScreenContent(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = dimensionResource(R.dimen.padding_medium))
+            .padding(horizontal = dimensionResource(R.dimen.padding_medium), vertical = dimensionResource(R.dimen.padding_small))
     ) {
         AuditScreenBody(
             state = state,
@@ -172,8 +184,7 @@ fun AuditScreenBody(
     var newAuditItem by rememberSaveable { mutableStateOf("") }
     Column(
         modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState()),
+            .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(
@@ -261,6 +272,13 @@ fun AuditScreenBody(
             ),
             singleLine = true
         )
+        /*Spacer(Modifier.padding(vertical = dimensionResource(R.dimen.padding_small)))
+        val textFieldState = TextFieldState()
+        SkuSearchBar(
+            textFieldState = textFieldState,
+            onEvent = onEvent,
+            state = state,
+        )*/
 
         if (state.audit.items.isEmpty()) {
             Text(
@@ -305,15 +323,71 @@ fun AuditScreenBody(
                 }
             }
         }
+
         ProgressButton(
             isLoading = state.isLoading,
             enabled = true,
             onClick = { onEvent(AuditEvent.SaveAudit) },
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp),
+                .fillMaxWidth(),
             content = { Text(stringResource(R.string.save_action)) }
         )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SkuSearchBar(
+    textFieldState: TextFieldState,
+    onEvent: (AuditEvent) -> Unit,
+    state: AuditState,
+    modifier: Modifier = Modifier
+) {
+    var expanded by rememberSaveable { mutableStateOf(false) }
+
+    Box(
+        modifier
+            .fillMaxWidth()
+//            .fillMaxSize()
+            .semantics { isTraversalGroup = true }
+    ) {
+        SearchBar(
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.TopCenter)
+                .semantics { traversalIndex = 0f },
+            inputField = {
+                SearchBarDefaults.InputField(
+                    query = textFieldState.text.toString(),
+                    onQueryChange = { textFieldState.edit { replace(0, length, it ) } },
+                    onSearch = {
+                        onEvent(AuditEvent.OnSearch(query = textFieldState.text.toString()))
+                        expanded = false
+                    },
+                    expanded = expanded,
+                    onExpandedChange = { expanded = it },
+                    placeholder = { Text("Search") }
+                )
+            },
+            expanded = expanded,
+            onExpandedChange = { expanded = it },
+        ) {
+            Column(
+                Modifier.verticalScroll(rememberScrollState())
+            ) {
+                state.searchResults.forEach { result ->
+                    ListItem(
+                        headlineContent = { Text(result.upc) },
+                        modifier = Modifier
+                            .clickable {
+                                textFieldState.edit { replace(0, length, result.upc) }
+                                expanded = false
+                            }
+                            .fillMaxWidth()
+                    )
+                }
+            }
+        }
     }
 }
 

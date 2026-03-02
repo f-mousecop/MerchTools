@@ -22,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.merchtools.core.Resource
 import com.example.merchtools.domain.model.AuditItem
 import com.example.merchtools.domain.repository.AuditItemRepository
 import com.example.merchtools.domain.repository.AuditRepository
@@ -63,6 +64,7 @@ class AuditViewModel @Inject constructor(
         get() = barcodeGenerator
 
     private var auditJob: Job? = null
+    private var searchJob: Job? = null
 
     init {
         getAuditStream(auditId)
@@ -88,6 +90,42 @@ class AuditViewModel @Inject constructor(
             is AuditEvent.DiscardChanges -> {
                 discardChanges()
             }
+            is AuditEvent.OnSearch -> {
+                searchSku(event.query)
+            }
+        }
+    }
+
+    /**
+     * TODO: Work on this function for the SkuSearchBar
+     * Needs to be changed to MutableStateFlow to update the state
+     */
+    private fun searchSku(query: String) {
+        if (query.isBlank()) {
+            state = state.copy(searchResults = emptyList())
+            return
+        }
+
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch {
+            searchSkuUseCase.catalog(query)
+                .onEach { result ->
+                    when(result) {
+                        is Resource.Success -> {
+                            state = state.copy(
+                                searchResults = result.data ?: emptyList()
+                            )
+                        }
+                        is Resource.Error -> {
+                            _uiEffect.emit(
+                                AuditUiEffect.ShowMessage(result.message ?: "Unknown error")
+                            )
+                        }
+                        is Resource.Loading -> {
+                            // We can show a loading indicator here in the future
+                        }
+                    }
+                }.launchIn(this)
         }
     }
 
