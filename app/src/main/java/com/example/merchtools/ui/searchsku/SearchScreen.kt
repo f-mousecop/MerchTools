@@ -121,10 +121,10 @@ fun SearchScreen(
                     onClick = {
                         viewModel.onEvent(SearchSkuEvent.AddNewSku(upc = ""))
                     },
-                    colors = ButtonDefaults.buttonColors(
+                    /*colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.onSecondaryContainer,
                         contentColor = MaterialTheme.colorScheme.onSecondary
-                    ),
+                    ),*/
                     modifier = Modifier.weight(0.5f)
                 ) {
                     Text(text = "Add New SKU")
@@ -135,10 +135,10 @@ fun SearchScreen(
                     onClick = {
                         viewModel.onEvent(SearchSkuEvent.BarcodeScanned)
                     },
-                    colors = ButtonDefaults.buttonColors(
+                    /*colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.onSecondaryContainer,
                         contentColor = MaterialTheme.colorScheme.onSecondary
-                    ),
+                    ),*/
                     modifier = Modifier.weight(0.5f)
                 ) {
                     Text(text = "Scan Barcode")

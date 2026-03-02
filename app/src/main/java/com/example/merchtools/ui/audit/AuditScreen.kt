@@ -1,16 +1,26 @@
 package com.example.merchtools.ui.audit
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -31,6 +41,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
@@ -39,6 +50,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.merchtools.R
@@ -112,13 +124,16 @@ fun AuditScreen(
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        containerColor = MaterialTheme.colorScheme.surfaceVariant
+        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+        contentWindowInsets = WindowInsets(0)
     ) { innerPadding ->
         AuditScreenContent(
             state = state,
             onEvent = viewModel::onEvent,
             barcodeGenerator = viewModel.barcodeGen,
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxWidth()
         )
     }
 }
@@ -143,17 +158,6 @@ fun AuditScreenContent(
                 .weight(1f)
                 .fillMaxWidth()
         )
-        HorizontalDivider(Modifier.padding(vertical = 8.dp))
-
-        ProgressButton(
-            isLoading = state.isLoading,
-            enabled = true,
-            onClick = { onEvent(AuditEvent.SaveAudit) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = dimensionResource(R.dimen.padding_small)),
-            content = { Text(stringResource(R.string.save_action)) }
-        )
     }
 }
 
@@ -167,7 +171,9 @@ fun AuditScreenBody(
 ) {
     var newAuditItem by rememberSaveable { mutableStateOf("") }
     Column(
-        modifier = modifier,
+        modifier = modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(
@@ -196,7 +202,6 @@ fun AuditScreenBody(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = dimensionResource(R.dimen.padding_small))
         ) {
             Text(
                 text = "Created by: ",
@@ -213,7 +218,7 @@ fun AuditScreenBody(
 
         HorizontalDivider(
             thickness = 2.dp,
-            modifier = Modifier.padding(vertical = dimensionResource(R.dimen.padding_small))
+            modifier = Modifier.padding(vertical = 4.dp)
         )
 
         Row(
@@ -222,7 +227,8 @@ fun AuditScreenBody(
             horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))
         ) {
             Button(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .weight(1f),
                 shape = MaterialTheme.shapes.small,
                 onClick = {
                     onEvent(AuditEvent.AddItemBySearch(newAuditItem))
@@ -232,7 +238,8 @@ fun AuditScreenBody(
                 Text("Add Item")
             }
             Button(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .weight(1f),
                 shape = MaterialTheme.shapes.small,
                 onClick = { onEvent(AuditEvent.BarcodeScanned) }
             ) {
@@ -264,13 +271,14 @@ fun AuditScreenBody(
         } else {
             LazyColumn(
                 modifier = Modifier
-                    .fillMaxSize(),
+                    .weight(1f)
+                    .fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(
                     dimensionResource(R.dimen.padding_small)
                 ),
                 contentPadding = PaddingValues(
-                    top = dimensionResource(R.dimen.padding_medium),
-                    bottom = dimensionResource(R.dimen.padding_medium)
+                    top = dimensionResource(R.dimen.padding_small),
+                    bottom = dimensionResource(R.dimen.padding_small)
                 ),
             ) {
                 items(
@@ -297,6 +305,15 @@ fun AuditScreenBody(
                 }
             }
         }
+        ProgressButton(
+            isLoading = state.isLoading,
+            enabled = true,
+            onClick = { onEvent(AuditEvent.SaveAudit) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp),
+            content = { Text(stringResource(R.string.save_action)) }
+        )
     }
 }
 
@@ -307,7 +324,8 @@ fun AuditScreenPreview() {
         /*AuditScreenContent(
             state = AuditState(),
             onEvent = {},
-
+            barcodeGenerator = null,
+            modifier = Modifier,
         )*/
     }
 }
