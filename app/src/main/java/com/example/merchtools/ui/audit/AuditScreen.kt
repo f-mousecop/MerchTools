@@ -1,7 +1,5 @@
 package com.example.merchtools.ui.audit
 
-import android.annotation.SuppressLint
-import android.widget.Space
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,61 +8,48 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
+import androidx.compose.material3.DockedSearchBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.isTraversalGroup
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.merchtools.R
 import com.example.merchtools.core.toDisplayString
+import com.example.merchtools.domain.model.Sku
 import com.example.merchtools.domain.util.BarcodeGenerator
 import com.example.merchtools.ui.components.AuditInventoryItem
 import com.example.merchtools.ui.components.ProgressButton
@@ -76,11 +61,9 @@ import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.EditAuditItemScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.HistoryScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.ScanBarCodeScreenDestination
-import com.ramcosta.composedestinations.generated.navtype.barcodeScanResultNavType
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultRecipient
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @Destination<RootGraph>
@@ -93,8 +76,11 @@ fun AuditScreen(
 ) {
     val uiEffect = viewModel.uiEffect
     val snackbarHostState = remember { SnackbarHostState() }
-    val state = viewModel.state
-    val textFieldState = TextFieldState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
+    val searchResults by viewModel.searchResults.collectAsStateWithLifecycle()
+    val expanded by viewModel.expanded.collectAsStateWithLifecycle()
 
     resultRecipient.onNavResult { navResult ->
         when (navResult) {
@@ -140,9 +126,12 @@ fun AuditScreen(
         contentWindowInsets = WindowInsets(0)
     ) { innerPadding ->
         AuditScreenContent(
-            state = state,
+            uiState = uiState,
             onEvent = viewModel::onEvent,
             barcodeGenerator = viewModel.barcodeGen,
+            searchQuery = searchQuery,
+            searchResults = searchResults,
+            expanded = expanded,
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxWidth()
@@ -152,23 +141,31 @@ fun AuditScreen(
 
 @Composable
 fun AuditScreenContent(
-    state: AuditState,
+    uiState: AuditState,
     onEvent: (AuditEvent) -> Unit,
     barcodeGenerator: BarcodeGenerator,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    searchQuery: String,
+    searchResults: List<Sku>,
+    expanded: Boolean
 ) {
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = dimensionResource(R.dimen.padding_medium), vertical = dimensionResource(R.dimen.padding_small))
+            .padding(
+                horizontal = dimensionResource(R.dimen.padding_medium),
+                vertical = dimensionResource(R.dimen.padding_small)
+            )
     ) {
         AuditScreenBody(
-            state = state,
+            uiState = uiState,
             onEvent = onEvent,
             barcodeGenerator = barcodeGenerator,
             modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
+                .fillMaxSize(),
+            searchQuery = searchQuery,
+            searchResults = searchResults,
+            expanded = expanded
         )
     }
 }
@@ -176,160 +173,159 @@ fun AuditScreenContent(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AuditScreenBody(
-    state: AuditState,
+    uiState: AuditState,
     onEvent: (AuditEvent) -> Unit,
     barcodeGenerator: BarcodeGenerator,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    searchQuery: String,
+    searchResults: List<Sku>,
+    expanded: Boolean
 ) {
-    var newAuditItem by rememberSaveable { mutableStateOf("") }
-    Column(
-        modifier = modifier
-            .fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
+    Box(
+        modifier = Modifier.fillMaxSize()
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))
+        Column(
+            modifier = modifier
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // This works fine
-            val storeName = state.audit.store?.name
-            Text(
-                text = storeName ?: "-",
-                style = MaterialTheme.typography.titleMedium
-            )
-            Spacer(Modifier.weight(1f))
-
-            val startedAtText = state.audit.startedAt
-                ?.toDisplayString()
-                ?: "—"
-            Text(
-                text = "Started at: $startedAtText",
-                style = MaterialTheme.typography.bodyMedium,
-                fontStyle = FontStyle.Italic,
-                textAlign = TextAlign.Right
-            )
-
-        }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            Text(
-                text = "Created by: ",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
-
-            val createdBy = state.audit.createdBy
-            Text(
-                text = createdBy ?: "—",
-                style = MaterialTheme.typography.titleMedium
-            )
-        }
-
-        HorizontalDivider(
-            thickness = 2.dp,
-            modifier = Modifier.padding(vertical = 4.dp)
-        )
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))
-        ) {
-            Button(
-                modifier = Modifier
-                    .weight(1f),
-                shape = MaterialTheme.shapes.small,
-                onClick = {
-                    onEvent(AuditEvent.AddItemBySearch(newAuditItem))
-                    if (newAuditItem.isNotBlank()) newAuditItem = ""
-                }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))
             ) {
-                Text("Add Item")
+                // This works fine
+                val storeName = uiState.audit.store?.name
+                Text(
+                    text = storeName ?: "-",
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Spacer(Modifier.weight(1f))
+
+                val startedAtText = uiState.audit.startedAt
+                    ?.toDisplayString()
+                    ?: "—"
+                Text(
+                    text = "Started at: $startedAtText",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontStyle = FontStyle.Italic,
+                    textAlign = TextAlign.Right
+                )
+
             }
-            Button(
+            Row(
                 modifier = Modifier
-                    .weight(1f),
-                shape = MaterialTheme.shapes.small,
-                onClick = { onEvent(AuditEvent.BarcodeScanned) }
+                    .fillMaxWidth()
             ) {
-                Text("Scan Barcode")
+                Text(
+                    text = "Created by: ",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+
+                val createdBy = uiState.audit.createdBy
+                Text(
+                    text = createdBy ?: "—",
+                    style = MaterialTheme.typography.titleMedium
+                )
             }
 
-
-        }
-        OutlinedTextField(
-            value = newAuditItem,
-            onValueChange = { newText ->
-                newAuditItem = newText
-            },
-            label = { Text("Enter or scan UPC") },
-            modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Done
-            ),
-            singleLine = true
-        )
-        /*Spacer(Modifier.padding(vertical = dimensionResource(R.dimen.padding_small)))
-        val textFieldState = TextFieldState()
-        SkuSearchBar(
-            textFieldState = textFieldState,
-            onEvent = onEvent,
-            state = state,
-        )*/
-
-        if (state.audit.items.isEmpty()) {
-            Text(
-                text = "No audit items",
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.titleMedium
+            HorizontalDivider(
+                thickness = 2.dp,
+                modifier = Modifier.padding(vertical = 4.dp)
             )
-        } else {
-            LazyColumn(
+
+            Row(
                 modifier = Modifier
-                    .weight(1f)
                     .fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(
-                    dimensionResource(R.dimen.padding_small)
-                ),
-                contentPadding = PaddingValues(
-                    top = dimensionResource(R.dimen.padding_small),
-                    bottom = dimensionResource(R.dimen.padding_small)
-                ),
+                horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))
             ) {
-                items(
-                    items = state.audit.items,
-                    key = { item ->
-                        item.auditItemId
+                Button(
+                    modifier = Modifier
+                        .weight(1f),
+                    shape = MaterialTheme.shapes.small,
+                    onClick = {
+                        onEvent(AuditEvent.AddItemBySearch(searchQuery))
                     }
-                ) { item ->
-                    // Enables swipe left to give the option to delete AuditItem
-                    SwipeToDeleteContainer(
-                        item = item,
-                        onDelete = { onEvent(AuditEvent.RemoveItem(item)) }
-                    ) {
-                        // Navigate to edit audit item screen passing the auditItemId
-                        AuditInventoryItem(
+                ) {
+                    Text("Add Item")
+                }
+                Button(
+                    modifier = Modifier
+                        .weight(1f),
+                    shape = MaterialTheme.shapes.small,
+                    onClick = { onEvent(AuditEvent.BarcodeScanned) }
+                ) {
+                    Text("Scan Barcode")
+                }
+
+
+            }
+
+            Spacer(Modifier.height(64.dp))
+
+            if (uiState.audit.items.isEmpty()) {
+                Text(
+                    text = "No audit items",
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.titleMedium
+                )
+            } else {
+                LazyColumn(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(
+                        dimensionResource(R.dimen.padding_small)
+                    ),
+                    contentPadding = PaddingValues(
+                        top = dimensionResource(R.dimen.padding_small),
+                        bottom = dimensionResource(R.dimen.padding_small)
+                    ),
+                ) {
+                    items(
+                        items = uiState.audit.items,
+                        key = { item ->
+                            item.auditItemId
+                        }
+                    ) { item ->
+                        // Enables swipe left to give the option to delete AuditItem
+                        SwipeToDeleteContainer(
                             item = item,
-                            onClick = { onEvent(AuditEvent.EditAuditItem(item.auditItemId)) },
-                            barcodeGenerator = barcodeGenerator,
-                            modifier = Modifier.fillMaxWidth(),
-                            clickable = true,
-                            height = 220.dp
-                        )
+                            onDelete = { onEvent(AuditEvent.RemoveItem(item)) }
+                        ) {
+                            // Navigate to edit audit item screen passing the auditItemId
+                            AuditInventoryItem(
+                                item = item,
+                                onClick = { onEvent(AuditEvent.EditAuditItem(item.auditItemId)) },
+                                barcodeGenerator = barcodeGenerator,
+                                modifier = Modifier.fillMaxWidth(),
+                                clickable = true,
+                                height = 220.dp
+                            )
+                        }
                     }
                 }
             }
+            Spacer(Modifier.height(40.dp))
         }
+        SkuSearchBar(
+            onEvent = onEvent,
+            uiState = uiState,
+            searchQuery = searchQuery,
+            searchResults = searchResults,
+            expanded = expanded,
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = 112.dp)
+        )
 
         ProgressButton(
-            isLoading = state.isLoading,
+            isLoading = uiState.isLoading,
             enabled = true,
             onClick = { onEvent(AuditEvent.SaveAudit) },
             modifier = Modifier
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .align(Alignment.BottomCenter),
             content = { Text(stringResource(R.string.save_action)) }
         )
     }
@@ -338,54 +334,64 @@ fun AuditScreenBody(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SkuSearchBar(
-    textFieldState: TextFieldState,
     onEvent: (AuditEvent) -> Unit,
-    state: AuditState,
-    modifier: Modifier = Modifier
+    uiState: AuditState,
+    modifier: Modifier = Modifier,
+    searchQuery: String,
+    searchResults: List<Sku>,
+    expanded: Boolean
 ) {
-    var expanded by rememberSaveable { mutableStateOf(false) }
-
-    Box(
-        modifier
-            .fillMaxWidth()
-//            .fillMaxSize()
-            .semantics { isTraversalGroup = true }
+    DockedSearchBar(
+        modifier = modifier.fillMaxWidth(),
+        inputField = {
+            SearchBarDefaults.InputField(
+                modifier = Modifier.fillMaxWidth(),
+                query = searchQuery,
+                onQueryChange = { newValue ->
+                    onEvent(AuditEvent.OnSearchQueryChanged(newValue))
+                },
+                onSearch = { onEvent(AuditEvent.OnSearchExpandedChanged(false)) },
+                expanded = expanded,
+                onExpandedChange = { onEvent(AuditEvent.OnSearchExpandedChanged(it)) },
+                placeholder = { Text("Search SKUs...") },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
+                trailingIcon = {
+                    IconButton(onClick = {
+                        if (searchQuery.isNotEmpty()) {
+                            onEvent(AuditEvent.OnSearchQueryChanged(""))
+                        } else {
+                            onEvent(AuditEvent.OnSearchExpandedChanged(false))
+                        }
+                    }) {
+                        Icon(Icons.Default.Close, contentDescription = "Close search")
+                    }
+                },
+            )
+        },
+        expanded = expanded,
+        onExpandedChange = { onEvent(AuditEvent.OnSearchExpandedChanged(it)) },
+        shape = MaterialTheme.shapes.extraSmall,
+        colors = SearchBarDefaults.colors(
+            dividerColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        ),
+        tonalElevation = 4.dp,
+        shadowElevation = 4.dp
     ) {
-        SearchBar(
+        LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
-                .align(Alignment.TopCenter)
-                .semantics { traversalIndex = 0f },
-            inputField = {
-                SearchBarDefaults.InputField(
-                    query = textFieldState.text.toString(),
-                    onQueryChange = { textFieldState.edit { replace(0, length, it ) } },
-                    onSearch = {
-                        onEvent(AuditEvent.OnSearch(query = textFieldState.text.toString()))
-                        expanded = false
-                    },
-                    expanded = expanded,
-                    onExpandedChange = { expanded = it },
-                    placeholder = { Text("Search") }
-                )
-            },
-            expanded = expanded,
-            onExpandedChange = { expanded = it },
+                .heightIn(max = 300.dp)
         ) {
-            Column(
-                Modifier.verticalScroll(rememberScrollState())
-            ) {
-                state.searchResults.forEach { result ->
-                    ListItem(
-                        headlineContent = { Text(result.upc) },
-                        modifier = Modifier
-                            .clickable {
-                                textFieldState.edit { replace(0, length, result.upc) }
-                                expanded = false
-                            }
-                            .fillMaxWidth()
-                    )
-                }
+            items(searchResults) { result ->
+                ListItem(
+                    overlineContent = { Text(result.brand)},
+                    headlineContent = { Text(result.upc) },
+                    supportingContent = { result.casePack?.let { Text(it) } },
+                    modifier = Modifier
+                        .clickable {
+                            onEvent(AuditEvent.OnSearchQueryChanged(result.upc, fromSelection = true))
+                        }
+                )
             }
         }
     }

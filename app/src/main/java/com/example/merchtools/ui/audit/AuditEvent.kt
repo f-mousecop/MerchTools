@@ -9,7 +9,11 @@ sealed class AuditEvent {
     data class RemoveItem(val item: AuditItem) : AuditEvent()
 
     // Event for SKU search query
-    data class OnSearch(val query: String) : AuditEvent()
+    // added fromSelection to prevent re-expanding when an item is selected from the list
+    data class OnSearchQueryChanged(val query: String, val fromSelection: Boolean = false) : AuditEvent()
+    
+    // Event for SearchBar expanded state
+    data class OnSearchExpandedChanged(val expanded: Boolean) : AuditEvent()
 
     // Event for when a barcode is successfully scanned
     // carries the raw UPC value to the ViewModel to fetch the SKU
@@ -18,6 +22,4 @@ sealed class AuditEvent {
     object SaveAudit : AuditEvent()
     // Event for when a user confirms discarding changes
     object DiscardChanges : AuditEvent()
-
-
 }

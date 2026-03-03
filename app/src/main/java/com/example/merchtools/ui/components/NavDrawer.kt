@@ -92,6 +92,24 @@ private val screens = listOf(
     DrawerScreens.History
 )
 
+/**
+ * A composable that provides a common layout structure with a `TopAppBar` and a `ModalNavigationDrawer`.
+ * This component is intended to be used as a screen wrapper for pages that need access to the
+ * main application navigation.
+ *
+ * The drawer content is automatically populated with items from the [DrawerScreens] sealed class.
+ * It also displays the application version at the bottom. The `TopAppBar` shows a title, a navigation
+ * icon to open/close the drawer, and an action icon for settings (currently navigates home).
+ *
+ * @param title The title to be displayed in the `TopAppBar`.
+ * @param currentRoute The route of the currently displayed screen, used to highlight the
+ *                     active item in the navigation drawer.
+ * @param onDestinationClicked A callback lambda that is invoked when a navigation drawer item
+ *                             is clicked. It receives the route of the destination screen.
+ * @param content A composable lambda that defines the main content of the screen to be displayed
+ *                within the `Scaffold`. It receives `PaddingValues` from the `Scaffold` to
+ *                handle content padding correctly.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailedNavDrawer(
@@ -168,7 +186,7 @@ fun DetailedNavDrawer(
                 Spacer(Modifier.weight(1f))
                 Text(
                     text = "v$appVersion 💚",
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier
                         .padding(dimensionResource(R.dimen.padding_small))
