@@ -7,6 +7,9 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.merchtools.SnackbarAction
+import com.example.merchtools.SnackbarController
+import com.example.merchtools.SnackbarEvent
 import com.example.merchtools.domain.model.AuditItem
 import com.example.merchtools.domain.model.Sku
 import com.example.merchtools.domain.repository.AuditItemRepository
@@ -101,12 +104,9 @@ class EditAuditItemViewModel @Inject constructor(
                  auditItem = state.auditItem.copy(note = cleanedNote)
              )
             try {
-                delay(2000L)
-
                 auditItemRepository.updateAuditItem(state.auditItem)
 
                 _uiEffect.emit(AuditItemUiEffect.ShowMessage("Audit item saved"))
-                delay(1000L)
                 _uiEffect.emit(AuditItemUiEffect.NavigateUp)
 
             } catch (e: SQLiteException) {

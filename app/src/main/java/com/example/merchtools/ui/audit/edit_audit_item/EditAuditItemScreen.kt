@@ -1,5 +1,6 @@
 package com.example.merchtools.ui.audit.edit_audit_item
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -8,11 +9,13 @@ import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -36,6 +39,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.merchtools.R
+import com.example.merchtools.SnackbarAction
+import com.example.merchtools.SnackbarController
+import com.example.merchtools.SnackbarEvent
+import com.example.merchtools.core.ObserveAsEvents
 import com.example.merchtools.ui.components.ProgressButton
 import com.example.merchtools.ui.components.QuantityStepper
 import com.example.merchtools.ui.components.SkuItemCard
@@ -57,7 +64,7 @@ fun EditAuditItemScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val state = viewModel.state
 
-    LaunchedEffect(Unit) {
+    /*LaunchedEffect(Unit) {
         uiEffect.collect { effect ->
             when (effect) {
                 is AuditItemUiEffect.NavigateUp -> {
@@ -73,9 +80,42 @@ fun EditAuditItemScreen(
 
             }
         }
+    }*/
+
+    ObserveAsEvents(flow = uiEffect) { effect ->
+        when (effect) {
+            is AuditItemUiEffect.NavigateUp -> {
+                navigator.navigateUp()
+            }
+            is AuditItemUiEffect.ShowMessage -> {
+                scope.launch {
+                    SnackbarController.sendEvent(
+                        event = SnackbarEvent(
+                            message = effect.message,
+                            action = SnackbarAction(
+                                name = "Dismiss",
+                                action = {
+                                    snackbarHostState.currentSnackbarData?.dismiss()
+                                }
+                            )
+                        )
+                    )
+                }
+            }
+        }
     }
 
-    Scaffold(
+    EditAuditItemScreenContent(
+        state = state,
+        onEvent = viewModel::onEvent,
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .imePadding()
+            .verticalScroll(rememberScrollState())
+    )
+
+    /*Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         containerColor = MaterialTheme.colorScheme.surfaceVariant,
         contentWindowInsets = WindowInsets(0)
@@ -93,7 +133,7 @@ fun EditAuditItemScreen(
                 .verticalScroll(rememberScrollState())
                 .fillMaxWidth()
         )
-    }
+    }*/
 }
 
 @Composable

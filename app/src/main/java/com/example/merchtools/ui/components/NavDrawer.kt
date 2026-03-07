@@ -29,11 +29,16 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,6 +50,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.merchtools.BuildConfig
 import com.example.merchtools.R
+import com.example.merchtools.SnackbarController
+import com.example.merchtools.core.ObserveAsEvents
 import com.example.merchtools.ui.theme.MerchToolsTheme
 import com.ramcosta.composedestinations.generated.destinations.HistoryScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.HomeScreenDestination
@@ -101,6 +108,9 @@ private val screens = listOf(
  * It also displays the application version at the bottom. The `TopAppBar` shows a title, a navigation
  * icon to open/close the drawer, and an action icon for settings (currently navigates home).
  *
+ * This component also integrates a [SnackbarHost] and observes events from [SnackbarController]
+ * to display snackbars throughout the application.
+ *
  * @param title The title to be displayed in the `TopAppBar`.
  * @param currentRoute The route of the currently displayed screen, used to highlight the
  *                     active item in the navigation drawer.
@@ -120,7 +130,23 @@ fun DetailedNavDrawer(
     ) {
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val snackbarHostState = remember { SnackbarHostState() }
     val appVersion = BuildConfig.VERSION_NAME
+
+    ObserveAsEvents(flow = SnackbarController.events) { event ->
+        scope.launch {
+            snackbarHostState.currentSnackbarData?.dismiss()
+            val result = snackbarHostState.showSnackbar(
+                message = event.message,
+                actionLabel = event.action?.name,
+                duration = SnackbarDuration.Long
+            )
+
+            if (result == SnackbarResult.ActionPerformed) {
+                event.action?.action?.invoke()
+            }
+        }
+    }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -197,6 +223,10 @@ fun DetailedNavDrawer(
     ) {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
+            snackbarHost = {
+                SnackbarHost(
+                    hostState = snackbarHostState,
+            )},
             topBar = {
                 TopAppBar(
                     title = { Text(
