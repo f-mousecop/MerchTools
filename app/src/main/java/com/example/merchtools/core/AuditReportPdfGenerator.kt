@@ -234,7 +234,7 @@ class AuditReportPdfGenerator(
         )
 
         // Simple example of paginated items
-        val itemsPerPage = 2 // keep in sync with computePageCount()
+        val itemsPerPage =  2 // keep in sync with computePageCount()
         val startIndex = pageNumber * itemsPerPage
 
         var currentY = metaLine + 64f
@@ -264,7 +264,7 @@ class AuditReportPdfGenerator(
                 currentY + 40f,
                 paint
             )
-            currentY += barcode.height + 84f
+            currentY += barcode.height + 60f
 
 
             canvas.drawText("Count: ${row.count}",
@@ -281,11 +281,11 @@ class AuditReportPdfGenerator(
             )
             currentY += 14f
 
-            canvas.drawText("UPC: ${row.upc}",
+            /*canvas.drawText("UPC: ${row.upc}",
                 leftMargin,
                 currentY,
                 itemsPaint
-            )
+            )*/
             currentY += 14f
             canvas.drawText("SKU: ${row.skuName}",
                 leftMargin,

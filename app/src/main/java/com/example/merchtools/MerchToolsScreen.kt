@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.example.merchtools.ui.components.DetailedNavDrawer
 import com.ramcosta.composedestinations.DestinationsNavHost
+import com.ramcosta.composedestinations.animations.defaults.DefaultFadingTransitions
 import com.ramcosta.composedestinations.generated.NavGraphs
 import com.ramcosta.composedestinations.generated.destinations.AuditScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.EditAuditItemScreenDestination
@@ -98,6 +99,7 @@ fun MerchToolsApp() {
     ) { innerPadding ->
         DestinationsNavHost(
             navGraph = NavGraphs.root,
+            defaultTransitions = DefaultFadingTransitions,
             navController = navController,
             modifier = Modifier
                 .padding(innerPadding)

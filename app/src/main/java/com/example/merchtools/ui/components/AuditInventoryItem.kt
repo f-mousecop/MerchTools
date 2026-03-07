@@ -76,7 +76,7 @@ fun AuditItemDetails(
             shape = RoundedCornerShape(4.dp),
             tonalElevation = 2.dp,
             modifier = Modifier
-                .height(72.dp)
+                .height(88.dp)
                 .fillMaxWidth()
                 .align(Alignment.CenterHorizontally)
         ) {
@@ -89,12 +89,12 @@ fun AuditItemDetails(
         }
         Spacer(Modifier.height(dimensionResource(R.dimen.padding_small)))
 
-        if (!(item.sku?.upc.isNullOrBlank())) {
+        /*if (!(item.sku?.upc.isNullOrBlank())) {
             Text(
                 text = "UPC: ${item.sku.upc}",
                 style = MaterialTheme.typography.titleMedium,
             )
-        }
+        }*/
 
         Text(
             text = "SKU: ${item.sku?.name ?: "—"}",
