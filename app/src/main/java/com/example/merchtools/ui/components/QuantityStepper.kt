@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -101,13 +102,15 @@ fun QuantityStepper(
                         }
                         onValueChange(newQuantity)
                     },
+                    placeholder = { Text(text = minValue.toString()) },
                     modifier = Modifier
                         .width(64.dp),
                     textStyle = MaterialTheme.typography.bodyMedium.copy(
                         textAlign = TextAlign.Center
                     ),
                     keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Number
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done
                     ),
                     singleLine = true,
                     shape = shape

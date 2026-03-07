@@ -6,7 +6,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -87,6 +89,7 @@ fun EditAuditItemScreen(
                     top = innerPadding.calculateTopPadding(),
                     end = innerPadding.calculateEndPadding(LocalLayoutDirection.current)
                 )
+                .imePadding()
                 .verticalScroll(rememberScrollState())
                 .fillMaxWidth()
         )
@@ -177,8 +180,12 @@ fun AuditItemInputForm(
             enabled = true,
             label = { Text(stringResource(R.string.item_notes)) },
             onValueChange = { newText ->
-                onValueChange(AuditItemEvent.OnNoteChanged(newText))
+                if (newText.lines().size <= 3) {
+                    onValueChange(AuditItemEvent.OnNoteChanged(newText))
+                }
             },
+            maxLines = 3,
+            supportingText = { Text("${state.auditItem.note?.length ?: 0}/120")},
             modifier = Modifier.fillMaxWidth(),
             colors = OutlinedTextFieldDefaults.colors(
                 unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,

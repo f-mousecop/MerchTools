@@ -1,5 +1,6 @@
 package com.example.merchtools.ui.audit
 
+import android.graphics.Bitmap
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -49,7 +50,10 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.merchtools.R
 import com.example.merchtools.core.toDisplayString
+import com.example.merchtools.domain.model.Audit
+import com.example.merchtools.domain.model.AuditItem
 import com.example.merchtools.domain.model.Sku
+import com.example.merchtools.domain.model.Store
 import com.example.merchtools.domain.util.BarcodeGenerator
 import com.example.merchtools.ui.components.AuditInventoryItem
 import com.example.merchtools.ui.components.ProgressButton
@@ -65,6 +69,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultRecipient
 import kotlinx.coroutines.launch
+import java.time.Instant
 
 @Destination<RootGraph>
 @Composable
@@ -300,7 +305,7 @@ fun AuditScreenBody(
                                 barcodeGenerator = barcodeGenerator,
                                 modifier = Modifier.fillMaxWidth(),
                                 clickable = true,
-                                height = 220.dp
+                                height = 200.dp
                             )
                         }
                     }
@@ -399,13 +404,53 @@ fun SkuSearchBar(
 
 @Preview(showBackground = true)
 @Composable
-fun AuditScreenPreview() {
+fun AuditScreenContentPreview() {
+    val sampleSku = Sku(
+        skuId = 1L,
+        upc = "123456789012",
+        name = "Whole Milk",
+        casePack = "12/1L",
+        brand = "Dairy Farm"
+    )
+
+    val sampleAuditItem = AuditItem(
+        auditItemId = 1L,
+        count = 10,
+        sku = sampleSku
+    )
+
+    val sampleStore = Store(
+        storeId = 1L,
+        name = "Sample Store",
+        address = "123 Main St"
+    )
+
+    val sampleAudit = Audit(
+        auditId = 1L,
+        store = sampleStore,
+        createdBy = "John Doe",
+        items = listOf(sampleAuditItem),
+        startedAt = Instant.now()
+    )
+
+    val sampleAuditState = AuditState(
+        audit = sampleAudit
+    )
+
+    val fakeBarcodeGenerator = object : BarcodeGenerator {
+        override fun generate(upc: String, widthPx: Int, heightPx: Int): Bitmap {
+            return Bitmap.createBitmap(widthPx, heightPx, Bitmap.Config.ARGB_8888)
+        }
+    }
+
     MerchToolsTheme {
-        /*AuditScreenContent(
-            state = AuditState(),
+        AuditScreenContent(
+            uiState = sampleAuditState,
             onEvent = {},
-            barcodeGenerator = null,
-            modifier = Modifier,
-        )*/
+            barcodeGenerator = fakeBarcodeGenerator,
+            searchQuery = "",
+            searchResults = emptyList(),
+            expanded = false
+        )
     }
 }

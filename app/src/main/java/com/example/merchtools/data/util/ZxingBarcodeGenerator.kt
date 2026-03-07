@@ -1,15 +1,16 @@
 package com.example.merchtools.data.util
 
 import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.Color
-import android.widget.Toast
+import android.graphics.Paint
+import androidx.core.graphics.createBitmap
+import androidx.core.graphics.set
 import com.example.merchtools.domain.util.BarcodeGenerator
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.MultiFormatWriter
 import com.google.zxing.common.BitMatrix
 import javax.inject.Inject
-import androidx.core.graphics.createBitmap
-import androidx.core.graphics.set
 
 /**
  * An implementation of the [BarcodeGenerator] interface that uses the ZXing (Zebra Crossing)
@@ -61,6 +62,27 @@ class ZxingBarcodeGenerator @Inject constructor(): BarcodeGenerator {
                 bitmap[x, y] = if (bitMatrix[x, y]) Color.BLACK else Color.WHITE
             }
         }
-        return bitmap
+
+
+        val textHeight = 72
+
+        /**
+         * We need to create a combined bitmap using [Canvas] to display the [upc] below
+         * the generated barcode
+         */
+        val combinedBitmap = createBitmap(widthPx, heightPx + textHeight, Bitmap.Config.RGB_565)
+        val canvas = Canvas(combinedBitmap)
+        canvas.drawColor(Color.WHITE)
+        canvas.drawBitmap(bitmap, 0f, 10f, null)
+
+        val paint = Paint().apply {
+            textSize = 30f
+            color = Color.BLACK
+            textAlign = Paint.Align.CENTER
+        }
+
+        canvas.drawText(upc, widthPx / 2f, heightPx + textHeight - 10f, paint)
+
+        return combinedBitmap
     }
 }

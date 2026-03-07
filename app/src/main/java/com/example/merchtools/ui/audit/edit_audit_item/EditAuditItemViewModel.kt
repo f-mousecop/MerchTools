@@ -1,5 +1,6 @@
 package com.example.merchtools.ui.audit.edit_audit_item
 
+import android.database.sqlite.SQLiteException
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -11,9 +12,7 @@ import com.example.merchtools.domain.model.Sku
 import com.example.merchtools.domain.repository.AuditItemRepository
 import com.example.merchtools.domain.repository.SkuRepository
 import com.example.merchtools.domain.util.BarcodeGenerator
-import com.example.merchtools.ui.audit.edit_audit_item.AuditItemEvent
-import com.example.merchtools.ui.audit.edit_audit_item.AuditItemState
-import com.example.merchtools.ui.audit.edit_audit_item.AuditItemUiEffect
+import com.example.merchtools.domain.validation.AuditItemValidator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -50,63 +49,22 @@ class EditAuditItemViewModel @Inject constructor(
         getAuditItemStream(auditItemId)
     }
 
-    private fun validate(item: AuditItem): Boolean {
-        return item.count >= 0
-    }
 
     fun onEvent(event: AuditItemEvent) {
         when (event) {
-            is AuditItemEvent.OnItemChanged -> {
-                updateItem(event.item)
-            }
-            is AuditItemEvent.OnItemFieldChanged -> {
-                val updated = updateSku { current ->
-                    current.copy(upc = event.userInput)
-                }
-                state = state.copy(
-                    auditItem = updated,
-                    isEntryValid = validate(updated)
-                )
-            }
-            is AuditItemEvent.OnNameChanged -> {
-                val updated = updateSku { current ->
-                    current.copy(name = event.userInput)
-                }
-                state = state.copy(
-                    auditItem = updated,
-                    isEntryValid = validate(updated)
-                )
-            }
-            is AuditItemEvent.OnCasePackChanged -> {
-                val updated = updateSku { current ->
-                    current.copy(casePack = event.userInput.ifBlank { null })
-                }
-                state = state.copy(
-                    auditItem = updated,
-                    isEntryValid = validate(updated)
-                )
-            }
-            is AuditItemEvent.OnBrandChanged -> {
-                val updated = updateSku { current ->
-                    current.copy(brand = event.userInput)
-                }
-                state = state.copy(
-                    auditItem = updated,
-                    isEntryValid = validate(updated)
-                )
-            }
             is AuditItemEvent.OnNoteChanged -> {
-                val updated = state.auditItem.copy(note = event.userInput)
                 state = state.copy(
-                    auditItem = updated,
-                    isEntryValid = validate(updated)
+                    auditItem = state.auditItem.copy(
+                        note = AuditItemValidator.capInputLength(event.userInput)
+                    )
                 )
             }
             is AuditItemEvent.OnCountChanged -> {
-                val updated = state.auditItem.copy(count = event.newCount)
                 state = state.copy(
-                    auditItem = updated,
-                    isEntryValid = validate(updated)
+                    auditItem = state.auditItem.copy(count = event.newCount)
+                )
+                state = state.copy(
+                    isEntryValid = AuditItemValidator.isValidCount(event.newCount)
                 )
             }
             is AuditItemEvent.AddPhotoToItem -> {
@@ -121,22 +79,6 @@ class EditAuditItemViewModel @Inject constructor(
         }
     }
 
-    private fun updateSku(transform: (Sku) -> Sku): AuditItem {
-        val currentItem = state.auditItem
-        val currentSku = currentItem.sku
-            ?: Sku(
-                skuId = 0L,
-                upc = "",
-                name = "",
-                casePack = null,
-                brand = ""
-            )
-
-        return currentItem.copy(
-            sku = transform(currentSku)
-        )
-    }
-
     private fun removePhotoFromItem() {
         viewModelScope.launch {
             _uiEffect.emit(AuditItemUiEffect.ShowMessage("Not yet implemented"))
@@ -149,24 +91,25 @@ class EditAuditItemViewModel @Inject constructor(
         }
     }
 
-    private fun updateItem(item: AuditItem) {
-        TODO("Not yet implemented")
-    }
-
-
     private fun saveAuditItem() {
          viewModelScope.launch {
              state = state.copy(isLoading = true)
+             val cleanedNote = AuditItemValidator.trimTrailingSpaces(
+                 state.auditItem.note.orEmpty()
+             )
+             state = state.copy(
+                 auditItem = state.auditItem.copy(note = cleanedNote)
+             )
             try {
                 delay(2000L)
 
                 auditItemRepository.updateAuditItem(state.auditItem)
 
                 _uiEffect.emit(AuditItemUiEffect.ShowMessage("Audit item saved"))
-                delay(2000L)
+                delay(1000L)
                 _uiEffect.emit(AuditItemUiEffect.NavigateUp)
 
-            } catch (e: Exception) {
+            } catch (e: SQLiteException) {
                 _uiEffect.emit(AuditItemUiEffect.ShowMessage(e.message ?: "Unknown error"))
             } finally {
                 state = state.copy(isLoading = false)
