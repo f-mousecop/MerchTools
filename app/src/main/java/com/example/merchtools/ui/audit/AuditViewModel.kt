@@ -30,7 +30,6 @@ import com.example.merchtools.domain.use_case.AddAuditItemUseCase
 import com.example.merchtools.domain.use_case.SearchSkuUseCase
 import com.example.merchtools.domain.util.BarcodeGenerator
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -198,7 +197,7 @@ class AuditViewModel @Inject constructor(
                 auditRepository.updateAudit(currentAudit.copy(completedAt = now))
 
                 _uiEffect.emit(AuditUiEffect.ShowMessage("Audit saved at: ${now.toDisplayString()}"))
-                delay(2000L)
+//                delay(2000L)
                 _uiEffect.emit(AuditUiEffect.NavigateToHistoryScreen)
             } catch (e: SQLiteException) {
                 _uiEffect.emit(AuditUiEffect.ShowMessage(e.message ?: "Unknown error"))

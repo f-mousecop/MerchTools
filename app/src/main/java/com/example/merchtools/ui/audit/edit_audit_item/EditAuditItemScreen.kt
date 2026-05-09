@@ -82,6 +82,14 @@ fun EditAuditItemScreen(
         }
     }*/
 
+    /*
+    * ObserveAsEvents is used in place of LaunchedEffect in every
+    * screen. New snackbar controller from the navdrawer is used instead of
+    * relying on manual snackbar launch from within launchedeffect
+    *
+    * Issue?: Now snackbar overlaps buttons, might be fine
+    * TODO: See if there is a clean way to fix overlapping issue
+    */
     ObserveAsEvents(flow = uiEffect) { effect ->
         when (effect) {
             is AuditItemUiEffect.NavigateUp -> {

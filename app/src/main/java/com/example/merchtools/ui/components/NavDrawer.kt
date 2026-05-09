@@ -211,8 +211,8 @@ fun DetailedNavDrawer(
 
                 Spacer(Modifier.weight(1f))
                 Text(
-                    text = "v$appVersion 💚",
-                    style = MaterialTheme.typography.titleLarge,
+                    text = "Version $appVersion",
+                    style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier
                         .padding(dimensionResource(R.dimen.padding_small))

@@ -39,8 +39,8 @@
     <string name="home_tooltip_sub">Home Screen Information</string>
     <string name="home_tooltip_text">
         - Click the hamburger menu icon to open the side navigation menu, or swipe right on the screen.\n
-        - Click "Start Audit" to start a new audit.\n
-        - Click "Open Audit" to open an existing audit.\n
-        - Click "Audit History" to view audit history.\n
+        - Click \"Start Audit\" to start a new audit.\n
+        - Click \"Open Audit\" to open an existing audit.\n
+        - Click \"Audit History\" to view audit history.\n
     </string>
 </resources>
