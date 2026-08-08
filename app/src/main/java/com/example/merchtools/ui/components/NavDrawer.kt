@@ -56,6 +56,7 @@ import com.example.merchtools.ui.theme.MerchToolsTheme
 import com.ramcosta.composedestinations.generated.destinations.HistoryScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.HomeScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.SearchScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.SettingsScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.StoreCatalogScreenDestination
 import kotlinx.coroutines.launch
 
@@ -96,7 +97,7 @@ private val screens = listOf(
     DrawerScreens.Home,
     DrawerScreens.Search,
     DrawerScreens.Stores,
-    DrawerScreens.History
+    DrawerScreens.History,
 )
 
 /**
@@ -255,7 +256,7 @@ fun DetailedNavDrawer(
                     },
                     actions = {
                         IconButton(onClick = {
-                            onDestinationClicked(DrawerScreens.Home.route)
+                            onDestinationClicked(SettingsScreenDestination.route)
                         },
                             modifier = Modifier.padding(end = dimensionResource(R.dimen.padding_medium))
                         ) {

@@ -30,8 +30,10 @@ class AddSkuUseCase @Inject constructor(
             brand = ""
         )
 
-        // Make sure to return the new sku id after inserting it
-        // for navigation to edit sku screen
+        /**
+         * Make sure to return the new sku id after inserting it
+         * for navigation to edit sku screen
+         */
         val id = skuRepository.insert(newSku)
         val upc = newSku.upc
         return newSku.copy(skuId = id, upc = upc)
