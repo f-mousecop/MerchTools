@@ -121,7 +121,7 @@ Throughout planning and implementation, I learned more about separation of conce
 
 * Search product/SKU
 * Scan UPC/barcode 
-  * Auto fills audit item fields
+  * Autofills audit item fields
   * Enter shelf/inventory count
   * Add photo
   * Add note 
@@ -170,7 +170,7 @@ UPC text field - fills in SKU details if match is found)
 - [x] Configured type converter to display correct started at time and store object in the database
 - [x] Fixed theming issue on physical device (dynamicColor = false)
 - [x] Scan UPC/barcode 
-  - [x] Auto fills audit item fields 
+  - [x] Autofills audit item fields 
   - [x] Enter shelf/inventory count 
   - [x] Add photo 
   - [x] Add note
