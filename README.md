@@ -142,12 +142,28 @@ Feel free to contribute to the repository by suggesting improvements, fixing bug
 
 ---
 
-### License and Authors
+### Authors
 
-* This project is licensed under the Apache License 2.0 - see the [Apache License 2.0](LICENSE.md) for details
 * **Credit to the following developers**:
-    * [DUMA042](https://github.com/DUMA042/BarsandQ) (CameraX/ML Kit integration)
-    * [realityexpander](https://github.com/realityexpander/ComposeSwipeToDelete) (Swipe to delete compose container)
+  * [DUMA042](https://github.com/DUMA042/BarsandQ) (CameraX/ML Kit integration)
+  * [realityexpander](https://github.com/realityexpander/ComposeSwipeToDelete) (Swipe to delete compose container)
+
+---
+
+## License
+
+This project is licensed under the Apache License 2.0 - see the [Apache License 2.0](LICENSE.md) file for complete license terms.
+
+Copyright 2026 Charles Clark
+
+## Trademark and Branding
+
+The MerchTools name, logo, icons, and associated branding are not licensed for unrestricted use under the Apache License 2.0.
+
+Forks and derivative works may use the MerchTools name when reasonably necessary to identify the original project or describe the 
+origin of the software, but they should not represent themselves as the official MerchTools application or imply endorsement by the original project.
+
+See the [NOTICE](NOTICE) file for additional information.
 
 ---
 
@@ -170,7 +186,7 @@ UPC text field - fills in SKU details if match is found)
 - [x] Configured type converter to display correct started at time and store object in the database
 - [x] Fixed theming issue on physical device (dynamicColor = false)
 - [x] Scan UPC/barcode 
-  - [x] Autofills audit item fields 
+  - [x] Autofill audit item fields 
   - [x] Enter shelf/inventory count 
   - [x] Add photo 
   - [x] Add note
