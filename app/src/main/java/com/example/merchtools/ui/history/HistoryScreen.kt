@@ -357,7 +357,7 @@ fun AuditCardPreview() {
         AuditCard(
             audit = Audit(
                 auditId = 1,
-                completedAt = _root_ide_package_.java.time.Instant.now(),
+                completedAt = java.time.Instant.now(),
                 createdBy = "John Doe",
                 items = listOf(),
                 store = Store(
