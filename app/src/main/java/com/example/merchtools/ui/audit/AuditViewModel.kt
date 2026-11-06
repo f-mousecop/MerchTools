@@ -83,8 +83,10 @@ class AuditViewModel @Inject constructor(
         .getAuditStream(auditId)
         .map { audit ->
             if (audit == null) {
-                println("Debug: AuditState audit == null")
-                AuditState(error = "Audit not found")
+                AuditState(
+                    isLoading = false,
+                    error = "Audit not found"
+                )
             }
             else AuditState(audit = audit, isLoading = false)
         }
@@ -237,6 +239,17 @@ class AuditViewModel @Inject constructor(
      */
     private fun findSkuByUpc(upc: String) {
         viewModelScope.launch {
+
+            val state = uiState.value
+
+            if (state.isLoading || state.error != null) {
+                _uiEffect.emit(
+                    AuditUiEffect.ShowMessage(
+                        state.error.toString()
+                    )
+                )
+            }
+
             if (upc.isBlank()) {
                 _uiEffect.emit(AuditUiEffect.ShowMessage("Enter a valid UPC"))
                 return@launch

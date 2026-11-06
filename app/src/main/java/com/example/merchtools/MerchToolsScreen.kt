@@ -68,7 +68,7 @@ fun MerchToolsApp() {
     // Determine the title based on the current destination
     val title = when (currentDestination?.route) {
         HomeScreenDestination.route -> "Merch Tools"
-        SearchScreenDestination.route -> "Search SKU"
+        SearchScreenDestination.route -> "SKU Catalog"
         EditSkuScreenDestination.route -> "SKU Entry"
         AuditScreenDestination.route -> "Audit"
         EditAuditItemScreenDestination.route -> "Edit Audit Item"
@@ -95,6 +95,7 @@ fun MerchToolsApp() {
                 } else {
                     popUpTo(navController.graph.startDestinationId)
                     launchSingleTop = true
+                    println("DEBUG: ${navController.graph.startDestinationId} else MerchToolsScreen")
                 }
             }
         }
