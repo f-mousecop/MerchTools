@@ -13,7 +13,7 @@ android {
     defaultConfig {
         applicationId = "com.example.merchtools"
         minSdk = 26
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 1
         versionName = "0.2.0"
 
