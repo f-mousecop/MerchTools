@@ -82,10 +82,14 @@ class AuditViewModel @Inject constructor(
     val uiState: StateFlow<AuditState> = auditRepository
         .getAuditStream(auditId)
         .map { audit ->
-            if (audit == null) AuditState(error = "Audit not found")
+            if (audit == null) {
+                println("Debug: AuditState audit == null")
+                AuditState(error = "Audit not found")
+            }
             else AuditState(audit = audit, isLoading = false)
         }
         .catch { e ->
+            println("Debug: AuditState catch")
             emit(AuditState(error = e.message ?: "Unknown error", isLoading = false))
         }
         .stateIn(
