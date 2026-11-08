@@ -1,6 +1,22 @@
+/*
+ * Copyright (c) 2026 Charles Clark
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.example.merchtools.ui.audit
 
-import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -45,8 +61,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
 import com.example.merchtools.R
 import com.example.merchtools.SnackbarAction
 import com.example.merchtools.SnackbarController
@@ -72,10 +86,8 @@ import com.ramcosta.composedestinations.generated.destinations.ScanBarCodeScreen
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultRecipient
-import com.ramcosta.composedestinations.utils.destination
 import kotlinx.coroutines.launch
 import java.time.Instant
-import androidx.compose.runtime.collectAsState
 
 @Destination<RootGraph>
 @Composable
@@ -93,9 +105,6 @@ fun AuditScreen(
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
     val searchResults by viewModel.searchResults.collectAsStateWithLifecycle()
     val expanded by viewModel.expanded.collectAsStateWithLifecycle()
-
-    //TODO: Nav graph issue when 'saving' audit -> nav to audit history,
-    // gesture back -> back to audit EVEN if the audit is deleted causing SQLite exception
 
     resultRecipient.onNavResult { navResult ->
         when (navResult) {
