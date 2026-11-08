@@ -121,7 +121,7 @@ Throughout planning and implementation, I learned more about separation of conce
 
 * Search product/SKU
 * Scan UPC/barcode 
-  * Autofills audit item fields
+  * Autofill audit item fields
   * Enter shelf/inventory count
   * Add photo
   * Add note 
@@ -169,7 +169,7 @@ See the [NOTICE](NOTICE) file for additional information.
 
 ## 📩 Contact
 
-Reach out to me via [email](mailto:charles.fmousecop@protonmail.com) for any questions
+Reach out to me via [email](mailto:charles.charles@builtbyclark.dev) for any questions
 
 ---
 ## Finished Implementations
